@@ -1,9 +1,9 @@
 {
-  "type": "mysql",
+  "type": "postgres",
   "host": "127.0.0.1",
-  "port": 3306,
-  "username": "root",
-  "password": "zgcgg902",
+  "port": 5432,
+  "username": "postgres",
+  "password": "123456",
   "database": "bling_test",
   "entities": [
     "/Users/blingabc/Desktop/auto-test/automated-test-service/src/**/**.entity{.ts,.js}"
