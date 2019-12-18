@@ -1,11 +1,12 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as Joi from 'joi';
-import { join } from "path";
+import { join } from 'path';
 
 export interface EnvConfig {
   [prop: string]: string;
 }
+export type ValidatedEnvConfig = Record<string, any>;
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
@@ -101,5 +102,22 @@ export class ConfigService {
 
   get databaseDropSchema(): boolean {
     return Boolean(this.envConfig.DATABASE_DROPSCHEMA);
+  }
+
+  getTypeOrmConfig(): ValidatedEnvConfig {
+    return {
+      type: 'mysql',
+      host: this.databaseHost,
+      port: this.databasePort,
+      username: this.databaseUserName,
+      password: this.databasePassword,
+      database: this.databaseName,
+      entities: [join(__dirname, '../entities/*.entity{.ts,.js}')],
+      synchronize: this.databaseSynchronize,
+      migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
+      cli: {
+        migrationsDir: 'src/migrations',
+      },
+    }
   }
 }

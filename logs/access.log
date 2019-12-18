@@ -7,3 +7,4 @@
 [2019-12-18T10:30:10.088] [INFO] http - ::ffff:127.0.0.1 - - "GET /api/user/1 HTTP/1.1" 200 209 "" "PostmanRuntime/7.20.1"
 [2019-12-18T10:30:41.550] [INFO] http - ::ffff:127.0.0.1 - - "GET /api/user/1 HTTP/1.1" 200 209 "" "PostmanRuntime/7.20.1"
 [2019-12-18T10:31:39.821] [INFO] http - ::ffff:127.0.0.1 - - "GET /api/user/1 HTTP/1.1" 200 209 "" "PostmanRuntime/7.20.1"
+[2019-12-18T15:56:29.315] [ERROR] http - ::1 - - "GET /api/user/1 HTTP/1.1" 400 101 "" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
