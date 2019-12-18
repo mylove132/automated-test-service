@@ -1,5 +1,5 @@
 {
-  "name": "nest-op-auto",
+  "name": "automated-test-service",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -27,14 +27,15 @@
     "@nestjs/typeorm": "^6.2.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",
+    "joi": "latest",
+    "log4js": "^6.1.0",
     "mysql": "^2.17.1",
     "nest-logger": "^3.0.0",
     "nestjs-config": "^1.4.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
-    "typeorm": "^0.2.21",
-    "joi": "latest"
+    "typeorm": "^0.2.21"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.9.0",
