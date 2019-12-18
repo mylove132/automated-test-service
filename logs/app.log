@@ -1,0 +1,15 @@
+[2019-12-18T10:31:39.807] [INFO] HttpExceptionFilter - {
+  host: '127.0.0.1:8088',
+  url: '/api/user/1',
+  method: 'GET',
+  args: undefined
+}
+[2019-12-18T10:31:39.816] [INFO] HttpExceptionFilter - User {
+  id: 1,
+  username: 'liuzhanhui',
+  email: 'liuzhanhui@xdf.cn',
+  mobile: '15910401369',
+  password: '123456',
+  createdAt: '2019-12-16 14:31:08',
+  updatedAt: '2019-12-16 14:31:14'
+}
