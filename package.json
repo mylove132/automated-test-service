@@ -24,7 +24,8 @@
     "typeorm:migration:run": "npm run typeorm -- migration:run",
     "pretypeorm": "(rm ormconfig.json || :) && ts-node -r tsconfig-paths/register scripts/write-type-orm-config.ts",
     "migration:dev": "export NODE_ENV=development && npm run typeorm:migration:generate && npm run typeorm:migration:run",
-    "migration:test": "export NODE_ENV=test && npm run typeorm:migration:generate && npm run typeorm:migration:run"
+    "migration:test": "export NODE_ENV=test && npm run typeorm:migration:generate && npm run typeorm:migration:run",
+    "migration": "export NODE_ENV=production && npm run typeorm:migration:generate && npm run typeorm:migration:run"
 
   },
   "dependencies": {
