@@ -6,6 +6,9 @@ export enum ApiErrorCode {
 
   //用户code
   USER_ID_INVALID = 10001, // 用户id无效
-  CREATE_USER_FAIL = 10002
+  CREATE_USER_FAIL = 10002,
+
+  //catalog
+  CATALOG_PARENT_INVALID = 20001  //catalog parentid无效
   
 }

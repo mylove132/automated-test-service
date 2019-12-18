@@ -1,23 +1,20 @@
 import { UserData } from '../user/user.interface';
-interface Comment {
-  body: string;
+interface CatalogVO {
+  catalogId: number;
+  catalogName: string;
+  createDate: Date,
+  updateDate: Date,
+  user: UserVO
 }
 
-interface ArticleData {
-  slug: string;
-  title: string;
-  description: string;
-  body?: string;
-  tagList?: string[];
-  createdAt?: Date
-  updatedAt?: Date
-  favorited?: boolean;
-  favoritesCount?: number;
-  author?: UserData;
+interface UserVO {
+  username: string;
+  email: string;
+  userid: number;
 }
 
-export interface CommentsRO {
-  comments: Comment[];
+export interface CatalogRO {
+  catalog: CatalogVO[]
 }
 
 

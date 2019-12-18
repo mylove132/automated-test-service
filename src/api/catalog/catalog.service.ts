@@ -6,6 +6,7 @@ import {CreateCatalogDto} from "./dto/create-catalog.dto";
 import {HttpException, HttpStatus} from "@nestjs/common";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
+import {CatalogRO} from './catalog.interface';
 
 export class CatalogService {
 
@@ -30,19 +31,41 @@ export class CatalogService {
           if (parent){
               catalog.parent = parent;
           }else{
-              throw new HttpException('parentId 不存在.', HttpStatus.BAD_REQUEST);
+              throw new ApiException('parentId 不存在.',ApiErrorCode.CATALOG_PARENT_INVALID, HttpStatus.BAD_REQUEST);
           }
       }
-      console.log(catalog)
       const saveResult = await this.catalogRepository.save(catalog);
-      console.log(saveResult)
       return saveResult;
   }
 
-  async findCatalogByUserId(): Promise<Object> {
-      const result = await this.catalogRepository.findTrees();
-      console.log(result);
-      return result;
+  async findCatalogByUserId(userId: number): Promise<CatalogRO> {
+
+      const allTree = await this.catalogRepository.findTrees();
+      const child = await this.catalogRepository.createDescendantsQueryBuilder('catalog','catalogClosure', allTree).andWhere(
+          'catalog.userId = 1'
+      ).getMany();
+     return this.buildCatalogRO(null);
   }
 
+    private buildCatalogRO(catalogs: CatalogEntity[]) {
+      let list = [];
+      catalogs.forEach(
+          cata => {
+              const catalogRO = {
+                  user:{username: cata.user.username,
+                      email: cata.user.email,
+                      userId: cata.user.id,
+                  },
+                  catalogName: cata.name,
+                  catalogId: cata.id,
+                  createDate: cata.createDate,
+                  updateDate: cata.updateDate
+              };
+              list.push(catalogRO);
+          }
+      )
+
+
+        return {catalog: list};
+    }
 }
