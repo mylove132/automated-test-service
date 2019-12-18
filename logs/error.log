@@ -1,0 +1,63 @@
+[2019-12-18T16:18:32.440] [ERROR] HttpExceptionFilter - HttpException [Error]: User not found.
+    at CatalogService.<anonymous> (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:25:17)
+    at Generator.next (<anonymous>)
+    at fulfilled (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:16:58)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  response: 'User not found.',
+  status: 400,
+  message: 'User not found.'
+}
+[2019-12-18T16:21:58.665] [ERROR] HttpExceptionFilter - ApiException [Error]: 用户id不存在.
+    at CatalogService.<anonymous> (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:26:17)
+    at Generator.next (<anonymous>)
+    at fulfilled (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:16:58)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  response: '用户id不存在.',
+  status: 400,
+  message: '用户id不存在.',
+  errorMessage: '用户id不存在.',
+  errorCode: 10001
+}
+[2019-12-18T16:22:49.511] [ERROR] HttpExceptionFilter - HttpException [Error]: parentId 不存在.
+    at CatalogService.<anonymous> (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:33:21)
+    at Generator.next (<anonymous>)
+    at fulfilled (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:16:58)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  response: 'parentId 不存在.',
+  status: 400,
+  message: 'parentId 不存在.'
+}
+[2019-12-18T16:36:58.551] [ERROR] HttpExceptionFilter - NotFoundException [Error]: [object Object]
+    at callback (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/@nestjs/core/router/routes-resolver.js:46:19)
+    at /Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/@nestjs/core/router/router-proxy.js:8:23
+    at Layer.handle [as handle_request] (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/index.js:317:13)
+    at /Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/index.js:284:7
+    at Function.process_params (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/index.js:335:12)
+    at next (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/index.js:275:10)
+    at urlencodedParser (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/body-parser/lib/types/urlencoded.js:91:7)
+    at Layer.handle [as handle_request] (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/node_modules/express/lib/router/index.js:317:13) {
+  response: {
+    statusCode: 404,
+    error: 'Not Found',
+    message: 'Cannot GET /api/catalog/'
+  },
+  status: 404,
+  message: {
+    statusCode: 404,
+    error: 'Not Found',
+    message: 'Cannot GET /api/catalog/'
+  }
+}
+[2019-12-18T16:46:30.048] [ERROR] HttpExceptionFilter - ApiException [Error]: 用户id不存在.
+    at CatalogService.<anonymous> (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:26:17)
+    at Generator.next (<anonymous>)
+    at fulfilled (/Users/liuzhanhui/lzh/workspace/online/automated-test-service/src/api/catalog/catalog.service.ts:16:58)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  response: '用户id不存在.',
+  status: 400,
+  message: '用户id不存在.',
+  errorMessage: '用户id不存在.',
+  errorCode: 10001
+}
