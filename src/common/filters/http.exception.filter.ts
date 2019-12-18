@@ -22,7 +22,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         });
 
     } else {
-
       response
         .status(status)
         .json({
