@@ -24,7 +24,7 @@ export class TransformInterceptor<T>
     req['host'] = request.headers.host;
     req['url'] = request.url;
     req['method'] = request.method;
-    req['args'] = request.args;
+    req['args'] = request.body;
     logger.info(req);
 
     return next.handle().pipe(

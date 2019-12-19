@@ -5,7 +5,6 @@ var logger = require('log4js').getLogger("HttpExceptionFilter");
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception, host: ArgumentsHost) {
-      console.log(exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();

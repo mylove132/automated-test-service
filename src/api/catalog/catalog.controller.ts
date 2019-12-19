@@ -11,6 +11,7 @@ import {
 import {CreateCatalogDto} from "./dto/create-catalog.dto";
 import {ValidationPipe} from "../../shared/pipes/validation.pipe";
 import {CatalogEntity} from "./catalog.entity";
+import {CatalogRO} from './catalog.interface';
 
 @ApiBearerAuth()
 @ApiUseTags('catalogs')
@@ -30,8 +31,8 @@ export class CatalogController {
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
   @Get()
-  async findCatalogById() {
-    return this.catalogService.findCatalogByUserId();
+  async findCatalogById(): Promise<CatalogEntity[]> {
+    return this.catalogService.findCatalogByUserId(1);
   }
 
 }
