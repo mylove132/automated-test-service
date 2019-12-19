@@ -31,7 +31,7 @@ export class CatalogController {
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
   @Get()
-  async findCatalogById(): Promise<CatalogRO> {
+  async findCatalogById(): Promise<CatalogEntity[]> {
     return this.catalogService.findCatalogByUserId(1);
   }
 

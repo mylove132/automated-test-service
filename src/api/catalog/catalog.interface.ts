@@ -4,7 +4,6 @@ interface CatalogVO {
   catalogName: string;
   createDate: Date,
   updateDate: Date,
-  user: UserVO
 }
 
 interface UserVO {

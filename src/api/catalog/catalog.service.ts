@@ -37,14 +37,10 @@ export class CatalogService {
       const saveResult = await this.catalogRepository.save(catalog);
       return saveResult;
   }
-
-  async findCatalogByUserId(userId: number): Promise<CatalogRO> {
-
-      const allTree = await this.catalogRepository.findTrees();
-      const child = await this.catalogRepository.createDescendantsQueryBuilder('catalog','catalogClosure', allTree).andWhere(
-          'catalog.userId = 1'
-      ).getMany();
-     return this.buildCatalogRO(null);
+  async findCatalogByUserId(userId: number): Promise<CatalogEntity[]> {
+      const result = await this.catalogRepository.findTrees();
+      console.log(result);
+     return result;
   }
 
     private buildCatalogRO(catalogs: CatalogEntity[]) {
