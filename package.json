@@ -6,7 +6,7 @@
   "scripts": {
     "build": "nest build",
     "start:prod": "export NODE_ENV=production && node dist/main.js",
-    "start:test": "export NODE_ENV=test && node dist/main.js",
+    "start:test": "export NODE_ENV=test && typeorm:migration:run && node dist/main.js",
     "start": "export NODE_ENV=development && node index.js",
     "start:watch": "export NODE_ENV=development && nodemon",
     "prestart:prod": "tsc",
