@@ -4,12 +4,13 @@
   "description": "[![Build Status](https://travis-ci.org/anishkny/node-express-realworld-example-app.svg?branch=master)](https://travis-ci.org/anishkny/node-express-realworld-example-app)",
   "main": "index.js",
   "scripts": {
-    "build": "nest build && export NODE_ENV=production && npm run start:prod",
-    "build:test": "nest build && export NODE_ENV=test && npm run start:prod",
+    "build:prod": "nest build && export NODE_ENV=production && npm run start:prod",
+    "build:test": "nest build && export NODE_ENV=test && npm run start:test",
+    "start:prod": "node dist/main.js",
+    "start:test": "node dist/main.js",
     "start": "export NODE_ENV=development && node index.js",
     "start:watch": "export NODE_ENV=development && nodemon",
     "prestart:prod": "tsc",
-    "start:prod": "node dist/main.js",
     "test": "jest --config=jest.json",
     "test:watch": "jest --watch --config=jest.json",
     "test:coverage": "jest --config=jest.json --coverage --coverageDirectory=coverage"
