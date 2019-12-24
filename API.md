@@ -85,7 +85,7 @@ data						|object		|R			|&nbsp;
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
 &emsp;userId				|number		|R			|用户id
-&emsp;isPub                 |bool       |O          |是否获取公共的目录（default：false）
+&emsp;isPub                 |bool       |O          |是否获取公共的目录,子目录不能为true（default：false）
 &emsp;name                  |string     |R          |目录名称
 &emsp;parentId              |number     |O          |父级目录ID(null则表示添加为根目录)
 
@@ -108,6 +108,61 @@ code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明�
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示创建成功
 
+返回成功示例
+
+```
+{
+    "data": [
+        {
+            "id": 10,
+            "createDate": "2019-12-23T09:44:10.599Z",
+            "updateDate": "2019-12-23T11:19:34.670Z",
+            "name": "上山",
+            "isPub": false,
+            "parentId": null,
+            "children": [
+                {
+                    "id": 12,
+                    "createDate": "2019-12-24T01:56:46.010Z",
+                    "updateDate": "2019-12-24T01:56:46.010Z",
+                    "name": "武夷山",
+                    "isPub": false,
+                    "parentId": 10
+                },
+                {
+                    "id": 13,
+                    "createDate": "2019-12-24T01:58:39.798Z",
+                    "updateDate": "2019-12-24T01:58:39.798Z",
+                    "name": "华夏",
+                    "isPub": true,
+                    "parentId": 10,
+                    "children": [
+                        {
+                            "id": 14,
+                            "createDate": "2019-12-24T01:59:42.870Z",
+                            "updateDate": "2019-12-24T01:59:42.870Z",
+                            "name": "华夏一条龙",
+                            "isPub": false,
+                            "parentId": 13
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "createDate": "2019-12-23T09:44:18.586Z",
+            "updateDate": "2019-12-24T03:31:32.844Z",
+            "name": "上山",
+            "isPub": false,
+            "parentId": null
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
 ### 2.3 更新目录
 - **接口说明：** 更新目录
 - **请求方式：** PUT
@@ -118,8 +173,7 @@ data						|object		|R			|&nbsp;true表示创建成功
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 &emsp;catalogId				|number		|R			|目录id	
-&emsp;userId				|number		|R			|用户id
-&emsp;isPub                 |bool       |O          |是否获取公共的目录（default：false）
+&emsp;isPub                 |bool       |O          |是否获取公共的目录,,子目录不能为true（default：false）
 &emsp;name                  |string     |R          |目录名称
 
 请求示例：
@@ -127,7 +181,6 @@ data						|object		|R			|&nbsp;true表示创建成功
 ```
 {
    "catalogId": 1001,
-   "userId": 1,
    "isPub": false,
    "name": "课标目录",
 }
@@ -141,23 +194,34 @@ code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明�
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示更新成功
 
+返回成功示例
+```
+{
+    "data": {
+        "generatedMaps": [],
+        "raw": []
+    },
+    "code": 0,
+    "message": "success"
+}
+
+```
+
 ### 2.4   删除目录
 - **接口说明：** 删除目录
 - **请求方式：** DELETE
-- **接口地址：** /api/catalog
+- **接口地址：** /api/catalog/?
 
 #### 2.4.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;catalogId				|number		|R			|目录id	
+&emsp;目录ids				|string		|R			|目录id，删除多个用英文逗号隔开	
 
 请求示例：
 
 ```
-{
-   "catalogId": 1001
-}
+/api/catalog/8,9,10
 
 ```
 返回结果

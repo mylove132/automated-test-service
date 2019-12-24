@@ -5,9 +5,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  TreeChildren, TreeParent, Tree
+  TreeChildren, TreeParent, Tree, OneToMany
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
+import {CaseEntity} from '../case/case.entity';
 
 @Entity('catalog')
 export class CatalogEntity {
@@ -32,5 +33,6 @@ export class CatalogEntity {
   @ManyToOne(type => UserEntity, user => user.catalogs)
   user: UserEntity;
 
-  children: CatalogEntity[];
+  @OneToMany(type => CaseEntity, cases => cases.catalog)
+  cases: CaseEntity[];
 }

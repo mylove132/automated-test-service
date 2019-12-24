@@ -4,13 +4,13 @@
   "port": 5432,
   "username": "postgres",
   "password": "123456",
-  "database": "bling_test",
+  "database": "bling_automated",
   "entities": [
-    "/Users/blingabc/Desktop/auto-test/automated-test-service/src/**/**.entity{.ts,.js}"
+    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/**/**.entity{.ts,.js}"
   ],
   "synchronize": false,
   "migrations": [
-    "/Users/blingabc/Desktop/auto-test/automated-test-service/src/migrations/*{.ts,.js}"
+    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/migrations/*{.ts,.js}"
   ],
   "cli": {
     "migrationsDir": "src/migrations"
