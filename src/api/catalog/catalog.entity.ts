@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
 
-@Tree("closure-table")
 @Entity('catalog')
 export class CatalogEntity {
   @PrimaryGeneratedColumn()
@@ -24,12 +23,14 @@ export class CatalogEntity {
   @Column()
   name: string;
 
-  @TreeChildren()
-  children: CatalogEntity[];
+  @Column({default: false})
+  isPub: boolean;
 
-  @TreeParent()
-  parent: CatalogEntity;
+  @Column({default: null, nullable: true})
+  parentId: number;
 
   @ManyToOne(type => UserEntity, user => user.catalogs)
   user: UserEntity;
+
+  children: CatalogEntity[];
 }

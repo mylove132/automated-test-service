@@ -8,9 +8,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-    const status = exception.getStatus()
-      logger.error(exception);
+    const status = exception.getStatus();
+    logger.error(exception);
     if (exception instanceof ApiException) {
+
       response
         .status(status)
         .json({

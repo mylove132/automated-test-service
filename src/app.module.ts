@@ -9,9 +9,8 @@ import {CatalogModule} from "./api/catalog/catalog.module";
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-
   return TypeOrmModule.forRoot({
-    type: 'mysql',
+    type: 'postgres',
     host: config.databaseHost,
     port: config.databasePort,
     username: config.databaseUserName,

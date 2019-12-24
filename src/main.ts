@@ -5,6 +5,7 @@ import {ConfigService} from "./config/config.service";
 import {join} from "path";
 import {HttpExceptionFilter} from "./shared/filters/http.exception.filter";
 import {TransformInterceptor} from "./shared/filters/http.response.filter";
+import {ValidationPipe} from './shared/pipes/validation.pipe';
 var log4js = require('log4js');
 
 async function bootstrap() {
@@ -12,6 +13,7 @@ async function bootstrap() {
   log4js.configure(join(__dirname,'../log4js.json'));
   const appOptions = {cors: true};
   const app = await NestFactory.create(ApplicationModule, appOptions);
+  app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');

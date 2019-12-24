@@ -7,7 +7,7 @@ import {
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-var logger = require('log4js').getLogger("HttpExceptionFilter");
+var logger = require('log4js').getLogger("TransformInterceptor");
 
 interface Response<T> {
   data: T;

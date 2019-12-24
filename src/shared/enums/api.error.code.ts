@@ -2,7 +2,8 @@ export enum ApiErrorCode {
   //通用code
   TIMEOUT = -1, // 系统繁忙
   SUCCESS = 0, // 成功
-  REQUESTID_NULL = 101,
+  PARAM_VALID_FAIL = 19999, //参数严重失败
+
 
   //用户code
   USER_ID_INVALID = 10001, // 用户id无效

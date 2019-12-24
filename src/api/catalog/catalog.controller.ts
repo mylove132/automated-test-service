@@ -1,17 +1,10 @@
-import {Get, Post, Body, Put, Delete, Query, Param, Controller, UsePipes} from '@nestjs/common';
-import { CatalogService } from './catalog.service';
+import {Body, Controller, Delete, Get, HttpStatus, Param, Post, Put} from '@nestjs/common';
+import {CatalogService} from './catalog.service';
 
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
+import {CreateCatalogDto, DeleteCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CatalogEntity} from './catalog.entity';
 
-import {
-  ApiUseTags,
-  ApiBearerAuth,
-  ApiResponse,
-  ApiOperation,
-} from '@nestjs/swagger';
-import {CreateCatalogDto} from "./dto/create-catalog.dto";
-import {ValidationPipe} from "../../shared/pipes/validation.pipe";
-import {CatalogEntity} from "./catalog.entity";
-import {CatalogRO} from './catalog.interface';
 
 @ApiBearerAuth()
 @ApiUseTags('catalogs')
@@ -22,17 +15,31 @@ export class CatalogController {
 
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
-  @UsePipes(new ValidationPipe())
   @Post()
   async createCatalog(@Body() createCatalogDto: CreateCatalogDto) {
     return await this.catalogService.addCatalog(createCatalogDto);
   }
 
-  @ApiOperation({ title: 'create catalog' })
-  @ApiResponse({ status: 200, description: 'create catalog success.'})
+  @ApiOperation({ title: 'query catalog' })
+  @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Get()
-  async findCatalogById(): Promise<CatalogEntity[]> {
-    return this.catalogService.findCatalogByUserId(1);
+  async findCatalogById(@Body() queryCatalogDto: QueryCatalogDto): Promise<CatalogEntity[]> {
+    return this.catalogService.findCatalog(queryCatalogDto);
+  }
+
+  @ApiOperation({ title: 'delete catalog' })
+  @ApiResponse({ status: 200, description: 'query catalog success.'})
+  @Delete(':ids')
+  async deleteCatalog(@Param('ids') ids: string) {
+    console.log(ids)
+    return this.catalogService.deleteById(ids);
+  }
+
+  @ApiOperation({ title: 'update catalog' })
+  @ApiResponse({ status: 200, description: 'update catalog success.'})
+  @Put('')
+  async updateCatalog(@Body() updateCatalogDto: UpdateCatalogDto) {
+    return this.catalogService.updateCatalog(updateCatalogDto);
   }
 
 }

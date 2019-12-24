@@ -378,7 +378,7 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 
 
 
-<span id="jump">
+<span id="jump"></span>
 ## 响应码说明
 
 响应码	|说明  
@@ -388,6 +388,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 10001	|用户ID不存在
 10002	|创建用户失败
 20001	|目录ID无效
-</span>
+
 
 

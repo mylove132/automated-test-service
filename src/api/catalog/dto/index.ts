@@ -1,2 +1,2 @@
-export { CreateArticleDto } from './create-article.dto';
-export { CreateCommentDto } from './create-comment';
+export { QueryCatalogDto } from './catalog.dto';
+export { CreateCatalogDto } from './catalog.dto';
