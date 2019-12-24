@@ -1,5 +1,4 @@
 import { Get, Post, Body, Put, Delete, Param, Controller, UsePipes } from '@nestjs/common';
-import { Request } from 'express';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
 import { UserRO } from './user.interface';
@@ -21,8 +20,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('user')
-  async findMe(@User('email') email: string): Promise<UserRO> {
-    return await this.userService.findByEmail(email);
+  async findMe(): Promise<UserEntity[]> {
+    return await this.userService.findAll();
   }
 
   @Put('user')
@@ -32,7 +31,7 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @Post('users')
-  async create(@Body('user') userData: CreateUserDto) {
+  async create(@Body() userData: CreateUserDto) {
     return this.userService.create(userData);
   }
 
@@ -43,7 +42,7 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @Post('users/login')
-  async login(@Body('user') loginUserDto: LoginUserDto): Promise<UserRO> {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<UserRO> {
     const _user = await this.userService.findOne(loginUserDto);
 
     const errors = {User: ' not found'};

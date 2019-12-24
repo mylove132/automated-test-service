@@ -9,18 +9,7 @@ import {CatalogModule} from "./api/catalog/catalog.module";
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-  return TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: config.databaseHost,
-    port: config.databasePort,
-    username: config.databaseUserName,
-    password: config.databasePassword,
-    database: config.databaseName,
-    entities: ["src/api/**/**.entity{.ts,.js}"],
-    synchronize: config.databaseSynchronize,
-    logging: "all",
-    logger: "file"
-  });
+  return TypeOrmModule.forRoot(config.getTypeOrmConfig());
 }
 
 @Module({

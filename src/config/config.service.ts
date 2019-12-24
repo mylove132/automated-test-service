@@ -102,4 +102,23 @@ export class ConfigService {
   get databaseDropSchema(): boolean {
     return Boolean(this.envConfig.DATABASE_DROPSCHEMA);
   }
+
+  getTypeOrmConfig(): Record<string, any> {
+    return {
+      type: this.databaseType,
+      host: this.databaseHost,
+      port: this.databasePort,
+      username: this.databaseUserName,
+      password: this.databasePassword,
+      database: this.databaseName,
+      entities: [join(__dirname, '../**/**.entity{.ts,.js}')],
+      synchronize: this.databaseSynchronize,
+      migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
+      cli: {
+        migrationsDir: 'src/migrations',
+      },
+      logging: "all",
+      logger: "file"
+    }
+  }
 }

@@ -8,8 +8,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-    const status = exception.getStatus();
+
+    const status = exception.getStatus()
     logger.error(exception);
+    console.log(exception && exception.message)
     if (exception instanceof ApiException) {
 
       response
@@ -25,7 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         .status(status)
         .json({
           statusCode: status,
-          date: new Date().toLocaleDateString(),
+          date: exception,
           path: request.url,
         });
     }
