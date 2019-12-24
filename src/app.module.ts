@@ -6,6 +6,7 @@ import { Connection } from 'typeorm';
 import {ConfigService} from "./config/config.service";
 import {ConfigModule} from "./config/config.module";
 import {CatalogModule} from "./api/catalog/catalog.module";
+import {CaseModule} from './api/case/case.module';
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
@@ -16,6 +17,7 @@ const Orm = (): DynamicModule => {
   imports: [
     ConfigModule,
     Orm(),
+    CaseModule,
     CatalogModule,
     UserModule,
   ],

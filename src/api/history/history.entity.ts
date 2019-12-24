@@ -1,5 +1,4 @@
 import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {CatalogEntity} from '../catalog/catalog.entity';
 import {RequestStatusEnum} from './dto/request.enum';
 import {CaseEntity} from '../case/case.entity';
 
@@ -13,8 +12,8 @@ export class HistoryEntity {
     @CreateDateColumn()
     createDate: Date;
 
-    @Column('enum',{default: RequestStatusEnum.SUCCESS, comment: '请求结果' })
-    status: string;
+    @Column('enum',{default: RequestStatusEnum.SUCCESS, nullable:false, comment: '请求结果', enum: RequestStatusEnum })
+    status: RequestStatusEnum;
 
     @ManyToOne(type => CaseEntity, cases => cases.histories)
     case: CaseEntity;

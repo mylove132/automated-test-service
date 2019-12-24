@@ -19,7 +19,12 @@ export class CatalogService {
     async addCatalog(createCatalogDto: CreateCatalogDto) {
         const {userId, name, isPub, parentId} = createCatalogDto;
         const catalog = new CatalogEntity();
-        const user = await this.userRepository.findOne(createCatalogDto.userId);
+        const user = await this.userRepository.findOne(createCatalogDto.userId).catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
         catalog.name = createCatalogDto.name;
         let isFlag: boolean;
         if (isPub) {
@@ -34,14 +39,24 @@ export class CatalogService {
         }
         if (createCatalogDto.parentId) {
             isFlag = false;
-            const parent = await this.catalogRepository.findOne(createCatalogDto.parentId);
+            const parent = await this.catalogRepository.findOne(createCatalogDto.parentId).catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
             if (!parent) {
                 throw new ApiException('parentId 不存在.', ApiErrorCode.CATALOG_PARENT_INVALID, HttpStatus.BAD_REQUEST);
             }
             catalog.parentId = createCatalogDto.parentId;
         }
         catalog.isPub = isFlag;
-        const saveResult = await this.catalogRepository.save(catalog);
+        const saveResult = await this.catalogRepository.save(catalog).catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
         return saveResult;
     }
 
@@ -57,17 +72,41 @@ export class CatalogService {
         if (userId && isFlag != null) {
             console.log(userId);
             console.log(isFlag);
-            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).andWhere('"isPub" = :isPub', {isPub: isFlag}).orderBy('id', 'ASC').getMany();
+            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).andWhere('"isPub" = :isPub', {isPub: isFlag}).
+            orderBy('id', 'ASC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
         } else if (userId) {
-            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).orderBy('id', 'ASC').getMany();
+            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
+            orderBy('id', 'ASC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
         } else if (isPub != null) {
-            result = await this.catalogRepository.createQueryBuilder().select().andWhere('"isPub" = :isPub', {isPub: isFlag}).orderBy('id', 'ASC').getMany();
+            result = await this.catalogRepository.createQueryBuilder().select().andWhere('"isPub" = :isPub', {isPub: isFlag}).
+            orderBy('id', 'ASC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
         } else {
-            result = await this.catalogRepository.createQueryBuilder().select().orderBy('id', 'ASC').getMany();
+            result = await this.catalogRepository.createQueryBuilder().select().orderBy('id', 'ASC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
         }
         return this.getTree(result);
 
     }
+    
 
     private getTree(oldArr) {
         oldArr.forEach(element => {
@@ -90,11 +129,21 @@ export class CatalogService {
     async deleteById(ids: string): Promise<void> {
         let delList = ids.split(',');
         for (const delId of delList) {
-            const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(delId)}).getOne();
+            const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(delId)}).getOne().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
             if (!catalog) {
                 throw new ApiException(`删除id:${delId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             } else {
-                const result = await this.catalogRepository.createQueryBuilder().delete().where('id = :id', {id: Number(delId)}).execute();
+                const result = await this.catalogRepository.createQueryBuilder().delete().where('id = :id', {id: Number(delId)}).execute().catch(
+                    err => {
+                        console.log(err)
+                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                    }
+                );
             }
         }
 
@@ -121,7 +170,12 @@ export class CatalogService {
             isPub: isFlag
         }).where(
             '"id" = :id', {id: id}
-        ).execute();
+        ).execute().catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
 
     }
 
