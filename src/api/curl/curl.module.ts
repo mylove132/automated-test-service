@@ -4,11 +4,9 @@ import { CurlService } from './curl.service';
 @Global()
 @Module({
   imports: [
-    HttpModule.registerAsync({
-      useFactory: () => ({
-        timeout: 5000,
-        maxRedirects: 5,
-      }),
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
     }),
   ],
   providers: [CurlService],
