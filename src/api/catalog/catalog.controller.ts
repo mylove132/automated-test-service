@@ -1,8 +1,8 @@
-import {Body, Controller, Delete, Get, HttpStatus, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query} from '@nestjs/common';
 import {CatalogService} from './catalog.service';
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
-import {CreateCatalogDto, DeleteCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {CatalogEntity} from './catalog.entity';
 
 
@@ -23,8 +23,8 @@ export class CatalogController {
   @ApiOperation({ title: 'query catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Get()
-  async findCatalogById(@Body() queryCatalogDto: QueryCatalogDto): Promise<CatalogEntity[]> {
-    return this.catalogService.findCatalog(queryCatalogDto);
+  async findCatalogById(@Query('userId') userId: number, @Query('isPub') isPub: boolean): Promise<CatalogEntity[]> {
+    return this.catalogService.findCatalog(userId, isPub);
   }
 
   @ApiOperation({ title: 'delete catalog' })

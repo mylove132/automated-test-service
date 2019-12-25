@@ -1,4 +1,4 @@
-import {IsEmpty, IsJSON, IsNotEmpty, IsNumber, IsUrl, Max} from 'class-validator';
+import { IsJSON, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl} from 'class-validator';
 
 export class CreateCaseDto {
 
@@ -6,15 +6,19 @@ export class CreateCaseDto {
     readonly name: string;
 
     @IsJSON()
-    readonly header: string = '{}';
+    @IsOptional()
+    readonly header: string;
 
     @IsJSON()
-    readonly param: string = '{}';
+    @IsOptional()
+    readonly param: string;
 
     @IsNotEmpty()
     @IsUrl()
     readonly url: string;
 
+    @IsNumberString()
+    @IsOptional()
     readonly type: string;
 
     @IsNotEmpty()
@@ -22,25 +26,32 @@ export class CreateCaseDto {
 
 }
 
-
 export class UpdateCaseDto {
 
     @IsNotEmpty()
     id: number;
 
+    @IsString()
+    @IsOptional()
     readonly name: string;
 
     @IsJSON()
-    readonly header: string = '{}';
+    @IsOptional()
+    readonly header: string;
 
     @IsJSON()
-    readonly param: string = '{}';
+    @IsOptional()
+    readonly param: string;
 
     @IsUrl()
+    @IsOptional()
     readonly url: string;
 
+    @IsNumberString()
+    @IsOptional()
     readonly type: string;
 
-    catalogId: number;
+    @IsOptional()
+    catalogId: string;
 
 }

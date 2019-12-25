@@ -3,6 +3,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/co
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
 import {CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {IsNotEmpty} from 'class-validator';
 
 
 @ApiBearerAuth()
@@ -22,7 +23,7 @@ export class CaseController {
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
-  async findCaseById(@Query('catalogId') catalogId: number,@Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+  async findCaseById(@Query('catalogId') catalogId: number ,@Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
    return this.caseService.findCase(catalogId,{page, limit});
   }

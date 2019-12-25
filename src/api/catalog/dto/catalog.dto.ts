@@ -12,20 +12,6 @@ export class CreateCatalogDto {
 
   readonly isPub: string;
 }
-
-export class QueryCatalogDto {
-
-  readonly userId: number;
-
-  readonly isPub: string;
-}
-
-export class DeleteCatalogDto {
-
-  @IsNotEmpty()
-  readonly catalogIds: number[];
-}
-
 export class UpdateCatalogDto{
 
   @IsNotEmpty()

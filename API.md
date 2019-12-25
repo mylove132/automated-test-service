@@ -33,7 +33,7 @@ restful风格
 {
     "Code":10001,
     "message":"userId not invaild",
-    "daata":{
+    "data":{
     }
 }
 ```
@@ -43,7 +43,7 @@ restful风格
 - **接口说明：** 获取目录结构
 - **请求方式：** GET
 - **接口地址：** /api/catalog
-
+- `注意事项` 查询的目录isPub以根目录的为准
 #### 2.1.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
@@ -55,10 +55,7 @@ restful风格
 请求示例：
 
 ```
-{
-   userId: 1,
-   isPub: false
-}
+/api/catalog?userId=1&isPub=false
 
 ```
 返回结果
@@ -266,7 +263,7 @@ data						|object		|R			|&nbsp;true表示删除成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-catalogId				|number		|O			|目录id(默认查询所有用例)
+catalogId				    |number		|O			|目录id(默认查询所有用例)
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
 
@@ -331,24 +328,28 @@ data						|object		|R			|&nbsp;
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;scriptId				|number		|R			|脚本id
-&emsp;scriptName			|string		|R			|脚本名称
-&emsp;header			    |Object		|O			|header参数
-&emsp;param			        |string		|O			|接口参数
-&emsp;type			        |string		|O			|请求类型（GET,POST,DELETE,PUT）默认GET
+&emsp;id				    |number		|R			|脚本ID
+&emsp;catalogId				|number		|O			|目录ID
+&emsp;name			        |string		|O			|脚本名称
+&emsp;header			    |string		|O			|header参数{JSON类型}
+&emsp;param			        |string		|O			|接口参数{JSON类型}
+&emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）默认0
 
 
 请求示例：
 
 ```
 {
-   "scriptId": 1001,
-   "scriptName": "测试",
+   "id": 1001,
+   "name": "测试",
    "header":{
      "Content-Type": "application/json"
      }
-   "param": "",
-   "type": "GET"
+   "param": {
+     "name":"zhangsan"
+    },
+   "type": 1,
+   "catalogId": 1
 }
 
 ```
@@ -359,6 +360,19 @@ data						|object		|R			|&nbsp;
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示更新用例成功
+
+
+返回成功示例
+```
+{
+"data": {
+        "status": true
+    },
+    "code": 0,
+    "message": "success"
+}
+
+```
 
 ### 2.7  删除接口用例
 - **接口说明：** 删除用例接口

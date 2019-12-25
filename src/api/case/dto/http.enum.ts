@@ -1,3 +1,3 @@
 export enum RequestType {
-    GET,POST,DELETE
+    GET,POST,DELETE,PUT
 }

@@ -1,8 +1,8 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserEntity} from '../user/user.entity';
-import {DeleteResult, Repository} from 'typeorm';
+import { Repository} from 'typeorm';
 import {CatalogEntity} from './catalog.entity';
-import {CreateCatalogDto, DeleteCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {HttpStatus} from '@nestjs/common';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
@@ -60,55 +60,22 @@ export class CatalogService {
         return saveResult;
     }
 
-    async findCatalog(queryCatalogDto: QueryCatalogDto): Promise<CatalogEntity[]> {
-        const {userId, isPub} = queryCatalogDto;
-        let isFlag: boolean;
-        if (isPub) {
-            isFlag = isPub.toLocaleLowerCase() == 'true' ? true : false;
-        } else {
-            isFlag = null;
+    async findCatalog(userId: number, isPub: boolean): Promise<CatalogEntity[]> {
+        if (userId == null){
+            throw new ApiException('userId不能为空', ApiErrorCode.USER_ID_INVALID, HttpStatus.OK);
         }
-        let result = [];
-        if (userId && isFlag != null) {
-            console.log(userId);
-            console.log(isFlag);
-            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).andWhere('"isPub" = :isPub', {isPub: isFlag}).
-            orderBy('id', 'ASC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-        } else if (userId) {
-            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
-            orderBy('id', 'ASC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-        } else if (isPub != null) {
-            result = await this.catalogRepository.createQueryBuilder().select().andWhere('"isPub" = :isPub', {isPub: isFlag}).
-            orderBy('id', 'ASC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-        } else {
-            result = await this.catalogRepository.createQueryBuilder().select().orderBy('id', 'ASC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-        }
-        return this.getTree(result);
-
+        const result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
+                orderBy('id', 'ASC').getMany().catch(
+                    err => {
+                        console.log(err)
+                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                    }
+                );
+        return this.getTree(result, isPub);
     }
 
 
-    private getTree(oldArr) {
+    private getTree(oldArr, isPub) {
         oldArr.forEach(element => {
             let parentId = element.parentId;
             if (parentId !== 0) {
@@ -122,7 +89,12 @@ export class CatalogService {
                 });
             }
         });
-        oldArr = oldArr.filter(ele => ele.parentId === null); //这一步是过滤，按树展开，将多余的数组剔除；
+        if (isPub == null){
+            oldArr = oldArr.filter(ele => ele.parentId === null); //这一步是过滤，按树展开，将多余的数组剔除；
+            return oldArr;
+        }
+        oldArr = oldArr.filter(ele => { const x = isPub === "true" ? true:false;
+            return (ele.parentId === null && ele.isPub === x )}); //这一步是过滤，按树展开，将多余的数组剔除；
         return oldArr;
     }
 

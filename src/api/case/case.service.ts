@@ -7,7 +7,7 @@ import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {RequestType} from './dto/http.enum';
-import {paginate, IPaginationOptions, Pagination} from 'nestjs-typeorm-paginate';
+import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 
 export class CaseService {
     constructor(
@@ -91,7 +91,7 @@ export class CaseService {
             );
             console.log(caseObj);
             if (!caseObj) {
-                throw new ApiException(`删除的caseId:${delId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`删除的ID: ${delId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
             }
             await this.caseRepository.createQueryBuilder().delete().where('id = :id', {id: Number(delId)}).execute().catch(
                 err => {
@@ -119,9 +119,11 @@ export class CaseService {
                 break;
             case 2:
                 return RequestType.DELETE;
+            case 3:
+                return RequestType.PUT;
                 break;
             default:
-                return RequestType.GET;
+                throw new ApiException(`type值在[0,1,2,3]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -148,7 +150,7 @@ export class CaseService {
             if (!catalog) {
                 throw new ApiException(`查询catalog的id:${updateCaseDto.catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
             }
-
+            cases.catalog = catalog;
         }
         if (updateCaseDto.header) {
             cases.header = updateCaseDto.header;
@@ -171,7 +173,9 @@ export class CaseService {
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
         );
-        return true;
+        return {
+            status: true
+        };
     }
 
 }
