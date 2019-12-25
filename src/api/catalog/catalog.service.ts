@@ -106,7 +106,7 @@ export class CatalogService {
         return this.getTree(result);
 
     }
-    
+
 
     private getTree(oldArr) {
         oldArr.forEach(element => {
@@ -126,8 +126,9 @@ export class CatalogService {
         return oldArr;
     }
 
-    async deleteById(ids: string): Promise<void> {
+    async deleteById(ids: string) {
         let delList = ids.split(',');
+        let res = [];
         for (const delId of delList) {
             const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(delId)}).getOne().catch(
                 err => {
@@ -144,8 +145,15 @@ export class CatalogService {
                         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                     }
                 );
+                res.push(
+                    {
+                        id: delId,
+                        result: true
+                    }
+                )
             }
         }
+        return  res;
 
     }
 

@@ -70,43 +70,10 @@ message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;
 &emsp;&emsp;&emsp;isPub     |bool       |R          |目录类型
 &emsp;&emsp;&emsp;name      |string     |R          |目录名称
-&emsp;&emsp;&emsp;catalogId |number     |R          |目录Id
+&emsp;&emsp;&emsp;parentId  |number     |R          |父级目录Id
 &emsp;&emsp;&emsp;children  |[]         |R          |目录子目录
-
-
-
-### 2.2 添加目录
-- **接口说明：** 添加目录
-- **请求方式：** POST
-- **接口地址：** /api/catalog
-
-#### 2.2.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-&emsp;userId				|number		|R			|用户id
-&emsp;isPub                 |bool       |O          |是否获取公共的目录,子目录不能为true（default：false）
-&emsp;name                  |string     |R          |目录名称
-&emsp;parentId              |number     |O          |父级目录ID(null则表示添加为根目录)
-
-请求示例：
-
-```
-{
-   "userId": 1,
-   "isPub": false,
-   "name": "课标目录",
-   "parentId": 1002 
-}
-
-```
-返回结果
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;true表示创建成功
+&emsp;&emsp;&emsp;createDate|date       |R          |创建时间
+&emsp;&emsp;&emsp;updateDate|date       |R          |更新时间
 
 返回成功示例
 
@@ -162,6 +129,42 @@ data						|object		|R			|&nbsp;true表示创建成功
     "message": "success"
 }
 ```
+
+
+### 2.2 添加目录
+- **接口说明：** 添加目录
+- **请求方式：** POST
+- **接口地址：** /api/catalog
+
+#### 2.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+&emsp;userId				|number		|R			|用户id
+&emsp;isPub                 |bool       |O          |是否获取公共的目录,子目录不能为true（default：false）
+&emsp;name                  |string     |R          |目录名称
+&emsp;parentId              |number     |O          |父级目录ID(null则表示添加为根目录)
+
+请求示例：
+
+```
+{
+   "userId": 1,
+   "isPub": false,
+   "name": "课标目录",
+   "parentId": 1002 
+}
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示创建成功
+
+
 
 ### 2.3 更新目录
 - **接口说明：** 更新目录
@@ -231,30 +234,46 @@ data						|object		|R			|&nbsp;true表示更新成功
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示删除成功
+&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;删除的id
+&nbsp;&nbsp;&nbsp;result	|object		|R			|&nbsp;删除的结果
 
+返回成功示例
 
-### 2.5  查询目录下的接口用例
+```
+{
+    "data": [
+        {
+            "id": "4",
+            "result": true
+        },
+        {
+            "id": "5",
+            "result": true
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
+
+### 2.5  查询接口用例
 - **接口说明：** 查询用例接口
 - **请求方式：** GET
-- **接口地址：** /api/script
+- **接口地址：** /api/case
 
 #### 2.5.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;catalogId				|number		|O			|目录id(默认查询所有目录下的用例)
-pagesize	                |number		|O			|展示个数(默认10)
-pagenum	                    |number		|O			|页数(默认1)
+catalogId				|number		|O			|目录id(默认查询所有用例)
+page	                    |number		|O			|页数(默认1)
+limit	                    |number		|O			|每页展示个数(默认10)
 
 请求示例：
 
 ```
-{
-   "catalogId": 1001,
-   "pagesize": 10,
-   "pagenum": 2
-}
-
+/api/case?page=1&limit=5&catalogId=1
 ```
 返回结果
 
@@ -264,11 +283,49 @@ code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明�
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;
 
+返回成功示例
+```
+{
+    "data": {
+        "items": [
+            {
+                "id": 2,
+                "name": "获取腾讯信息",
+                "header": null,
+                "param": null,
+                "url": "http://www.sina.com",
+                "type": 0,
+                "createDate": "2019-12-24T10:04:02.792Z",
+                "updateDate": "2019-12-24T10:04:02.792Z"
+            },
+            {
+                "id": 1,
+                "name": "获取首页信息",
+                "header": null,
+                "param": null,
+                "url": "http://www.baidu.com",
+                "type": 0,
+                "createDate": "2019-12-24T10:00:18.744Z",
+                "updateDate": "2019-12-24T10:00:18.744Z"
+            }
+        ],
+        "itemCount": 2,
+        "totalItems": 2,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    },
+    "code": 0,
+    "message": "success"
+}
+
+```
+
 
 ### 2.6  更新接口用例
 - **接口说明：** 更新用例接口
 - **请求方式：** PUT
-- **接口地址：** /api/script
+- **接口地址：** /api/case
 
 #### 2.6.1 请求参数
   
