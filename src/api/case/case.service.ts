@@ -6,7 +6,7 @@ import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import {RequestType} from './dto/http.enum';
+import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 
 export class CaseService {
@@ -23,10 +23,9 @@ export class CaseService {
     }
 
     async addCase(createCaseDto: CreateCaseDto) {
-        console.log(createCaseDto);
         const type = this.getRequestType(Number(createCaseDto.type));
-        console.log(type);
         const caseObj = new CaseEntity();
+        caseObj.type = type;
         const catalogId = createCaseDto.catalogId;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
             err => {
@@ -37,17 +36,19 @@ export class CaseService {
         if (!catalog) {
             throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        caseObj.catalog = catalog;
+        caseObj.endpoint = createCaseDto.endpoint;
+        caseObj.assertText = createCaseDto.assertText;
+        caseObj.name = createCaseDto.name;
+        caseObj.path = createCaseDto.path;
+        caseObj.header = createCaseDto.header;
+        caseObj.param = createCaseDto.param;
+        caseObj.paramType = this.getParamType(Number(createCaseDto.paramType));
+        await this.caseRepository.createQueryBuilder().insert()
         const result: InsertResult = await this.caseRepository.createQueryBuilder()
             .insert()
             .into(CaseEntity)
-            .values({
-                type: type,
-                name: createCaseDto.name,
-                url: createCaseDto.url,
-                header: createCaseDto.header,
-                param: createCaseDto.param,
-                catalog: catalog
-            })
+            .values(caseObj)
             .execute().catch(
                 err => {
                     console.log(err);
@@ -78,7 +79,6 @@ export class CaseService {
     }
 
     async deleteById(ids: string) {
-
         let delList = ids.split(',');
         let result = [];
         for (const delId of delList) {
@@ -109,23 +109,6 @@ export class CaseService {
         return result;
     }
 
-    private getRequestType(type: number): RequestType {
-        switch (type) {
-            case 0:
-                return RequestType.GET;
-                break;
-            case 1:
-                return RequestType.POST;
-                break;
-            case 2:
-                return RequestType.DELETE;
-            case 3:
-                return RequestType.PUT;
-                break;
-            default:
-                throw new ApiException(`type值在[0,1,2,3]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-    }
 
     async updateCase(updateCaseDto: UpdateCaseDto): Promise<Object> {
 
@@ -160,14 +143,20 @@ export class CaseService {
         }
         cases.type = this.getRequestType(Number(updateCaseDto.type));
         cases.id = id;
-        if (updateCaseDto.url) {
-            cases.url = updateCaseDto.url;
+        if (updateCaseDto.path) {
+            cases.path = updateCaseDto.path;
+        }
+        if (updateCaseDto.endpoint) {
+            cases.endpoint = updateCaseDto.endpoint;
         }
         if (updateCaseDto.name) {
             cases.name = updateCaseDto.name;
         }
+        if (updateCaseDto.assertText) {
+            cases.assertText = updateCaseDto.assertText;
+        }
 
-        const result = await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).where('id = :id', {id: id}).execute().catch(
+        await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).where('id = :id', {id: id}).execute().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -178,4 +167,35 @@ export class CaseService {
         };
     }
 
+
+    private getRequestType(type: number): RequestType {
+        switch (type) {
+            case 0:
+                return RequestType.GET;
+                break;
+            case 1:
+                return RequestType.POST;
+                break;
+            case 2:
+                return RequestType.DELETE;
+            case 3:
+                return RequestType.PUT;
+                break;
+            default:
+                throw new ApiException(`type值在[0,1,2,3]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private getParamType(type: number): ParamType {
+        switch (type) {
+            case 0:
+                return ParamType.TEXT;
+                break;
+            case 1:
+                return ParamType.FILE;
+                break;
+            default:
+                throw new ApiException(`type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

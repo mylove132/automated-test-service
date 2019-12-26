@@ -44,7 +44,8 @@ restful风格
 - **请求方式：** GET
 - **接口地址：** /api/catalog
 - `注意事项` 查询的目录isPub以根目录的为准
-#### 2.1.1 请求参数
+
+### 2.1.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
@@ -508,10 +509,357 @@ code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明�
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示执行用例成功
 
+### 3.0  添加环境
+- **接口说明：** 添加环境接口
+- **请求方式：** POST
+- **接口地址：** /api/env
+
+#### 3.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;name			        |string		|R			|环境名称
+
+请求示例：
+
+```
+{
+  "name": "dev"
+}
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;生成的环境id
+
+返回成功示例
+```
+{
+    "data": {
+        "id": 3
+    },
+    "code": 0,
+    "message": "success"
+}
+
+```
+
+### 3.1  添加endpoint
+- **接口说明：** 添加endpoint接口
+- **请求方式：** POST
+- **接口地址：** /api/env/endpoint
+
+#### 3.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;name			        |string		|R			|endpoint名称
+&emsp;endpoint			    |string	    |R		    |前缀地址
+&emsp;envs			        |string		|R			|环境id（多个环境用英文逗号隔开,eg:1,2,3）
+
+请求示例：
+
+```
+{
+  "name": "百度",
+  "endponit": "http://www.baidu.com",
+  "envs": "1,2,3"
+}
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name		|object		|R			|&nbsp;endpoint名称
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endpoint		|object		|R			|&nbsp;endpoint地址
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;生成的endpoint ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;envs		|list		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;关联的环境id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name		|string		|R			|&nbsp;关联的环境名称
+返回成功示例
+```
+{
+    "data": {
+        "name": "腾讯",
+        "endpoint": "http://www.sina.com",
+        "envs": [
+            {
+                "id": 1,
+                "name": "dev"
+            },
+            {
+                "id": 2,
+                "name": "hotfix"
+            },
+            {
+                "id": 3,
+                "name": "online"
+            }
+        ],
+        "id": 6
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 3.2  获取环境和endpoint
+- **接口说明：** 获取环境和endpoint接口
+- **请求方式：** GET
+- **接口地址：** /api/env/endpoint
+
+#### 3.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
 
 
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list		|list		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;环境ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name		|object		|R			|&nbsp;环境名称
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endpoints		|list		|R			|&nbsp;关联的endpoint
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;endpoint ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name		|string		|R			|&nbsp;endpoint名称
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endpoint		|string		|R			|&nbsp;endpoint地址
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "dev",
+            "endpoints": [
+                {
+                    "id": 5,
+                    "name": "百度",
+                    "endpoint": "http://www.baidu.com"
+                },
+                {
+                    "id": 6,
+                    "name": "腾讯",
+                    "endpoint": "http://www.sina.com"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "hotfix",
+            "endpoints": [
+                {
+                    "id": 5,
+                    "name": "百度",
+                    "endpoint": "http://www.baidu.com"
+                },
+                {
+                    "id": 6,
+                    "name": "腾讯",
+                    "endpoint": "http://www.sina.com"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "online",
+            "endpoints": [
+                {
+                    "id": 5,
+                    "name": "百度",
+                    "endpoint": "http://www.baidu.com"
+                },
+                {
+                    "id": 6,
+                    "name": "腾讯",
+                    "endpoint": "http://www.sina.com"
+                }
+            ]
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+### 3.3  删除环境
+- **接口说明：** 删除环境接口
+- **请求方式：** DELETE
+- **接口地址：** /api/env
+
+#### 3.3.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;envIds			    |string		|R			|环境id(多个id用英文逗号隔开:eg：1,2,3)
+
+请求示例：
+
+```
+/api/env?envIds=1,2,3
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;删除的环境id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status    |object		|R			|&nbsp;删除的环境结果
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;message    |object		|R			|&nbsp;删除的环境失败原因
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": "6",
+            "status": true
+        },
+        {
+            "id": "7",
+            "status": false,
+            "message": "id不存在"
+        },
+        {
+            "id": "8",
+            "status": false,
+            "message": "id不存在"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
+
+### 3.4  删除endpoint
+- **接口说明：** 删除endpoint接口
+- **请求方式：** DELETE
+- **接口地址：** /api/env/endpoint
+
+#### 3.4.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;endpointIds			|string		|R			|endpoint ID(多个id用英文逗号隔开:eg：1,2,3)
+
+请求示例：
+
+```
+/api/env/endpoint?endpointIds=1,2,3
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;删除的环境id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status    |object		|R			|&nbsp;删除的环境结果
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;message    |object		|R			|&nbsp;删除的环境失败原因
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": "7",
+            "status": false,
+            "message": "id不存在"
+        },
+        {
+            "id": "8",
+            "status": false,
+            "message": "id不存在"
+        },
+        {
+            "id": "9",
+            "status": false,
+            "message": "id不存在"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
 
 
+### 3.5  获取所有环境
+- **接口说明：** 获取所有环境接口
+- **请求方式：** GET
+- **接口地址：** /api/env
+
+#### 3.4.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+请求示例：
+
+```
+/api/env?envIds=1,2,3
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;list						|list		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id		|object		|R			|&nbsp;环境id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name    |object		|R			|&nbsp;环境名称
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 2,
+            "name": "hotfix"
+        },
+        {
+            "id": 3,
+            "name": "online"
+        },
+        {
+            "id": 1,
+            "name": "env___"
+        },
+        {
+            "id": 4,
+            "name": "test"
+        },
+        {
+            "id": 5,
+            "name": "prod"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
 
 <span id="jump"></span>
 ## 响应码说明

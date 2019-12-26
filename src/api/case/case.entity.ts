@@ -1,7 +1,8 @@
-import {Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
-import {RequestType} from './dto/http.enum';
+import {Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {ParamType, RequestType} from './dto/http.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
+import {CaselistEntity} from '../caselist/caselist.entity';
 
 
 @Entity('case')
@@ -16,11 +17,17 @@ export class CaseEntity {
     @Column('json', {default: '{}', nullable: true, comment: '请求接口的header信息'})
     header: string;
 
-    @Column('json', {default: '{}', nullable: true, comment: '请求接口的参数信息'})
+    @Column({nullable: true, comment: '请求接口的参数信息'})
     param: string;
 
-    @Column({comment: '请求接口的url'})
-    url: string;
+    @Column('enum',{default: ParamType.TEXT, nullable: false, enum: ParamType, comment: '参数类型'})
+    paramType: ParamType;
+
+    @Column({comment: '请求接口的路径'})
+    path: string;
+
+    @Column({comment: '请求接口的前缀'})
+    endpoint: string;
 
     @Column('enum', {default: RequestType.GET, nullable:false, comment: '请求接口的类型', enum: RequestType})
     type: RequestType;
@@ -36,6 +43,12 @@ export class CaseEntity {
 
     @UpdateDateColumn()
     updateDate: Date;
+
+    @Column({comment: '断言内容'})
+    assertText: string;
+
+    @ManyToMany(type => CaselistEntity, caselist => caselist.cases)
+    caseLists: CaselistEntity[];
 }
 
 

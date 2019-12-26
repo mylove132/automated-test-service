@@ -1,4 +1,5 @@
 import { IsJSON, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl} from 'class-validator';
+import {Optional} from '@nestjs/common';
 
 export class CreateCaseDto {
 
@@ -15,7 +16,10 @@ export class CreateCaseDto {
 
     @IsNotEmpty()
     @IsUrl()
-    readonly url: string;
+    readonly endpoint: string;
+
+    @IsNotEmpty()
+    readonly path: string;
 
     @IsNumberString()
     @IsOptional()
@@ -23,6 +27,13 @@ export class CreateCaseDto {
 
     @IsNotEmpty()
     catalogId: number;
+
+    @IsNumberString()
+    @IsOptional()
+    paramType: string;
+
+    @IsNotEmpty()
+    assertText: string;
 
 }
 
@@ -43,9 +54,11 @@ export class UpdateCaseDto {
     @IsOptional()
     readonly param: string;
 
-    @IsUrl()
     @IsOptional()
-    readonly url: string;
+    readonly path: string;
+
+    @IsOptional()
+    readonly endpoint: string;
 
     @IsNumberString()
     @IsOptional()
@@ -53,5 +66,12 @@ export class UpdateCaseDto {
 
     @IsOptional()
     catalogId: string;
+
+    @IsNumberString()
+    @IsOptional()
+    paramType: string;
+
+    @Optional()
+    assertText: string;
 
 }

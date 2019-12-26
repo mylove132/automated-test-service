@@ -8,7 +8,7 @@
   "entities": [
     "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/**/**.entity{.ts,.js}"
   ],
-  "synchronize": false,
+  "synchronize": true,
   "migrations": [
     "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/migrations/*{.ts,.js}"
   ],
