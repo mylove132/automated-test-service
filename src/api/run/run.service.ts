@@ -50,7 +50,7 @@ export class RunService {
     const caseObj = await this.caseRepository.findOne(id);
     if (caseObj instanceof CaseEntity) {
       const requestData: AxiosRequestConfig = {
-        url: caseObj.url,
+        url: caseObj.path,
         method: getRequestMethodTypeString(Number(caseObj.type)),
         headers: caseObj.header,
       }
