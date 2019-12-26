@@ -1,6 +1,18 @@
-import {Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from 'typeorm';
 import {CaseEntity} from '../case/case.entity';
 import {EnvEntity} from '../env/env.entity';
+import {SchedulerEntity} from '../task/scheduler.entity';
 
 @Entity('caselist')
 export class CaselistEntity {
@@ -25,4 +37,13 @@ export class CaselistEntity {
 
     @ManyToOne(type => EnvEntity, env => env.caseLists,{cascade: true})
     env: EnvEntity;
+
+    @CreateDateColumn()
+    createDate: Date;
+
+    @UpdateDateColumn()
+    updateDate: Date;
+
+    @OneToOne(type => SchedulerEntity, secheduler => secheduler.caseList)
+    secheduler: SchedulerEntity;
 }

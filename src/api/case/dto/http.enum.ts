@@ -1,7 +1,7 @@
 export enum RequestType {
-    GET,POST,DELETE,PUT
+    GET = 0,POST = 1,DELETE = 2,PUT = 3
 }
 
 export enum ParamType {
-    TEXT,FILE
+    TEXT = 0,FILE = 1
 }

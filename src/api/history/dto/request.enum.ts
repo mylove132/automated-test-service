@@ -1,3 +1,4 @@
 export enum RequestStatusEnum {
-    SUCCESS,FAIL
+    SUCCESS = 0,
+    FAIL = 1
 }
