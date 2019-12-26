@@ -6,11 +6,11 @@
   "password": "123456",
   "database": "bling_automated",
   "entities": [
-    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/**/**.entity{.ts,.js}"
+    "/Users/blingabc/Desktop/auto-test/automated-test-service/src/**/**.entity{.ts,.js}"
   ],
   "synchronize": false,
   "migrations": [
-    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/migrations/*{.ts,.js}"
+    "/Users/blingabc/Desktop/auto-test/automated-test-service/src/migrations/*{.ts,.js}"
   ],
   "cli": {
     "migrationsDir": "src/migrations"
