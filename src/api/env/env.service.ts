@@ -127,6 +127,15 @@ export class EnvService {
         const addPoint = new EndpointEntity();
         if (addEndpointDto.endpoint == null){
             throw new ApiException('前缀url名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }else {
+            const endpointObj = await this.endpointgRepository.createQueryBuilder().select().where('endpoint = :endpoint',{endpoint: addEndpointDto.endpoint}).getOne().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
+                }
+            );
+            if (endpointObj){
+                throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
         }
         if (addEndpointDto.name == null){
             throw new ApiException('前缀名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -147,8 +156,14 @@ export class EnvService {
          }
          envList.push(envObj);
        }
+       let endP;
+       if (addEndpointDto.endpoint.lastIndexOf('/')){
+           endP = addEndpointDto.endpoint.substr(0,addEndpointDto.endpoint.length-1);
+       }else {
+           endP = addEndpointDto.endpoint;
+       }
        addPoint.name = addEndpointDto.name;
-       addPoint.endpoint = addEndpointDto.endpoint;
+       addPoint.endpoint = endP;
        addPoint.envs = envList;
 
       return await this.endpointgRepository.save(addPoint).catch(

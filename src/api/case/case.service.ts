@@ -1,7 +1,7 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {InsertResult, Repository} from 'typeorm';
 import {CaseEntity} from './case.entity';
-import {AddCaseListDto, CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
@@ -9,7 +9,7 @@ import {HttpStatus} from '@nestjs/common';
 import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 import {CaselistEntity} from '../caselist/caselist.entity';
-import {of} from 'rxjs';
+import {EndpointEntity} from '../env/endpoint.entity';
 
 export class CaseService {
     constructor(
@@ -19,6 +19,8 @@ export class CaseService {
         private readonly catalogRepository: Repository<CatalogEntity>,
         @InjectRepository(CaselistEntity)
         private readonly caseListRepository: Repository<CaselistEntity>,
+        @InjectRepository(EndpointEntity)
+        private readonly endpointRepository: Repository<EndpointEntity>,
     ) {
     }
 
@@ -47,11 +49,29 @@ export class CaseService {
         if (typeof createCaseDto.paramType != "undefined"){
             caseObj.paramType = this.getParamType(Number(createCaseDto.paramType));
         }
+        if (createCaseDto.endpointId != null){
+            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id',{id:createCaseDto.endpointId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            if (!endpoint) {
+                throw new ApiException(`endpointId:${createCaseDto.endpointId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+            caseObj.endpointObject = endpoint;
+        }
+        let pa;
+        if (createCaseDto.path.charAt(0) != '/'){
+            pa = "/"+createCaseDto.path;
+        }else {
+            pa = createCaseDto.path;
+        }
         caseObj.catalog = catalog;
         caseObj.endpoint = createCaseDto.endpoint;
         caseObj.assertText = createCaseDto.assertText;
         caseObj.name = createCaseDto.name;
-        caseObj.path = createCaseDto.path;
+        caseObj.path = pa;
         caseObj.header = createCaseDto.header;
         caseObj.param = createCaseDto.param;
 
@@ -131,6 +151,18 @@ export class CaseService {
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
         );
+        if (updateCaseDto.endpointId != null){
+            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id',{id:updateCaseDto.endpointId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            if (!endpoint) {
+                throw new ApiException(`endpointId:${updateCaseDto.endpointId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+            cases.endpointObject = endpoint;
+        }
         if (!caseObj) {
             throw new ApiException(`查询case的id:${id}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
         }
@@ -155,7 +187,13 @@ export class CaseService {
         cases.type = this.getRequestType(Number(updateCaseDto.type));
         cases.id = id;
         if (updateCaseDto.path) {
-            cases.path = updateCaseDto.path;
+            let pa;
+            if (updateCaseDto.path.charAt(0) != '/'){
+                pa = "/"+updateCaseDto.path;
+            }else {
+                pa = updateCaseDto.path;
+            }
+            cases.path = pa;
         }
         if (updateCaseDto.endpoint) {
             cases.endpoint = updateCaseDto.endpoint;
@@ -178,6 +216,17 @@ export class CaseService {
         };
     }
 
+    async findCaseByEndpointAndPath(){}
+
+    async unionFindAllEndpoint(){
+        const result = await this.caseRepository.createQueryBuilder('case').select('case.endpoint').groupBy('case.endpoint').addGroupBy('case.id').getMany().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        return result;
+    }
 
 
     private getRequestType(type: number): RequestType {

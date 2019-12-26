@@ -43,5 +43,11 @@ export class CaseController {
     return  this.caseService.updateCase(updateCaseDto);
   }
 
+  @ApiOperation({ title: 'get all union endpoint case' })
+  @ApiResponse({ status: 200, description: 'get all union endpoint success.'})
+  @Get('endpoints')
+  async unionFindEndpoint(){
+    return this.caseService.unionFindAllEndpoint();
+  }
 
 }

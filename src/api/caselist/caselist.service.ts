@@ -67,6 +67,7 @@ export class CaselistService {
 
         const result = await this.caseListRepository.createQueryBuilder('caselist').
         leftJoinAndSelect('caselist.cases','cases').
+            leftJoinAndSelect('cases.endpointObject','end').
         leftJoinAndSelect('caselist.env','env').
         leftJoinAndSelect('env.endpoints','endpoint').getMany().catch(
             err => {

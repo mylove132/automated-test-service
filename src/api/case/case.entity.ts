@@ -3,6 +3,7 @@ import {ParamType, RequestType} from './dto/http.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {CaselistEntity} from '../caselist/caselist.entity';
+import {EndpointEntity} from '../env/endpoint.entity';
 
 
 @Entity('case')
@@ -50,6 +51,9 @@ export class CaseEntity {
     @ManyToMany(type => CaselistEntity, caselist => caselist.cases,{cascade: true})
     @JoinTable()
     caseLists: CaselistEntity[];
+
+    @ManyToOne(type => EndpointEntity, endpoint => endpoint.cases,{cascade: true})
+    endpointObject: EndpointEntity;
 }
 
 
