@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put, Query, ValidationPipe} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
 import {EnvService} from './env.service';
 import {EnvEntity} from './env.entity';
@@ -49,14 +49,14 @@ export class EnvController {
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')
-    async findEndpointByEnvId(){
-        return this.envService.findEndpointByEnv();
+    async findEndpointByEnvId( @Query('envIds')envIds: string = null){
+        return this.envService.findEndpointByEnv(envIds);
     }
 
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Delete('/endpoint')
-    async deleteEndpointByIds(@Query('endpointIds')endpointIds: string){
+    async deleteEndpointByIds(@Query('endpointIds') endpointIds: string = null){
         return this.envService.deleteEndpointByIds(endpointIds);
     }
 

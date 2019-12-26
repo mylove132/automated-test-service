@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/co
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
-import {CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {AddCaseListDto, CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {IsNotEmpty} from 'class-validator';
 
 
@@ -42,5 +42,6 @@ export class CaseController {
   async updateCase(@Body() updateCaseDto: UpdateCaseDto) {
     return  this.caseService.updateCase(updateCaseDto);
   }
+
 
 }

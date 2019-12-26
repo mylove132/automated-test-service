@@ -1,5 +1,6 @@
-import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {EndpointEntity} from './endpoint.entity';
+import {CaselistEntity} from '../caselist/caselist.entity';
 
 @Entity('env')
 export class EnvEntity {
@@ -12,4 +13,8 @@ export class EnvEntity {
 
     @ManyToMany(type => EndpointEntity, endpoint => endpoint.envs)
     endpoints: EndpointEntity[];
+
+
+    @OneToMany(type => CaselistEntity, caseList => caseList.env)
+    caseLists: CaselistEntity[]
 }

@@ -158,8 +158,42 @@ export class EnvService {
        );
     }
 
-    async findEndpointByEnv(){
-        return await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
-            .getMany();
+    async findEndpointByEnv(envId: string){
+        const result = await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
+            .getMany().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
+                }
+            );
+        if (envId == null){
+            return result;
+        }
+        let findIds = [];
+        if (envId.indexOf(',') != -1){
+            findIds = envId.split(',');
+        }else {
+            findIds.push(envId);
+        }
+        for (const findId of findIds){
+            const envObj = await this.envRepository.createQueryBuilder().select().where('id =  :id',{id: findId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            if (!envObj){
+                throw new ApiException(`查询env ID:${findId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+            }
+        }
+
+        let rs = [];
+        for (const res of result){
+            for (const findId of findIds){
+                if (Number(res.id) == Number(findId)){
+                    rs.push(res);
+                }
+            }
+        }
+        return rs;
     }
 }

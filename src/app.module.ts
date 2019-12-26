@@ -8,6 +8,7 @@ import {ConfigModule} from "./config/config.module";
 import {CatalogModule} from "./api/catalog/catalog.module";
 import {CaseModule} from './api/case/case.module';
 import {EnvModule} from './api/env/env.module';
+import {CaseListModule} from './api/caselist/caselist.module';
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
@@ -21,7 +22,8 @@ const Orm = (): DynamicModule => {
     CaseModule,
     CatalogModule,
     UserModule,
-    EnvModule
+    EnvModule,
+    CaseListModule
   ],
   controllers: [
     AppController

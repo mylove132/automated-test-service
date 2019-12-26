@@ -15,7 +15,7 @@ export class HistoryEntity {
     @Column('enum',{default: RequestStatusEnum.SUCCESS, nullable:false, comment: '请求结果', enum: RequestStatusEnum })
     status: RequestStatusEnum;
 
-    @ManyToOne(type => CaseEntity, cases => cases.histories)
+    @ManyToOne(type => CaseEntity, cases => cases.histories, {cascade: true})
     case: CaseEntity;
 }
 

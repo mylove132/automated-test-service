@@ -75,3 +75,18 @@ export class UpdateCaseDto {
     assertText: string;
 
 }
+
+export class AddCaseListDto {
+
+    @IsNotEmpty()
+    ids: string;
+
+    @IsNotEmpty()
+    caseListName: string;
+
+    @Optional()
+    cron: string;
+
+    @Optional()
+    desc: string;
+}

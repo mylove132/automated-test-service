@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 import {ParamType, RequestType} from './dto/http.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
@@ -32,7 +32,7 @@ export class CaseEntity {
     @Column('enum', {default: RequestType.GET, nullable:false, comment: '请求接口的类型', enum: RequestType})
     type: RequestType;
 
-    @ManyToOne(type => CatalogEntity, catalog => catalog.cases)
+    @ManyToOne(type => CatalogEntity, catalog => catalog.cases, {cascade: true})
     catalog: CatalogEntity;
 
     @OneToMany(type => HistoryEntity, history => history.case)
@@ -47,7 +47,8 @@ export class CaseEntity {
     @Column({comment: '断言内容'})
     assertText: string;
 
-    @ManyToMany(type => CaselistEntity, caselist => caselist.cases)
+    @ManyToMany(type => CaselistEntity, caselist => caselist.cases,{cascade: true})
+    @JoinTable()
     caseLists: CaselistEntity[];
 }
 

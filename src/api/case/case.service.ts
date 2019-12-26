@@ -1,13 +1,15 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {InsertResult, Repository} from 'typeorm';
 import {CaseEntity} from './case.entity';
-import {CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {AddCaseListDto, CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
+import {CaselistEntity} from '../caselist/caselist.entity';
+import {of} from 'rxjs';
 
 export class CaseService {
     constructor(
@@ -15,6 +17,8 @@ export class CaseService {
         private readonly caseRepository: Repository<CaseEntity>,
         @InjectRepository(CatalogEntity)
         private readonly catalogRepository: Repository<CatalogEntity>,
+        @InjectRepository(CaselistEntity)
+        private readonly caseListRepository: Repository<CaselistEntity>,
     ) {
     }
 
@@ -23,9 +27,8 @@ export class CaseService {
     }
 
     async addCase(createCaseDto: CreateCaseDto) {
-        const type = this.getRequestType(Number(createCaseDto.type));
+
         const caseObj = new CaseEntity();
-        caseObj.type = type;
         const catalogId = createCaseDto.catalogId;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
             err => {
@@ -36,6 +39,14 @@ export class CaseService {
         if (!catalog) {
             throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        if (typeof createCaseDto.type != "undefined"){
+            const type = this.getRequestType(Number(createCaseDto.type));
+            caseObj.type = type;
+        }
+        console.log(createCaseDto.paramType)
+        if (typeof createCaseDto.paramType != "undefined"){
+            caseObj.paramType = this.getParamType(Number(createCaseDto.paramType));
+        }
         caseObj.catalog = catalog;
         caseObj.endpoint = createCaseDto.endpoint;
         caseObj.assertText = createCaseDto.assertText;
@@ -43,7 +54,7 @@ export class CaseService {
         caseObj.path = createCaseDto.path;
         caseObj.header = createCaseDto.header;
         caseObj.param = createCaseDto.param;
-        caseObj.paramType = this.getParamType(Number(createCaseDto.paramType));
+
         await this.caseRepository.createQueryBuilder().insert()
         const result: InsertResult = await this.caseRepository.createQueryBuilder()
             .insert()
@@ -168,6 +179,7 @@ export class CaseService {
     }
 
 
+
     private getRequestType(type: number): RequestType {
         switch (type) {
             case 0:
@@ -195,7 +207,7 @@ export class CaseService {
                 return ParamType.FILE;
                 break;
             default:
-                throw new ApiException(`type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                throw new ApiException(`param type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 }

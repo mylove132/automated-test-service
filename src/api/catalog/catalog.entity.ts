@@ -30,7 +30,7 @@ export class CatalogEntity {
   @Column({default: null, nullable: true})
   parentId: number;
 
-  @ManyToOne(type => UserEntity, user => user.catalogs)
+  @ManyToOne(type => UserEntity, user => user.catalogs, {cascade: true})
   user: UserEntity;
 
   @OneToMany(type => CaseEntity, cases => cases.catalog)

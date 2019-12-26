@@ -623,7 +623,7 @@ data						|object		|R			|&nbsp;true表示执行用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-
+&emsp;envIds			        |string		|O			|环境ID,同时获取多个环境id用逗号隔开
 
 返回结果
 
@@ -862,6 +862,148 @@ data						|object		|R			|&nbsp;true表示执行用例成功
     "message": "success"
 }
 ```
+
+
+### 3.6  获取用例信息
+- **接口说明：** 获取用例信息接口
+- **请求方式：** GET
+- **接口地址：** /api/caseList
+
+#### 3.6.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;caseListId			|string		|O		|caseList ID(多个id用英文逗号隔开:eg：1,2,3)
+
+请求示例：
+
+```
+/api/caseList?caseListId=1,2,3
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;cases					|list		|R			|&nbsp;接口数组
+&nbsp;&nbsp;&nbsp;env       |object		|R			|&nbsp;环境信息
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endpoints       |object		|R			|&nbsp;环境对应的endpoints
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 4,
+            "name": "注册接口",
+            "desc": "注册信息如下：",
+            "cron": "* * * * * ?",
+            "isTask": true,
+            "cases": [
+                {
+                    "id": 26,
+                    "name": "山竹",
+                    "header": {},
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/sz",
+                    "endpoint": "http://www.sz.com",
+                    "type": 1,
+                    "createDate": "2019-12-26T04:59:49.412Z",
+                    "updateDate": "2019-12-26T04:59:49.412Z",
+                    "assertText": "\"code\":0"
+                },
+                {
+                    "id": 27,
+                    "name": "松鼠",
+                    "header": {},
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/ss",
+                    "endpoint": "http://www.ss.com",
+                    "type": 1,
+                    "createDate": "2019-12-26T05:00:05.446Z",
+                    "updateDate": "2019-12-26T05:00:05.446Z",
+                    "assertText": "\"code\":0"
+                }
+            ],
+            "env": {
+                "id": 2,
+                "name": "hotfix",
+                "endpoints": [
+                    {
+                        "id": 6,
+                        "name": "腾讯",
+                        "endpoint": "http://www.sina.com"
+                    },
+                    {
+                        "id": 5,
+                        "name": "百度",
+                        "endpoint": "http://www.baidu.com"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "name": "登录接口",
+            "desc": "注册信息如下：",
+            "cron": "* * * * * ?",
+            "isTask": true,
+            "cases": [
+                {
+                    "id": 26,
+                    "name": "山竹",
+                    "header": {},
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/sz",
+                    "endpoint": "http://www.sz.com",
+                    "type": 1,
+                    "createDate": "2019-12-26T04:59:49.412Z",
+                    "updateDate": "2019-12-26T04:59:49.412Z",
+                    "assertText": "\"code\":0"
+                },
+                {
+                    "id": 27,
+                    "name": "松鼠",
+                    "header": {},
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/ss",
+                    "endpoint": "http://www.ss.com",
+                    "type": 1,
+                    "createDate": "2019-12-26T05:00:05.446Z",
+                    "updateDate": "2019-12-26T05:00:05.446Z",
+                    "assertText": "\"code\":0"
+                }
+            ],
+            "env": {
+                "id": 3,
+                "name": "online",
+                "endpoints": [
+                    {
+                        "id": 6,
+                        "name": "腾讯",
+                        "endpoint": "http://www.sina.com"
+                    },
+                    {
+                        "id": 5,
+                        "name": "百度",
+                        "endpoint": "http://www.baidu.com"
+                    }
+                ]
+            }
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
 
 <span id="jump"></span>
 ## 响应码说明

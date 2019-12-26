@@ -13,7 +13,7 @@ export class EndpointEntity {
     @Column()
     endpoint: string;
 
-    @ManyToMany(type => EnvEntity, env => env.endpoints)
+    @ManyToMany(type => EnvEntity, env => env.endpoints, {cascade: true})
     @JoinTable()
     envs: EnvEntity[];
 }

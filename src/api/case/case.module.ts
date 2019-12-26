@@ -4,11 +4,12 @@ import {CaseEntity} from './case.entity';
 import {CaseService} from './case.service';
 import {CaseController} from './case.controller';
 import {CatalogEntity} from '../catalog/catalog.entity';
+import {CaselistEntity} from '../caselist/caselist.entity';
 
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CaseEntity, CatalogEntity])],
+  imports: [TypeOrmModule.forFeature([CaseEntity, CatalogEntity, CaselistEntity])],
   providers: [CaseService],
   controllers: [
     CaseController
