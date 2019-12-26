@@ -1,4 +1,4 @@
-import { IsJSON, IsNotEmpty, IsUrl } from 'class-validator';
+import { IsJSON, IsNotEmpty, IsUrl, IsNumber } from 'class-validator';
 
 export class RunCaseDto {
 
@@ -13,5 +13,12 @@ export class RunCaseDto {
     readonly param: string = '{}';
 
     readonly type: string;
+
+}
+export class RunCaseByIdDto{
+
+    @IsNotEmpty()
+    @IsNumber()
+    readonly caseId: number;
 
 }

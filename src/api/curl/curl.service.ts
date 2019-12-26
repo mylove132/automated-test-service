@@ -15,7 +15,7 @@ export class CurlService {
    * @return {{[propsName: string]: any}}: get参数拼接成的字符串
    */
   private verifyMiddleWare(res: any): boolean {
-    if (+res.code === 10000) {
+    if (+res.status === 200) {
       return true;
     } else {
       return false;
@@ -30,7 +30,7 @@ export class CurlService {
 	makeRequest(config: AxiosRequestConfig): Observable<any> {
 		return this.httpService.request(config).pipe(
       map(res => {
-        return this.verifyMiddleWare(res) ? { result: true, data: res } : { result: false, data: res };
+        return this.verifyMiddleWare(res) ? { result: true, data: res.data } : { result: false, data: res.data };
       }),
 			catchError(error => of(`失败的请求: ${error}`)),
 		);
