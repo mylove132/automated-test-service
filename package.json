@@ -18,7 +18,8 @@
     "typeorm:migration:generate": "npm run typeorm -- migration:generate -n migration",
     "typeorm:migration:run": "npm run typeorm -- migration:run",
     "pretypeorm": "(rm ormconfig.json || :) && ts-node -r tsconfig-paths/register src/scripts/write-type-orm-config.ts",
-    "migration": "export NODE_ENV=development && npm run typeorm:migration:generate && npm run typeorm:migration:run"
+    "migration": "export NODE_ENV=test && npm run typeorm:migration:generate && npm run typeorm:migration:run",
+    "migration:dev": "export NODE_ENV=development && npm run typeorm:migration:generate && npm run typeorm:migration:run"
   },
   "repository": {
     "type": "git",
@@ -52,10 +53,11 @@
     "nestjs-typeorm-paginate": "^1.0.3",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
-    "pg": "^7.15.0",
+    "pg": "^7.15.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.4.0",
     "slug": "^1.0.0",
+    "swagger-ui-express": "^4.1.2",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.15",
     "typescript": "^3.3.1"

@@ -12,6 +12,10 @@ export class SchedulerController {
 
     @Post('')
     async startTask(@Body() addCaselistTaskDto: AddCaselistTaskDto){
-        this.schedulerService.startTask(addCaselistTaskDto);
+        return await this.schedulerService.startTask(addCaselistTaskDto);
+    }
+
+    async getAllJobs(){
+
     }
 }

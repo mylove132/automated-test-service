@@ -1,12 +1,12 @@
-import {Cron, SchedulerRegistry} from '@nestjs/schedule';
+import {SchedulerRegistry} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {Repository} from 'typeorm';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import * as crypto from "crypto";
-import { CronJob } from 'cron';
+import * as crypto from 'crypto';
+import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
 import {AddCaselistTaskDto} from './dto/scheduler.dto';
@@ -31,6 +31,7 @@ export class SchedulerService {
                 envIds.push(addCaselistTaskDto.envIds);
             }
         }
+        let result = [];
         if (envIds.length > 0){
             for (var envId of envIds){
                 const envObj = await this.envRepository.createQueryBuilder().select().where('id=:id',{id: envId}).getOne().catch(
@@ -78,16 +79,24 @@ export class SchedulerService {
                     secheduler.createDate = createDate;
                     secheduler.env = envObj;
                     secheduler.caseList = caseListObj;
+                    console.log(secheduler);
                     await this.scheRepository.save(secheduler).catch(
                         err => {
-                            console.log(err);
                             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                         }
                     )
                     job.start();
+                    result.push(secheduler);
                 }
             }
+        }else {
+            throw new ApiException('定时任务环境不能为空', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        return result;
+    }
+
+    async getAllJobs(){
+        return this.schedulerRegistry.getCronJobs();
     }
 
     private async runCaseList(envId, caseListId){
