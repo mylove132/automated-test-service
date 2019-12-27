@@ -2,17 +2,25 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CaseEntity } from '../case/case.entity';
-import { RunCaseDto } from './dto/run.dto';
+import { RunCaseDto, RunCaseByIdDto } from './dto/run.dto';
 import { CurlService } from '../curl/curl.service';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
-import { AxiosRequestConfig, Method } from 'axios';
+import { AxiosRequestConfig } from 'axios';
+import { getRequestMethodTypeString, generateEndpointByEnv } from '../../utils'
+import { EndpointEntity } from '../env/endpoint.entity';
+import { EnvEntity } from '../env/env.entity';
 
 @Injectable()
 export class RunService {
   constructor(
     @InjectRepository(CaseEntity)
     private readonly caseRepository: Repository<CaseEntity>,
+    @InjectRepository(EnvEntity)
+    private readonly envRepository: Repository<EnvEntity>,
+    @InjectRepository(EndpointEntity)
+    private readonly endpointgRepository: Repository<EndpointEntity>,
+
     private readonly curlService: CurlService
   ) {}
 
@@ -22,17 +30,9 @@ export class RunService {
    * @return {Promise<any>}: 发起请求后的响应结果
    */
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
-    const requestData: AxiosRequestConfig = {
-      url: runCaseDto.url,
-      method: getRequestMethodTypeString(Number(runCaseDto.type)),
-      headers: runCaseDto.header
-    }
-    // 如果为get方法，则参数为params，否则为data
-    if (runCaseDto.type === '0') {
-      requestData.params = runCaseDto.param
-    } else {
-      requestData.data = runCaseDto.param
-    }
+    // 生成请求数据
+    const requestData = this.generateRequestData(runCaseDto);
+    // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
     if (result.result) {
       return result.data
@@ -46,21 +46,32 @@ export class RunService {
    * @param {id}: 样例Id
    * @return {Promise<any>}: 发起请求后的响应结果
    */
-  async runCaseById(id: number): Promise<any> {
-    const caseObj = await this.caseRepository.findOne(id);
+  async runCaseById(runCaseByIdDto: RunCaseByIdDto): Promise<any> {
+    const caseObj = await this.caseRepository
+    .createQueryBuilder('case')
+    .select()
+    .leftJoinAndSelect("case.endpointObject", 'endpointObj')
+    .where('case.id = :id', {id: runCaseByIdDto.caseId})
+    .leftJoinAndSelect("endpointObj.envs", 'envObj')
+    .where('envObj.id = :id', {id: runCaseByIdDto.envId})
+    .getOne()
+    .catch(
+      err => {
+          console.log(err);
+          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      }
+    );
     if (caseObj instanceof CaseEntity) {
-      const requestData: AxiosRequestConfig = {
-        url: caseObj.path,
-        method: getRequestMethodTypeString(Number(caseObj.type)),
-        headers: caseObj.header,
-      }
-      // 如果为get方法，则参数为params，否则为data
-      if (caseObj.type === 0) {
-        requestData.params = caseObj.param
-      } else {
-        requestData.data = caseObj.param
-      }
+      const endpoint = generateEndpointByEnv(caseObj.endpointObject.envs[0].name, caseObj.endpointObject.endpoint)
+      const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
+        endpoint: endpoint,
+        type: String(caseObj.type),
+      });
+      const requestData = this.generateRequestData(requestBaseData);
+      // const requestData = {};
+      console.log(requestData)
       const result = await this.curlService.makeRequest(requestData).toPromise();
+      console.log(result)
       if (result.result) {
         return result.data
       } else {
@@ -70,22 +81,31 @@ export class RunService {
       throw new ApiException('没有找到该样例', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     }
   }
-}
 
 
-// type转换成method文字
-export function getRequestMethodTypeString(type: number): Method {
-  switch (type) {
-    case 0:
-        return 'GET';
-    case 1:
-        return 'POST';
-    case 2:
-        return 'DELETE';
-    case 3:
-        return 'PUT';
-    default:
-        return 'GET';
+  // 生成请求参数
+  private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
+    const requestData: AxiosRequestConfig = {
+      url: runCaseDto.endpoint + runCaseDto.path,
+      method: getRequestMethodTypeString(Number(runCaseDto.type)),
+      headers: runCaseDto.header
+    }
+    // 判断是否是上传文件
+    if (runCaseDto.paramType == '1') {
+      // 将requestData的data转化成文件流
+    } else {
+      // 如果为get方法，则参数为params，否则为data
+      if (runCaseDto.type === '0') {
+        requestData.params = runCaseDto.param
+      } else {
+        requestData.data = runCaseDto.param
+      }
+    }
+    return requestData
   }
+
 }
+
+
+
 

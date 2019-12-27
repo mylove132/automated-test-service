@@ -5,7 +5,7 @@ import { CurlService } from './curl.service';
 @Module({
   imports: [
     HttpModule.register({
-      timeout: 5000,
+      timeout: 50000,
       maxRedirects: 5,
     }),
   ],

@@ -21,6 +21,6 @@ export class RunController {
   @ApiResponse({ status: 200, description: 'run case success.'})
   @Post('case-script')
   async runCaseById(@Body() runCaseByIdDto: RunCaseByIdDto): Promise<any> {
-    return await this.runService.runCaseById(runCaseByIdDto.caseId);
+    return await this.runService.runCaseById(runCaseByIdDto);
   }
 }
