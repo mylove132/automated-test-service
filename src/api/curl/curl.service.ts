@@ -21,6 +21,14 @@ export class CurlService {
       return false;
     }
   }
+  getFile(url: string): Observable<any> {
+		return this.httpService.get(url).pipe(
+			// map(res => {
+			// 	return this.verifyMiddleWare(res) ? res.data : '';
+			// }),
+			catchError(error => of(`地址加载失败: ${error}`)),
+		);
+	}
 	
 	/**
    * 通用的request请求

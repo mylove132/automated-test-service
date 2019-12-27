@@ -10,6 +10,8 @@ import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { AxiosRequestConfig } from 'axios';
 import { getRequestMethodTypeString, generateEndpointByEnv } from '../../utils'
 import { forkJoin } from 'rxjs';
+import * as FormData from 'form-data';
+import * as request from 'request';
 
 @Injectable()
 export class RunService {
@@ -29,8 +31,10 @@ export class RunService {
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
     // 生成请求数据
     const requestData = this.generateRequestData(runCaseDto);
+
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
+    console.log(result)
     if (result.result) {
       return result.data
     } else {
@@ -75,6 +79,7 @@ export class RunService {
       throw new ApiException('没有找到该接口', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     }
   }
+
   /**
    * 执行测试用例中的所有接口
    * @param {RunCaseListByIdDto}: 用例Id及环境Id
@@ -124,6 +129,12 @@ export class RunService {
     // 判断是否是上传文件
     if (runCaseDto.paramType == '1') {
       // 将requestData的data转化成文件流
+      if (!runCaseDto.param) {
+        throw new ApiException('没有正确传入文件地址', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+      }
+      const form = this.generateFileStream('file', JSON.parse(runCaseDto.param)['file']);
+      requestData.data = form;
+      requestData.headers = form.getHeaders();
     } else {
       // 如果为get方法，则参数为params，否则为data
       if (runCaseDto.type === '0') {
@@ -135,6 +146,12 @@ export class RunService {
     return requestData
   }
 
+  // 生成文件流
+  private generateFileStream(paramName: string, address: string) {
+    const form = new FormData();
+    form.append(paramName, request(address))
+    return form
+  }
 }
 
 
