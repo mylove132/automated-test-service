@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { RunService } from './run.service';
-import { RunCaseDto, RunCaseByIdDto } from './dto/run.dto';
+import { RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto } from './dto/run.dto';
 import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('run')
@@ -22,5 +22,12 @@ export class RunController {
   @Post('case-script')
   async runCaseById(@Body() runCaseByIdDto: RunCaseByIdDto): Promise<any> {
     return await this.runService.runCaseById(runCaseByIdDto);
+  }
+
+  @ApiOperation({ title: 'run caselist by id', description: '运行样例里的所有接口请求' })
+  @ApiResponse({ status: 200, description: 'run caselist success.'})
+  @Post('caselist-script')
+  async runCaseListById(@Body() runCaseListByIdDto: RunCaseListByIdDto): Promise<any> {
+    return await this.runService.runCaseListById(runCaseListByIdDto);
   }
 }

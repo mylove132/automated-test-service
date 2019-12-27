@@ -40,3 +40,12 @@ export class RunCaseByIdDto{
     @IsNumber()
     readonly envId: number;
 }
+export class RunCaseListByIdDto{
+    @IsNotEmpty()
+    @IsNumber()
+    readonly caseListId: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    readonly envId: number;
+}
