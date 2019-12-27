@@ -6,7 +6,7 @@ import { RunCaseDto } from './dto/run.dto';
 import { CurlService } from '../curl/curl.service';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, Method } from 'axios';
 
 @Injectable()
 export class RunService {
@@ -74,7 +74,7 @@ export class RunService {
 
 
 // type转换成method文字
-export function getRequestMethodTypeString(type: number): string {
+export function getRequestMethodTypeString(type: number): Method {
   switch (type) {
     case 0:
         return 'GET';
