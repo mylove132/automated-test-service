@@ -9,3 +9,9 @@ export class AddCaselistTaskDto {
     @Optional()
     envIds: string
 }
+
+export class Md5ListDto {
+
+
+    md5s: Set<string>;
+}

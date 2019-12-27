@@ -1005,6 +1005,329 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ```
 
 
+### 3.7  添加定时任务
+- **接口说明：** 添加定时任务接口
+- **请求方式：** POST
+- **接口地址：** /api/scheduler
+
+#### 3.7.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;caseListIds			|string		|R		|caseList ID(多个id用英文逗号隔开:eg：1,2,3)
+&emsp;envIds                |string		|R		|env ID(多个环境ID用英文逗号隔开:eg：1,2,3)
+
+请求示例：
+
+```
+{
+  "caseListIds": "1,2,3"
+   "envIds": "2,3,4"
+}
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;md5		|string		|R			|&nbsp; 定时任务名称ID(用于查找运行中的定时任务)
+&nbsp;&nbsp;&nbsp;env		|Object		|R			|&nbsp; 定时任务运行的环境
+&nbsp;&nbsp;&nbsp;caseList		|Object		|R			|&nbsp; 定时任务运行的用例
+&nbsp;&nbsp;&nbsp;status		|number		|R			|&nbsp; 定时任务运行的状态(0:RUNNING,1:STOP,2:DELETE)
+&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;定时任务id
+
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "md5": "7225de143eaaf349cffc09ef7269ffa03ffde8dc658fb8323484f1f575da4c41",
+            "createDate": "2019-12-27T09:51:25.708Z",
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
+            },
+            "status": "0",
+            "id": 93,
+            "updateDate": "2019-12-27T09:51:25.888Z"
+        },
+        {
+            "md5": "4d67b5de0426a9e22db0eddd7e23de7105e7605bf4c46bd54887239db28746b7",
+            "createDate": "2019-12-27T09:51:26.060Z",
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 2,
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
+            },
+            "status": "0",
+            "id": 94,
+            "updateDate": "2019-12-27T09:51:26.133Z"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 3.8  获取运行中的定时任务
+- **接口说明：** 获取运行中的定时任务接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/running
+
+#### 3.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;md5		|string		|R			|&nbsp; 定时任务名称ID(用于查找运行中的定时任务)
+&nbsp;&nbsp;&nbsp;env		|Object		|R			|&nbsp; 定时任务运行的环境
+&nbsp;&nbsp;&nbsp;caseList		|Object		|R			|&nbsp; 定时任务运行的用例
+&nbsp;&nbsp;&nbsp;status		|number		|R			|&nbsp; 定时任务运行的状态(0:RUNNING,1:STOP,2:DELETE)
+&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;定时任务id
+
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 91,
+            "md5": "d6dad2892106ce0e5270972af0dc269584ea1a91d1aa56f51fb782bd498a694a",
+            "createDate": "2019-12-27T09:24:21.216Z",
+            "updateDate": "2019-12-27T09:24:21.384Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
+            }
+        },
+        {
+            "id": 92,
+            "md5": "4e333e1a4c073c0fdf7b20cc85b79dcd9156ae1cb6226c301fb190f349d2caf5",
+            "createDate": "2019-12-27T09:24:21.558Z",
+            "updateDate": "2019-12-27T09:24:21.728Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 2,
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
+            }
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 3.9  停止运行中的定时任务
+- **接口说明：** 获取运行中的定时任务接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/stop
+
+#### 3.9.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;md5s			        |string		|O		    |定时任务的md5集合（如果为空停止所有定时任务）
+
+请求示例
+
+```
+api/scheduler/stop?md5s=d6dad2892106ce0e5270972af0dc269584ea1a91d1aa56f51fb782bd498a694a,4e333e1a4c073c0fdf7b20cc85b79dcd9156ae1cb6226c301fb190f349d2caf5
+
+```
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;success	|[]		    |R			|&nbsp; 停止成功的任务ID
+&nbsp;&nbsp;&nbsp;fail		|【】		|R			|&nbsp; 停止失败的任务ID
+
+
+
+返回成功示例
+```
+{
+    "data": {
+        "success": [
+            91,
+            92
+        ],
+        "fail": []
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+
+### 4.0  停止数据库扫描监控
+- **接口说明：** 停止数据库扫描监控接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/stop_system_task
+- `使用说明`: 用于服务更新时暂停扫描数据库监控
+
+#### 4.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;status	|boolean	    |R			|&nbsp; true表示删除成功
+
+
+
+
+返回成功示例
+```
+{
+    "data": {
+        "status": true
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 4.1  删除任务列表中的定时任务
+- **接口说明：** 删除任务列表中的定时任务接口
+- **请求方式：** DELETE
+- **接口地址：** /api/scheduler/running
+
+#### 3.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;md5s			        |string		|R		    |删除任务的md5集合
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;md5		|string		|R			|&nbsp; 定时任务名称ID(用于查找运行中的定时任务)
+&nbsp;&nbsp;&nbsp;env		|Object		|R			|&nbsp; 定时任务运行的环境
+&nbsp;&nbsp;&nbsp;caseList		|Object		|R			|&nbsp; 定时任务运行的用例
+&nbsp;&nbsp;&nbsp;status		|number		|R			|&nbsp; 定时任务运行的状态(0:RUNNING,1:STOP,2:DELETE)
+&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;定时任务id
+
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 91,
+            "md5": "d6dad2892106ce0e5270972af0dc269584ea1a91d1aa56f51fb782bd498a694a",
+            "createDate": "2019-12-27T09:24:21.216Z",
+            "updateDate": "2019-12-27T09:24:21.384Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
+            }
+        },
+        {
+            "id": 92,
+            "md5": "4e333e1a4c073c0fdf7b20cc85b79dcd9156ae1cb6226c301fb190f349d2caf5",
+            "createDate": "2019-12-27T09:24:21.558Z",
+            "updateDate": "2019-12-27T09:24:21.728Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 2,
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
+            }
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
+
 <span id="jump"></span>
 ## 响应码说明
 

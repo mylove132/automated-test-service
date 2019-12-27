@@ -1,10 +1,10 @@
-import {SchedulerRegistry} from '@nestjs/schedule';
+import {Cron, SchedulerRegistry} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {Repository} from 'typeorm';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
-import {HttpStatus} from '@nestjs/common';
+import {HttpException, HttpStatus} from '@nestjs/common';
 import * as crypto from 'crypto';
 import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
@@ -97,24 +97,173 @@ export class SchedulerService {
     }
 
     async getAllJobs(){
-        const jobs = this.schedulerRegistry.getCronJobs();
-        let result = [];
-        for (const mp of jobs){
-            const sechObj = await this.scheRepository.createQueryBuilder('seche').select().
-            leftJoinAndSelect('seche.env','env').
-            leftJoinAndSelect('seche.caseList', 'caseList').
-            where('md5 = :md5',{md5: mp[0]}).getOne().catch(
-                err => {
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            )
-            result.push(sechObj);
-        }
+        const result = await this.scheRepository.createQueryBuilder('seche').select().
+        leftJoinAndSelect('seche.env','env').
+        leftJoinAndSelect('seche.caseList', 'caseList').where('status = :status',{status: RunStatus.RUNNING}).getMany().catch(
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
         return result;
     }
 
-    async getJobByMd5(md5: string){
+    async deleteJob(md5s: string){
+        if (md5s == null){
+            throw new ApiException(`删除定时任务的md5值不能为空`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            let delMd5s = [];
+            if (md5s.indexOf(',') != -1){
+                delMd5s = md5s.split(',');
+            }else {
+                delMd5s.push(md5s);
+            }
+            for (const deLmd5 of delMd5s){
+                this.schedulerRegistry.deleteCronJob(deLmd5);
+                await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.DELETE}).where('md5 = :md5',{md5: deLmd5}).execute().catch(
+                    err => {
+                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                    }
+                )
+            }
+        }catch (e) {
+            throw new HttpException('定时任务删除异常', HttpStatus.BAD_REQUEST);
+        }
+        return {status: true};
 
+    }
+
+    async stopJob(md5s: string){
+        if (md5s == null){
+            const tasks = await this.scheRepository.createQueryBuilder().select().where('status = :status',{status: RunStatus.RUNNING}).getMany().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            let stopSuccess = [];
+            let stopFail = [];
+            for (const task of tasks){
+                try {
+                    this.schedulerRegistry.getCronJob(task.md5).stop();
+                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('md5 = :md5',{md5: task.md5}).execute().catch(
+                        err => {
+                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                        }
+                    )
+                    stopSuccess.push(task.id);
+                }catch (e) {
+                    stopFail.push(task.id);
+                }
+
+            }
+            return {success: stopSuccess,fail: stopFail};
+        }
+        try {
+            let delMd5s = [];
+            if (md5s.indexOf(',') != -1){
+                delMd5s = md5s.split(',');
+            }else {
+                delMd5s.push(md5s);
+            }
+            let stopSuccess = [];
+            let stopFail = [];
+            for (const deLmd5 of delMd5s){
+                console.log(deLmd5);
+                const sechObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5',{md5: deLmd5}).getOne().catch(
+                    err => {
+                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                    }
+                );
+                if (!sechObj){
+                    throw new ApiException(`停止的md5:${deLmd5}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                }if (sechObj.status == RunStatus.STOP){
+                    stopSuccess.push(sechObj.id);
+                    continue;
+                }
+                try {
+                    this.schedulerRegistry.getCronJob(deLmd5).stop();
+                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('md5 = :md5',{md5: deLmd5}).execute().catch(
+                        err => {
+                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                        }
+                    )
+                    stopSuccess.push(sechObj.id);
+                }catch (e) {
+                    stopFail.push(sechObj.id);
+                }
+
+            }
+            return {success: stopSuccess, fail: stopFail}
+        }catch (e) {
+            throw new HttpException(`停止定时任务异常:${e}`, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async restartTaskJob(){
+            const sechuObj = await this.scheRepository.createQueryBuilder().select().where('status = :status',{status:RunStatus.RUNNING}).getMany().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            if (sechuObj.length > 0){
+                for (const sechu of sechuObj){
+                    let addCaselistTaskDto: AddCaselistTaskDto;
+                    addCaselistTaskDto.caseListIds = sechu.caseList.id.toString();
+                    addCaselistTaskDto.envIds = sechu.env.id.toString();
+                    await this.startTask(addCaselistTaskDto);
+                }
+            }
+    }
+
+
+    async delCheckJobTask(){
+        try {
+            this.schedulerRegistry.getCronJob('checkStatus').stop();
+        }catch (e) {
+            return {status: false};
+        }
+
+        return {status: true};
+    }
+
+
+    @Cron('* * * * * *',{name:'checkStatus'})
+    async checkJobRunStatus() {
+        console.log('------------------------排查定时任务--------------------')
+        const result = await this.scheRepository.createQueryBuilder('sechu').where('sechu.status = :status',{status: RunStatus.RUNNING}).getMany().catch(
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+        if (result.length > 0){
+            for (const res of result){
+                try {
+                    const sech = this.schedulerRegistry.getCronJob(res.md5);
+                    if (!sech){
+                        await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.DELETE}).where('id = :id',{id: res.id}).execute().catch(
+                            err => {
+                                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                            }
+                        );
+                    }else {
+                        console.log(sech)
+                        if (sech.running != true){
+                            await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('id = :id',{id: res.id}).execute().catch(
+                                err => {
+                                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                                }
+                            );
+                        }
+                    }
+                }catch (e) {
+                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.DELETE}).where('id = :id',{id: res.id}).execute().catch(
+                        err => {
+                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                        }
+                    );
+                }
+            }
+        }
     }
 
     private async runCaseList(envId, caseListId){

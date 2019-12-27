@@ -1,3 +1,3 @@
 export enum RunStatus {
-    RUNNING, STOP
+    RUNNING, STOP,DELETE
 }
