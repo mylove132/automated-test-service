@@ -1,6 +1,7 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn} from 'typeorm';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {EnvEntity} from '../env/env.entity';
+import {RunStatus} from './dto/run.status';
 
 @Unique(['md5'])
 @Entity('secheduler')
@@ -18,11 +19,14 @@ export class SchedulerEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @OneToOne(type => CaselistEntity,caselist => caselist.secheduler)
+    @ManyToOne(type => CaselistEntity,caselist => caselist.sechedulers)
     @JoinColumn()
     caseList: CaselistEntity;
 
-    @OneToOne(type => EnvEntity,env => env.secheduler)
+    @ManyToOne(type => EnvEntity,env => env.sechedulers)
     @JoinColumn()
     env: EnvEntity;
+
+    @Column('enum', {default: RunStatus.STOP, nullable:false, comment: '定时任务状态', enum: RunStatus})
+    status: RunStatus;
 }

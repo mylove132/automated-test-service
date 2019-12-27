@@ -124,6 +124,7 @@ export class EnvService {
     }
 
     async addEndpoint(addEndpointDto: AddEndpointDto){
+        console.log(addEndpointDto);
         const addPoint = new EndpointEntity();
         if (addEndpointDto.endpoint == null){
             throw new ApiException('前缀url名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);

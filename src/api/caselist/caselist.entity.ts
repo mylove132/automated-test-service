@@ -45,5 +45,5 @@ export class CaselistEntity {
     updateDate: Date;
 
     @OneToOne(type => SchedulerEntity, secheduler => secheduler.caseList)
-    secheduler: SchedulerEntity;
+    sechedulers: SchedulerEntity[];
 }

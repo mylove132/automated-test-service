@@ -10,6 +10,7 @@ import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
 import {AddCaselistTaskDto} from './dto/scheduler.dto';
+import {RunStatus} from './dto/run.status';
 
 export class SchedulerService {
 
@@ -22,7 +23,6 @@ export class SchedulerService {
                 private readonly envRepository: Repository<EnvEntity>,) {}
 
     async startTask(addCaselistTaskDto: AddCaselistTaskDto){
-
         let envIds = [];
         if (addCaselistTaskDto.envIds != null){
             if (addCaselistTaskDto.envIds.indexOf(',') != -1){
@@ -62,9 +62,6 @@ export class SchedulerService {
                     const secheduler = new SchedulerEntity();
                     const createDate = new Date();
                     const md5 = crypto.createHmac('sha256', caseListObj.id.toString()+createDate).digest('hex');
-                    const job = new CronJob(caseListObj.cron, () => {
-                        this.runCaseList(envId, caseListId);
-                    });
                     const scheObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5',{md5: md5}).getOne().catch(
                         err => {
                             console.log(err);
@@ -74,17 +71,21 @@ export class SchedulerService {
                     if (scheObj){
                         throw new ApiException(`定时任务md5:${md5}已存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                     }
-                   this.schedulerRegistry.addCronJob(md5, job);
                     secheduler.md5 = md5;
                     secheduler.createDate = createDate;
                     secheduler.env = envObj;
                     secheduler.caseList = caseListObj;
+                    secheduler.status = RunStatus.RUNNING;
                     console.log(secheduler);
-                    await this.scheRepository.save(secheduler).catch(
+                    await this.scheRepository.createQueryBuilder().insert().into(SchedulerEntity).values(secheduler).execute().catch(
                         err => {
                             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                         }
-                    )
+                    );
+                    const job = new CronJob(caseListObj.cron, () => {
+                        this.runCaseList(envId, caseListId);
+                    });
+                    this.schedulerRegistry.addCronJob(md5, job);
                     job.start();
                     result.push(secheduler);
                 }
@@ -96,7 +97,24 @@ export class SchedulerService {
     }
 
     async getAllJobs(){
-        return this.schedulerRegistry.getCronJobs();
+        const jobs = this.schedulerRegistry.getCronJobs();
+        let result = [];
+        for (const mp of jobs){
+            const sechObj = await this.scheRepository.createQueryBuilder('seche').select().
+            leftJoinAndSelect('seche.env','env').
+            leftJoinAndSelect('seche.caseList', 'caseList').
+            where('md5 = :md5',{md5: mp[0]}).getOne().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+            result.push(sechObj);
+        }
+        return result;
+    }
+
+    async getJobByMd5(md5: string){
+
     }
 
     private async runCaseList(envId, caseListId){
