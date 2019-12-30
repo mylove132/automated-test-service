@@ -5,7 +5,11 @@ import {CaselistEntity} from './caselist.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import {AddCaseListDto} from '../case/dto/case.dto';
+import {CommonUtil} from '../../util/common.util';
+import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
+import {AddCaseListDto, CaseListIdsDto, UpdateCaseListDto} from './dto/caselist.dto';
+import {EnvEntity} from '../env/env.entity';
+
 
 export class CaselistService {
 
@@ -14,6 +18,8 @@ export class CaselistService {
         private readonly caseRepository: Repository<CaseEntity>,
         @InjectRepository(CaselistEntity)
         private readonly caseListRepository: Repository<CaselistEntity>,
+        @InjectRepository(EnvEntity)
+        private readonly envRepository: Repository<EnvEntity>,
     ) {
     }
 
@@ -22,7 +28,6 @@ export class CaselistService {
 
         const caseListOBj = new CaselistEntity();
         caseListOBj.name = addCaseListDto.caseListName;
-
         if (addCaseListDto.cron){
             caseListOBj.cron = addCaseListDto.cron;
             caseListOBj.isTask = true;
@@ -30,15 +35,18 @@ export class CaselistService {
         if (addCaseListDto.desc){
             caseListOBj.desc = addCaseListDto.desc;
         }
-        let addCaseListIds = [];
-        if (addCaseListDto.ids.indexOf(',') != -1){
-            addCaseListIds = addCaseListDto.ids.split(',');
-        }else {
-            addCaseListIds.push(addCaseListDto.ids);
+        const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: addCaseListDto.envId}).getOne().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        if (!envObj){
+            throw new ApiException(`添加用例case的环境ID:${addCaseListDto.envId}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
         }
-
+        caseListOBj.env = envObj;
         let caseList = [];
-        for (const addId of addCaseListIds){
+        for (const addId of addCaseListDto.caseIds){
             const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id',{id:addId}).getOne().catch(
                 err => {
                     console.log(err);
@@ -46,7 +54,7 @@ export class CaselistService {
                 }
             );
             if (!caseObj){
-                throw new ApiException(`添加用例case的ID:${addId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`添加用例case的ID:${addId}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
             }else {
                 caseList.push(caseObj);
             }
@@ -63,48 +71,127 @@ export class CaselistService {
 
     }
 
-    async findCaseByCaseListId(caseListId: string){
-
-        const result = await this.caseListRepository.createQueryBuilder('caselist').
-        leftJoinAndSelect('caselist.cases','cases').
-            leftJoinAndSelect('cases.endpointObject','end').
-        leftJoinAndSelect('caselist.env','env').
-        leftJoinAndSelect('env.endpoints','endpoint').getMany().catch(
+    async updateCaseList(updateCaseListDto: UpdateCaseListDto) {
+        const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id = :id',{id: updateCaseListDto.id}).getOne().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
         );
-        if (caseListId == null){
-            return result;
+        if (!caseListObj){
+            throw new ApiException(`修改用例caselist的ID:${updateCaseListDto.id}不存在`, ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.OK);
         }
-        let findIds = [];
-        if (caseListId.indexOf(',') != -1){
-            findIds = caseListId.split(',');
-        }else {
-            findIds.push(caseListId);
+
+        let caseList = new CaselistEntity();
+        let caseObjList = [];
+        if (updateCaseListDto.caseIds){
+            for (const caseId of updateCaseListDto.caseIds){
+                const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id',{id:caseId}).getOne().catch(
+                    err => {
+                        console.log(err);
+                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                    }
+                )
+                if(!caseObj){
+                    throw new ApiException(`查询接口case的ID:${caseId}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
+                }
+                caseObjList.push(caseObj);
+            }
+            caseList.cases = caseObjList;
         }
-        for (const findId of findIds){
-            const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id =  :id',{id: findId}).getOne().catch(
+        if (updateCaseListDto.caseListName){
+            caseList.name = updateCaseListDto.caseListName;
+        }
+        if (updateCaseListDto.cron){
+            caseList.cron = updateCaseListDto.cron
+        }
+        if (updateCaseListDto.desc){
+            caseList.desc = updateCaseListDto.desc;
+        }
+        if (updateCaseListDto.envId){
+            const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: updateCaseListDto.envId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+            if (!envObj) {
+                throw new ApiException(`查询接口env的ID:${updateCaseListDto.envId}不存在`, ApiErrorCode.ENV_ID_INVALID, HttpStatus.OK);
+            }
+        caseList.env = envObj;
+        }
+        const result = await this.caseListRepository.save(caseList).catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        console.log(result);
+        return result;
+    }
+
+    async findCaseByCaseListId(isTask: boolean, envId: number, options: IPaginationOptions):Promise<Pagination<CaselistEntity>> {
+
+        let queryBuilder;
+        if (isTask && envId){
+            queryBuilder = await this.caseListRepository.createQueryBuilder('caselist').where('caselist.isTask = :isTask',{isTask: isTask}).andWhere('caselist.env = :env',{env: envId}).
+           leftJoinAndSelect('caselist.cases','cases').
+           leftJoinAndSelect('cases.endpointObject','end').
+           leftJoinAndSelect('caselist.env','env').
+           leftJoinAndSelect('env.endpoints','endpoint').orderBy('caselist.updateDate', 'DESC');
+       }else if (!isTask && envId){
+            queryBuilder = await this.caseListRepository.createQueryBuilder('caselist').andWhere('caselist.env = :env',{env: envId}).
+            leftJoinAndSelect('caselist.cases','cases').
+            leftJoinAndSelect('cases.endpointObject','end').
+            leftJoinAndSelect('caselist.env','env').
+            leftJoinAndSelect('env.endpoints','endpoint').orderBy('caselist.updateDate', 'DESC');
+        }else if (!isTask && !envId){
+            queryBuilder = await this.caseListRepository.createQueryBuilder('caselist').
+            leftJoinAndSelect('caselist.cases','cases').
+            leftJoinAndSelect('cases.endpointObject','end').
+            leftJoinAndSelect('caselist.env','env').
+            leftJoinAndSelect('env.endpoints','endpoint').orderBy('caselist.updateDate', 'DESC');
+        }else if (isTask && !envId){
+            queryBuilder = await this.caseListRepository.createQueryBuilder('caselist').where('caselist.isTask = :isTask',{isTask: isTask}).
+            leftJoinAndSelect('caselist.cases','cases').
+            leftJoinAndSelect('cases.endpointObject','end').
+            leftJoinAndSelect('caselist.env','env').
+            leftJoinAndSelect('env.endpoints','endpoint').orderBy('caselist.updateDate', 'DESC');
+        }
+
+        return await paginate<CaselistEntity>(queryBuilder, options);
+    }
+
+    async deleteCaseList(caseListIdsDto: CaseListIdsDto){
+        if (caseListIdsDto.ids.length == 0){
+            return {};
+        }
+        for (const id of caseListIdsDto.ids){
+            if (!CommonUtil.isNumber(id)){
+                throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+            }
+        }
+        let res = [];
+        for (const delId of caseListIdsDto.ids){
+            const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id = :id',{id: delId}).getOne().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
             if (!caseListObj){
-                throw new ApiException(`查询用例ID:${findId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`caselist ID:${delId}不存在`,ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
-        }
-
-        let rs = [];
-        for (const res of result){
-            for (const findId of findIds){
-                if (Number(res.id) == Number(findId)){
-                    rs.push(res);
+            const result = await this.caseListRepository.createQueryBuilder().delete().where('id = :id',{id: delId}).execute().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
-            }
+            );
+            res.push(
+                {status: true,id: delId}
+            );
         }
-        return rs;
+        return res;
     }
-
 }

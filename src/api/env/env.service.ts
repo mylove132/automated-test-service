@@ -5,7 +5,8 @@ import {EndpointEntity} from './endpoint.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import {AddEndpointDto} from './dto/env.dto';
+import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
+import {CommonUtil} from '../../util/common.util';
 
 export class EnvService {
 
@@ -26,7 +27,7 @@ export class EnvService {
 
     async addEnv(env: EnvEntity){
         if (env.name == null){
-            throw new ApiException('环境名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            throw new ApiException('环境名称不能为空',ApiErrorCode.ENV_NAME_INVAILD, HttpStatus.BAD_REQUEST);
         }
         const envObj = new EnvEntity();
         envObj.name = env.name;
@@ -48,28 +49,29 @@ export class EnvService {
             }
         );
         if (!envO){
-            throw new ApiException(`更新env的ID：${env.id}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            throw new ApiException(`更新env的ID：${env.id}不存在`,ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
         const envObj = new EnvEntity();
         envObj.id = env.id;
         envObj.name = env.name;
         const result = await this.envRepository.createQueryBuilder().update(EnvEntity).set(envObj).where('id = :id',{id: env.id}).execute().catch(
             err => {
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
             }
         );
         return {result: true};
     }
 
-    async deleteEnv(ids: string){
-        let delIds = [];
-        if (ids.indexOf(',') != -1){
-            delIds = ids.split(',');
-        }else{
-            delIds.push(ids);
-        }
+    async deleteEnv(queryEnvDto: QueryEnvDto){
+        queryEnvDto.ids.forEach(
+            id => {
+                if (!CommonUtil.isNumber(id)){
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+                }
+            }
+        );
         let result = [];
-        for (const delId of delIds){
+        for (const delId of queryEnvDto.ids){
             const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: delId}).getOne().catch(
                 err => {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
@@ -92,18 +94,21 @@ export class EnvService {
         return result;
     }
 
-    async deleteEndpointByIds(endpointIds: string){
-        let delIds = [];
-        if (endpointIds.indexOf(',') != -1){
-            delIds = endpointIds.split(',');
-        }else{
-            delIds.push(endpointIds);
-        }
+    async deleteEndpointByIds( deleteEndpointDto: DeleteEndpointDto){
+
+        deleteEndpointDto.endpointIds.forEach(
+            id => {
+                if (!CommonUtil.isNumber(id)){
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+                }
+            }
+        );
+
         let result = [];
-        for (const delId of delIds){
+        for (const delId of deleteEndpointDto.endpointIds){
             const endpointObj = await this.endpointgRepository.createQueryBuilder().select().where('id = :id',{id: delId}).getOne().catch(
                 err => {
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
                 }
             );
             if (!endpointObj){
@@ -127,7 +132,7 @@ export class EnvService {
         console.log(addEndpointDto);
         const addPoint = new EndpointEntity();
         if (addEndpointDto.endpoint == null){
-            throw new ApiException('前缀url名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            throw new ApiException('前缀url名称不能为空', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }else {
             const endpointObj = await this.endpointgRepository.createQueryBuilder().select().where('endpoint = :endpoint',{endpoint: addEndpointDto.endpoint}).getOne().catch(
                 err => {
@@ -135,25 +140,21 @@ export class EnvService {
                 }
             );
             if (endpointObj){
-                throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.ENDPOINT_NAME_REPEAT, HttpStatus.BAD_REQUEST);
             }
         }
         if (addEndpointDto.name == null){
             throw new ApiException('前缀名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
-        if (addEndpointDto.envs  == null){
-            throw new ApiException('环境选择不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        const envs = addEndpointDto.envs.split(',');
         let envList = [];
-       for (const env of envs){
-         const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: Number(env)}).getOne().catch(
+       for (const env of addEndpointDto.envs){
+         const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: env}).getOne().catch(
              err => {
                  throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
              }
          );
          if (!envObj){
-             throw new ApiException(`环境ID ${env}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+             throw new ApiException(`环境ID ${env}不存在`,ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
          }
          envList.push(envObj);
        }
@@ -174,23 +175,25 @@ export class EnvService {
        );
     }
 
-    async findEndpointByEnv(envId: string){
+    async findEndpointByEnv(queryEndpointDto: QueryEndpointDto){
+
         const result = await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
             .getMany().catch(
                 err => {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
                 }
             );
-        if (envId == null){
+        if (typeof queryEndpointDto.envIds == 'undefined'){
             return result;
         }
-        let findIds = [];
-        if (envId.indexOf(',') != -1){
-            findIds = envId.split(',');
-        }else {
-            findIds.push(envId);
-        }
-        for (const findId of findIds){
+        queryEndpointDto.envIds.forEach(
+            id => {
+                if (!CommonUtil.isNumber(id)){
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+                }
+            }
+        );
+        for (const findId of queryEndpointDto.envIds){
             const envObj = await this.envRepository.createQueryBuilder().select().where('id =  :id',{id: findId}).getOne().catch(
                 err => {
                     console.log(err);
@@ -198,14 +201,14 @@ export class EnvService {
                 }
             );
             if (!envObj){
-                throw new ApiException(`查询env ID:${findId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`查询env ID:${findId}不存在`, ApiErrorCode.ENV_ID_INVALID, HttpStatus.OK);
             }
         }
 
         let rs = [];
         for (const res of result){
-            for (const findId of findIds){
-                if (Number(res.id) == Number(findId)){
+            for (const findId of queryEndpointDto.envIds){
+                if (Number(res.id) == findId){
                     rs.push(res);
                 }
             }

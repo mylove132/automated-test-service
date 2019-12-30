@@ -19,11 +19,11 @@ export class SchedulerEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @ManyToOne(type => CaselistEntity,caselist => caselist.sechedulers)
+    @ManyToOne(type => CaselistEntity,caselist => caselist.sechedulers,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     @JoinColumn()
     caseList: CaselistEntity;
 
-    @ManyToOne(type => EnvEntity,env => env.sechedulers)
+    @ManyToOne(type => EnvEntity,env => env.sechedulers,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     @JoinColumn()
     env: EnvEntity;
 

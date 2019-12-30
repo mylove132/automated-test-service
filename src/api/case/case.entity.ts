@@ -33,7 +33,7 @@ export class CaseEntity {
     @Column('enum', {default: RequestType.GET, nullable:false, comment: '请求接口的类型', enum: RequestType})
     type: RequestType;
 
-    @ManyToOne(type => CatalogEntity, catalog => catalog.cases, {cascade: true})
+    @ManyToOne(type => CatalogEntity, catalog => catalog.cases, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     catalog: CatalogEntity;
 
     @OneToMany(type => HistoryEntity, history => history.case)
@@ -48,11 +48,11 @@ export class CaseEntity {
     @Column({comment: '断言内容'})
     assertText: string;
 
-    @ManyToMany(type => CaselistEntity, caselist => caselist.cases,{cascade: true})
+    @ManyToMany(type => CaselistEntity, caselist => caselist.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     @JoinTable()
     caseLists: CaselistEntity[];
 
-    @ManyToOne(type => EndpointEntity, endpoint => endpoint.cases,{cascade: true})
+    @ManyToOne(type => EndpointEntity, endpoint => endpoint.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     endpointObject: EndpointEntity;
 }
 

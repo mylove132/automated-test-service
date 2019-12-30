@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/co
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
-import {AddCaseListDto, CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import { CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {IsNotEmpty} from 'class-validator';
 
 
@@ -30,9 +30,9 @@ export class CaseController {
 
   @ApiOperation({ title: 'delete case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
-  @Delete(':ids')
-  async deleteCase(@Param('ids') ids: string) {
-    return this.caseService.deleteById(ids);
+  @Delete('')
+  async deleteCase(@Body() deleteCaseDto: DeleteCaseDto) {
+    return this.caseService.deleteById(deleteCaseDto);
   }
 
 

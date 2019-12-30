@@ -2,10 +2,11 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {UserEntity} from '../user/user.entity';
 import { Repository} from 'typeorm';
 import {CatalogEntity} from './catalog.entity';
-import {CreateCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {HttpStatus} from '@nestjs/common';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
+import {CommonUtil} from '../../util/common.util';
 
 export class CatalogService {
     constructor(
@@ -98,20 +99,29 @@ export class CatalogService {
         return oldArr;
     }
 
-    async deleteById(ids: string) {
-        let delList = ids.split(',');
+    async deleteById(queryCatalogDto: QueryCatalogDto) {
+        queryCatalogDto.ids.forEach(
+            id => {
+                if (!CommonUtil.isNumber(id)){
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+                }
+            }
+        );
         let res = [];
-        for (const delId of delList) {
-            const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(delId)}).getOne().catch(
+        if (queryCatalogDto.ids.length == 0){
+           return res;
+        }
+        for (const delId of queryCatalogDto.ids) {
+            const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: delId}).getOne().catch(
                 err => {
                     console.log(err)
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
             if (!catalog) {
-                throw new ApiException(`删除id:${delId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                throw new ApiException(`删除id:${delId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
             } else {
-                const result = await this.catalogRepository.createQueryBuilder().delete().where('id = :id', {id: Number(delId)}).execute().catch(
+                const result = await this.catalogRepository.createQueryBuilder().delete().where('id = :id', {id: delId}).execute().catch(
                     err => {
                         console.log(err)
                         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -133,7 +143,7 @@ export class CatalogService {
         const {id, name, isPub} = updateCatalogDto;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(id)}).getOne();
         if (!catalog) {
-            throw new ApiException(`更新id:${id}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            throw new ApiException(`更新id:${id}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
         let isFlag: boolean;
         if (isPub) {

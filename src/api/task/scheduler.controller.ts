@@ -1,6 +1,6 @@
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
-import {AddCaselistTaskDto} from './dto/scheduler.dto';
+import {AddCaselistTaskDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
 import {SchedulerService} from './scheduler.service';
 
 ApiBearerAuth()
@@ -21,14 +21,14 @@ export class SchedulerController {
     }
 
     @Delete('running')
-    async deleRunnigJobs(@Query('md5s')md5s: string){
-        return this.schedulerService.deleteJob(md5s);
+    async deleRunnigJobs(@Body() deleteRunningTaskDto: DeleteRunningTaskDto){
+        return this.schedulerService.deleteJob(deleteRunningTaskDto);
     }
 
     @Get('stop')
-    async stopJobs(@Query('md5s') md5s: string){
-        return this.schedulerService.stopJob(md5s);
-    }
+    async stopJobs(@Body() deleteRunningTaskDto: DeleteRunningTaskDto){
+        return this.schedulerService.stopJob(deleteRunningTaskDto);
+    }z
 
     @Get('stop_system_task')
     async stopSystemTaskJob(){

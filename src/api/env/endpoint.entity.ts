@@ -14,7 +14,7 @@ export class EndpointEntity {
     @Column()
     endpoint: string;
 
-    @ManyToMany(type => EnvEntity, env => env.endpoints, {cascade: true})
+    @ManyToMany(type => EnvEntity, env => env.endpoints, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     @JoinTable()
     envs: EnvEntity[];
 

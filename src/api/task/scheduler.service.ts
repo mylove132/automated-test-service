@@ -9,8 +9,9 @@ import * as crypto from 'crypto';
 import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
-import {AddCaselistTaskDto} from './dto/scheduler.dto';
+import {AddCaselistTaskDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
+import {CommonUtil} from '../../util/common.util';
 
 export class SchedulerService {
 
@@ -20,199 +21,134 @@ export class SchedulerService {
                 @InjectRepository(CaselistEntity)
                 private readonly caseListRepository: Repository<CaselistEntity>,
                 @InjectRepository(EnvEntity)
-                private readonly envRepository: Repository<EnvEntity>,) {}
+                private readonly envRepository: Repository<EnvEntity>,) {
+    }
 
-    async startTask(addCaselistTaskDto: AddCaselistTaskDto){
-        let envIds = [];
-        if (addCaselistTaskDto.envIds != null){
-            if (addCaselistTaskDto.envIds.indexOf(',') != -1){
-                envIds = addCaselistTaskDto.envIds.split(',');
-            }else {
-                envIds.push(addCaselistTaskDto.envIds);
-            }
-        }
+    async startTask(addCaselistTaskDto: AddCaselistTaskDto) {
+
         let result = [];
-        if (envIds.length > 0){
-            for (var envId of envIds){
-                const envObj = await this.envRepository.createQueryBuilder().select().where('id=:id',{id: envId}).getOne().catch(
+        for (const envId of addCaselistTaskDto.envIds){
+            const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: envId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+            if (!envObj) {
+                throw new ApiException(`环境ID:${envId}不存在`, ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
+            }
+            const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id = :id',{id: addCaselistTaskDto.caseListId}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+            if (!caseListObj) {
+                throw new ApiException(`用例ID:${addCaselistTaskDto.caseListId}不存在`, ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
+            }
+            const secheduler = new SchedulerEntity();
+            const createDate = new Date();
+            const md5 = crypto.createHmac('sha256', caseListObj.id.toString() + createDate + CommonUtil.randomChar(10)).digest('hex');
+            const scheObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5', {md5: md5}).getOne().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+            if (scheObj) {
+                throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
+            }
+            secheduler.md5 = md5;
+            secheduler.createDate = createDate;
+            secheduler.env = envObj;
+            secheduler.caseList = caseListObj;
+            secheduler.status = RunStatus.RUNNING;
+            await this.scheRepository.createQueryBuilder().insert().into(SchedulerEntity).values(secheduler).execute().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            const job = new CronJob(caseListObj.cron, () => {
+                this.runCaseList(envId, addCaselistTaskDto.caseListId);
+            });
+            this.schedulerRegistry.addCronJob(md5, job);
+            job.start();
+            result.push(secheduler);
+        }
+        return result;
+    }
+
+    async getAllJobs() {
+        const allJobs = this.schedulerRegistry.getCronJobs();
+        let md5List = [];
+        for (const job of allJobs){
+            md5List.push(job[0]);
+        }
+        let res = [];
+        for (const md5 of md5List.filter(res => res != 'checkStatus')){
+            const result = await this.scheRepository.createQueryBuilder('seche').select().
+            leftJoinAndSelect('seche.env', 'env').
+            leftJoinAndSelect('seche.caseList', 'caseList').
+            where('md5 = :md5',{md5: md5}).getOne().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            res.push(result);
+        }
+
+        return res;
+    }
+
+    async deleteJob(deleteRunningTaskDto: DeleteRunningTaskDto) {
+        try {
+            for (const deLmd5 of deleteRunningTaskDto.md5List) {
+                const delSchedulerObj = await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.DELETE}).where('md5 = :md5', {md5: deLmd5}).execute().catch(
                     err => {
-                        console.log(err);
                         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                     }
                 );
-                if (!envObj){
-                    throw new ApiException(`环境ID:${envId}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                if (!delSchedulerObj) {
+                    throw new ApiException(`删除的任务名称:${deLmd5}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
                 }
-                let caseListIds = [];
-                if (addCaselistTaskDto.caseListIds.indexOf(',') != -1){
-                    caseListIds = addCaselistTaskDto.caseListIds.split(',');
-                }else {
-                    caseListIds.push(addCaselistTaskDto.caseListIds);
-                }
-                for (const caseListId of caseListIds){
-                    const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id=:id',{id: caseListId}).getOne().catch(
-                        err => {
-                            console.log(err);
-                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                        }
-                    );
-                    if (!caseListObj){
-                        throw new ApiException(`用例ID:${caseListId}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-                    }
-                    const secheduler = new SchedulerEntity();
-                    const createDate = new Date();
-                    const md5 = crypto.createHmac('sha256', caseListObj.id.toString()+createDate).digest('hex');
-                    const scheObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5',{md5: md5}).getOne().catch(
-                        err => {
-                            console.log(err);
-                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                        }
-                    )
-                    if (scheObj){
-                        throw new ApiException(`定时任务md5:${md5}已存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-                    }
-                    secheduler.md5 = md5;
-                    secheduler.createDate = createDate;
-                    secheduler.env = envObj;
-                    secheduler.caseList = caseListObj;
-                    secheduler.status = RunStatus.RUNNING;
-                    console.log(secheduler);
-                    await this.scheRepository.createQueryBuilder().insert().into(SchedulerEntity).values(secheduler).execute().catch(
-                        err => {
-                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                        }
-                    );
-                    const job = new CronJob(caseListObj.cron, () => {
-                        this.runCaseList(envId, caseListId);
-                    });
-                    this.schedulerRegistry.addCronJob(md5, job);
-                    job.start();
-                    result.push(secheduler);
-                }
-            }
-        }else {
-            throw new ApiException('定时任务环境不能为空', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        return result;
-    }
-
-    async getAllJobs(){
-        const result = await this.scheRepository.createQueryBuilder('seche').select().
-        leftJoinAndSelect('seche.env','env').
-        leftJoinAndSelect('seche.caseList', 'caseList').where('status = :status',{status: RunStatus.RUNNING}).getMany().catch(
-            err => {
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        )
-        return result;
-    }
-
-    async deleteJob(md5s: string){
-        if (md5s == null){
-            throw new ApiException(`删除定时任务的md5值不能为空`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        try {
-            let delMd5s = [];
-            if (md5s.indexOf(',') != -1){
-                delMd5s = md5s.split(',');
-            }else {
-                delMd5s.push(md5s);
-            }
-            for (const deLmd5 of delMd5s){
                 this.schedulerRegistry.deleteCronJob(deLmd5);
-                await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.DELETE}).where('md5 = :md5',{md5: deLmd5}).execute().catch(
-                    err => {
-                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                    }
-                )
             }
-        }catch (e) {
+        } catch (e) {
             throw new HttpException('定时任务删除异常', HttpStatus.BAD_REQUEST);
         }
         return {status: true};
 
     }
 
-    async stopJob(md5s: string){
-        if (md5s == null){
-            const tasks = await this.scheRepository.createQueryBuilder().select().where('status = :status',{status: RunStatus.RUNNING}).getMany().catch(
+    async stopJob(deleteRunningTaskDto: DeleteRunningTaskDto) {
+        let stopSuccess = [];
+        let stopFail = [];
+        for (const md5 of deleteRunningTaskDto.md5List) {
+            const task = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5', {md5: md5}).getOne().catch(
                 err => {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
-            let stopSuccess = [];
-            let stopFail = [];
-            for (const task of tasks){
-                try {
-                    this.schedulerRegistry.getCronJob(task.md5).stop();
-                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('md5 = :md5',{md5: task.md5}).execute().catch(
-                        err => {
-                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                        }
-                    )
-                    stopSuccess.push(task.id);
-                }catch (e) {
-                    stopFail.push(task.id);
-                }
-
+            if (!task) {
+                throw new ApiException(`停止的任务名称:${md5}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
             }
-            return {success: stopSuccess,fail: stopFail};
-        }
-        try {
-            let delMd5s = [];
-            if (md5s.indexOf(',') != -1){
-                delMd5s = md5s.split(',');
-            }else {
-                delMd5s.push(md5s);
+            if (task.status != RunStatus.RUNNING){
+                throw new ApiException(`定时任务已停止或删除`,ApiErrorCode.SCHEDULER_STOP_OR_DELETE, HttpStatus.BAD_REQUEST);
             }
-            let stopSuccess = [];
-            let stopFail = [];
-            for (const deLmd5 of delMd5s){
-                console.log(deLmd5);
-                const sechObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5',{md5: deLmd5}).getOne().catch(
+            try {
+                this.schedulerRegistry.getCronJob(task.md5).stop();
+                await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('md5 = :md5', {md5: task}).execute().catch(
                     err => {
                         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                     }
-                );
-                if (!sechObj){
-                    throw new ApiException(`停止的md5:${deLmd5}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-                }if (sechObj.status == RunStatus.STOP){
-                    stopSuccess.push(sechObj.id);
-                    continue;
-                }
-                try {
-                    this.schedulerRegistry.getCronJob(deLmd5).stop();
-                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('md5 = :md5',{md5: deLmd5}).execute().catch(
-                        err => {
-                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                        }
-                    )
-                    stopSuccess.push(sechObj.id);
-                }catch (e) {
-                    stopFail.push(sechObj.id);
-                }
-
+                )
+                stopSuccess.push(task.id);
+            } catch (e) {
+                stopFail.push(task.id);
             }
-            return {success: stopSuccess, fail: stopFail}
-        }catch (e) {
-            throw new HttpException(`停止定时任务异常:${e}`, HttpStatus.BAD_REQUEST);
+
         }
-    }
-
-    async restartTaskJob(){
-            const sechuObj = await this.scheRepository.createQueryBuilder().select().where('status = :status',{status:RunStatus.RUNNING}).getMany().catch(
-                err => {
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-            if (sechuObj.length > 0){
-                for (const sechu of sechuObj){
-                    let addCaselistTaskDto: AddCaselistTaskDto;
-                    addCaselistTaskDto.caseListIds = sechu.caseList.id.toString();
-                    addCaselistTaskDto.envIds = sechu.env.id.toString();
-                    await this.startTask(addCaselistTaskDto);
-                }
-            }
+        return {success: stopSuccess, fail: stopFail};
     }
 
 
@@ -246,7 +182,6 @@ export class SchedulerService {
                             }
                         );
                     }else {
-                        console.log(sech)
                         if (sech.running != true){
                             await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({status: RunStatus.STOP}).where('id = :id',{id: res.id}).execute().catch(
                                 err => {
