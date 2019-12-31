@@ -11,11 +11,14 @@ import {EnvModule} from './api/env/env.module';
 import {CaseListModule} from './api/caselist/caselist.module';
 import {SchedulerModule} from './api/task/scheduler.module';
 import {ScheduleModule} from '@nestjs/schedule';
+import {WsModule} from './api/ws/ws.module';
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
   return TypeOrmModule.forRoot(config.getTypeOrmConfig());
-}
+};
+
+
 
 @Module({
   imports: [
@@ -27,7 +30,8 @@ const Orm = (): DynamicModule => {
     UserModule,
     EnvModule,
     CaseListModule,
-    SchedulerModule
+    SchedulerModule,
+    WsModule
   ],
   controllers: [
     AppController
