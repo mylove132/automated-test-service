@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository, DeleteResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
-import {CreateUserDto, LoginUserDto, UpdateUserDto} from './dto';
-const jwt = require('jsonwebtoken');
+import { LoginUserDto } from './dto/login-user.dto';
+import * as jwt from 'jsonwebtoken';
 import { SECRET } from '../../config';
-import { validate } from 'class-validator';
-import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { HttpStatus } from '@nestjs/common';
-import * as crypto from 'crypto';
-
 import { CurlService } from '../curl/curl.service';
 import { ConfigService } from '../../config/config.service';
 import { getRequestMethodTypeString } from '../../utils'
@@ -89,8 +85,7 @@ export class UserService {
   async findById(id: number): Promise<any>{
     const user = await this.userRepository.findOne(id);
     if (!user) {
-      const errors = {User: ' not found'};
-      throw new HttpException({errors}, 401);
+      throw new ApiException('用户未找到', ApiErrorCode.USER_ID_INVALID, HttpStatus.OK);
     };
     return user
   }
