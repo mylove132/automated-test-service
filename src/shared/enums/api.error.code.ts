@@ -5,6 +5,7 @@ export enum ApiErrorCode {
   PARAM_VALID_FAIL = 19999, //参数验证失败
   RUN_SQL_EXCEPTION = 20000, //数据库执行失败
 
+  RUN_INTERFACE_FAIL = 5000,
   //用户code
   USER_ID_INVALID = 10001, // 用户id无效
   CREATE_USER_FAIL = 10002,

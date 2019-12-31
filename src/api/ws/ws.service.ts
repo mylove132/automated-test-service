@@ -9,7 +9,9 @@ export class WsService{
 
     @SubscribeMessage('events')
     async runCaseList(@MessageBody() data: any): Promise<Object>{
-        console.log(data)
-        return await data;
+        const envIds: number[] = data.envIds;
+        const caselistIds: number[] = data.caselistIds;
+
+        return {envIds, caselistIds};
     }
 }

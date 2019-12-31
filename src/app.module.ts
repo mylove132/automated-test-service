@@ -3,14 +3,15 @@ import { AppController } from './app.controller';
 import { UserModule } from './api/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import {ConfigService} from "./config/config.service";
-import {ConfigModule} from "./config/config.module";
-import {CatalogModule} from "./api/catalog/catalog.module";
-import {CaseModule} from './api/case/case.module';
-import {EnvModule} from './api/env/env.module';
-import {CaseListModule} from './api/caselist/caselist.module';
-import {SchedulerModule} from './api/task/scheduler.module';
-import {ScheduleModule} from '@nestjs/schedule';
+import { EnvModule } from './api/env/env.module';
+import { CaseListModule } from './api/caselist/caselist.module';
+import { ConfigService } from "./config/config.service";
+import { ConfigModule } from "./config/config.module";
+import { CatalogModule } from "./api/catalog/catalog.module";
+import { CaseModule } from './api/case/case.module';
+import { RunModule } from './api/run/run.module';
+import { SchedulerModule } from './api/task/scheduler.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import {WsModule} from './api/ws/ws.module';
 
 const Orm = (): DynamicModule => {
@@ -31,7 +32,10 @@ const Orm = (): DynamicModule => {
     EnvModule,
     CaseListModule,
     SchedulerModule,
-    WsModule
+    WsModule,
+    RunModule,
+    SchedulerModule,
+
   ],
   controllers: [
     AppController
