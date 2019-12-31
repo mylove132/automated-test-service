@@ -26,9 +26,9 @@ export class AuthGuard implements CanActivate {
         return this.validateRequest(request);
     }
     async validateRequest(req: Request): Promise<boolean> {
-      const authHeaders = req.headers.authorization;
-      if (authHeaders && (authHeaders as string).split(' ')[1]) {
-        const token = (authHeaders as string).split(' ')[1];
+      const authHeaders = req.headers.token;
+      if (authHeaders) {
+        const token = authHeaders;
         const decoded: any = jwt.verify(token, SECRET);
         const user = await this.userService.findById(decoded.id);
         if (!user) {
