@@ -5,7 +5,6 @@ import { UserEntity } from './user.entity';
 import {CreateUserDto, LoginUserDto, UpdateUserDto} from './dto';
 const jwt = require('jsonwebtoken');
 import { SECRET } from '../../config';
-import { UserRO } from './user.interface';
 import { validate } from 'class-validator';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { HttpStatus } from '@nestjs/common';
@@ -16,6 +15,8 @@ import { ConfigService } from '../../config/config.service';
 import { getRequestMethodTypeString } from '../../utils'
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
+import { UserData } from './user.interface';
+
 
 
 @Injectable()
@@ -33,22 +34,51 @@ export class UserService {
    * @return {Promise<any>}: 返回的用户信息及菜单列表
    */
   async login(loginUserDto: LoginUserDto): Promise<any> {
-    const url = this.configService.javaOapi + '/open-api/autotest/useradmin/v1/login'
+    const url = this.configService.javaOapi + '/auth/open-api/autotest/useradmin/v1/login'
     const requestData = {
       url: url,
       method: getRequestMethodTypeString(1),
       data: loginUserDto
     }
     const result = await this.curlService.makeRequest(requestData).toPromise();
-    if (result.data.code === 10000) {
-      // 请求成功储存用户
-
-    } else if (result.data.code === 21010) {
-      return result.data.msg
-    } else {
+    if (!result.data) {
       throw new ApiException('请求失败', ApiErrorCode.TIMEOUT, HttpStatus.OK);
     }
-    return result
+    if (result.data.code === 10000) {
+      // 请求成功储存用户
+      const userData = {
+        userId: result.data.data.userInfoVO.id,
+        username: result.data.data.userInfoVO.username
+      }
+      const user = await this.saveUser(userData);
+      const token = this.generateJWT(user);
+      result.data.data.userInfoVO.token = token;
+      return result.data.data
+    } else if (result.data.code === 21010 || result.data.code === 190003) {
+      return result.data.msg
+    }
+    else {
+      throw new ApiException('请求失败', ApiErrorCode.TIMEOUT, HttpStatus.OK);
+    }
+  }
+  
+  // 保存/更新 用户
+  private async saveUser(userData: UserData): Promise<UserEntity> {
+    let user = await this.userRepository.findOne({userId: userData.userId});
+    if (user) {
+      // 用户信息不一致则更新
+      if (user.username !== userData.username) {
+        await this.userRepository.update(user.id, userData).catch(err => {
+          throw new ApiException('更新用户失败', ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
+        })
+        user = Object.assign(user, userData);
+      }
+    } else {
+      user = await this.userRepository.save(userData).catch(err => {
+        throw new ApiException('保存用户失败', ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
+      })
+    }
+    return user
   }
 
   /**
@@ -62,28 +92,18 @@ export class UserService {
       const errors = {User: ' not found'};
       throw new HttpException({errors}, 401);
     };
-    return this.buildUserRO(user);
+    return user
   }
 
   public generateJWT(user) {
     let today = new Date();
     let exp = new Date(today);
-    exp.setDate(today.getDate() + 60);
-
+    exp.setDate(today.getDate() + 7);
     return jwt.sign({
       id: user.id,
+      userId: user.userId,
       username: user.username,
-      email: user.email,
       exp: exp.getTime() / 1000,
     }, SECRET);
   };
-
-  private buildUserRO(user: UserEntity) {
-    const userRO = {
-      username: user.username,
-      token: this.generateJWT(user),
-    };
-
-    return {user: userRO};
-  }
 }
