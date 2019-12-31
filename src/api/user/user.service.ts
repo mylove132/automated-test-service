@@ -11,86 +11,57 @@ import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { HttpStatus } from '@nestjs/common';
 import * as crypto from 'crypto';
 
+import { CurlService } from '../curl/curl.service';
+import { ConfigService } from '../../config/config.service';
+import { getRequestMethodTypeString } from '../../utils'
+import { ApiException } from '../../shared/exceptions/api.exception';
+import { ApiErrorCode } from '../../shared/enums/api.error.code';
+
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>
+    private readonly userRepository: Repository<UserEntity>,
+    private curlService: CurlService,
+    private configService: ConfigService,
   ) {}
-
-  async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find();
-  }
-
-  async findOne(loginUserDto: LoginUserDto): Promise<UserEntity> {
-    const findOneOptions = {
-      email: loginUserDto.email,
-      password: crypto.createHmac('sha256', loginUserDto.password).digest('hex'),
-    };
-
-    return await this.userRepository.findOne(findOneOptions);
-  }
-
-  async create(dto: CreateUserDto): Promise<UserRO> {
-
-    // check uniqueness of username/email
-    const {username, email, password} = dto;
-    const qb = await getRepository(UserEntity)
-      .createQueryBuilder('user')
-      .where('user.username = :username', { username })
-      .orWhere('user.email = :email', { email });
-
-    const user = await qb.getOne();
-
-    if (user) {
-      const errors = {username: 'Username and email must be unique.'};
-      throw new HttpException({message: 'Input data validation failed', errors}, HttpStatus.BAD_REQUEST);
-
+  
+  /**
+   * 登录接口
+   * @param {LoginUserDto}: 用户名及密码
+   * @return {Promise<any>}: 返回的用户信息及菜单列表
+   */
+  async login(loginUserDto: LoginUserDto): Promise<any> {
+    const url = this.configService.javaOapi + '/open-api/autotest/useradmin/v1/login'
+    const requestData = {
+      url: url,
+      method: getRequestMethodTypeString(1),
+      data: loginUserDto
     }
+    const result = await this.curlService.makeRequest(requestData).toPromise();
+    if (result.data.code === 10000) {
+      // 请求成功储存用户
 
-    // create new user
-    let newUser = new UserEntity();
-    newUser.username = username;
-    newUser.email = email;
-    newUser.password = password;
-
-    const errors = await validate(newUser);
-    if (errors.length > 0) {
-      const _errors = {username: 'Userinput is not valid.'};
-      throw new HttpException({message: 'Input data validation failed', _errors}, HttpStatus.BAD_REQUEST);
-
+    } else if (result.data.code === 21010) {
+      return result.data.msg
     } else {
-      const savedUser = await this.userRepository.save(newUser);
-      return this.buildUserRO(savedUser);
+      throw new ApiException('请求失败', ApiErrorCode.TIMEOUT, HttpStatus.OK);
     }
-
+    return result
   }
 
-  async update(id: number, dto: UpdateUserDto): Promise<UserEntity> {
-    let toUpdate = await this.userRepository.findOne(id);
-    delete toUpdate.password;
-
-    let updated = Object.assign(toUpdate, dto);
-    return await this.userRepository.save(updated);
-  }
-
-  async delete(email: string): Promise<DeleteResult> {
-    return await this.userRepository.delete({ email: email});
-  }
-
-  async findById(id: number): Promise<UserRO>{
+  /**
+   * 通过id查询用户
+   * @param {number}: id
+   * @return {Promise<UserRO>}: 用户信息
+   */
+  async findById(id: number): Promise<any>{
     const user = await this.userRepository.findOne(id);
-
     if (!user) {
       const errors = {User: ' not found'};
       throw new HttpException({errors}, 401);
     };
-
-    return this.buildUserRO(user);
-  }
-
-  async findByEmail(email: string): Promise<UserRO>{
-    const user = await this.userRepository.findOne({email: email});
     return this.buildUserRO(user);
   }
 
@@ -110,10 +81,7 @@ export class UserService {
   private buildUserRO(user: UserEntity) {
     const userRO = {
       username: user.username,
-      email: user.email,
-      bio: user.bio,
       token: this.generateJWT(user),
-      image: user.image
     };
 
     return {user: userRO};

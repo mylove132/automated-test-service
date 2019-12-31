@@ -43,6 +43,8 @@ export class ConfigService {
 
       LOG_DIR: Joi.string().default(join(__dirname, '..', 'logs')),
 
+      JAVA_OAPI: Joi.string()
+
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
@@ -101,6 +103,10 @@ export class ConfigService {
 
   get databaseDropSchema(): boolean {
     return Boolean(this.envConfig.DATABASE_DROPSCHEMA);
+  }
+
+  get javaOapi(): string {
+    return this.envConfig.JAVA_OAPI;
   }
 
   getTypeOrmConfig(): Record<string, any> {

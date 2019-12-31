@@ -176,7 +176,7 @@ export class CatalogService {
                 const catalogRO = {
                     user: {
                         username: cata.user.username,
-                        email: cata.user.email,
+                        // email: cata.user.email,
                         userId: cata.user.id,
                     },
                     catalogName: cata.name,
