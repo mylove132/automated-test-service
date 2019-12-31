@@ -1,4 +1,16 @@
-import { IsJSON, IsNotEmpty, IsNumberString, IsOptional, IsString, IsUrl} from 'class-validator';
+import {
+    ArrayMaxSize,
+    ArrayMinSize,
+    IsArray,
+    IsJSON,
+    IsNotEmpty,
+    IsNumber,
+    IsNumberString,
+    IsOptional,
+    IsString,
+    IsUrl,
+    MinLength
+} from 'class-validator';
 import {Optional} from '@nestjs/common';
 
 export class CreateCaseDto {
@@ -21,16 +33,16 @@ export class CreateCaseDto {
     @IsNotEmpty()
     readonly path: string;
 
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
-    readonly type: string;
+    readonly type: number;
 
     @IsNotEmpty()
     catalogId: number;
 
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
-    paramType: string;
+    paramType: number;
 
     @IsNotEmpty()
     assertText: string;
@@ -82,23 +94,11 @@ export class UpdateCaseDto {
 
 }
 
-export class AddCaseListDto {
 
-    @IsNotEmpty()
-    ids: string;
+export class DeleteCaseDto {
 
-    @IsNotEmpty()
-    caseListName: string;
-
-    @Optional()
-    cron: string;
-
-    @Optional()
-    desc: string;
-}
-
-export class QueryCaseByEndpointAndPathDto {
-
-
-    endpoint: string
+    @ArrayMinSize(1,{message: "删除的ID至少为1个"})
+    @ArrayMaxSize(20,{message: "删除ID数组最多一次20个"})
+    @IsArray()
+    ids: number[];
 }

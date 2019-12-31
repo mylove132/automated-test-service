@@ -23,7 +23,7 @@ restful风格
 {
     "Code":0,
     "message":"success",
-    "daata":{
+    "data":{
     }
 }
 ```
@@ -213,18 +213,20 @@ data						|object		|R			|&nbsp;true表示更新成功
 ### 2.4   删除目录
 - **接口说明：** 删除目录
 - **请求方式：** DELETE
-- **接口地址：** /api/catalog/?
+- **接口地址：** /api/catalog
 
 #### 2.4.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;目录ids				|string		|R			|目录id，删除多个用英文逗号隔开	
+&emsp;目录ids				|number[]		|R			|目录id集合
 
 请求示例：
 
 ```
-/api/catalog/8,9,10
+{
+ "ids":[1,2]
+}
 
 ```
 返回结果
@@ -386,14 +388,14 @@ data						|object		|R			|&nbsp;true表示更新用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;scriptId				|number		|R			|脚本id
+&emsp;ids				|number[]		|R			|接口id集合
 
 
 请求示例：
 
 ```
 {
-   "scriptId": 1001
+	"ids": [11,12]
 }
 
 ```
@@ -403,7 +405,28 @@ data						|object		|R			|&nbsp;true表示更新用例成功
 :----						|:---		|:------	|:---	
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;true表示删除用例成功
+data						|object		|R			|
+&nbsp;&nbsp;&nbsp;&nbsp;list						|object		|R			|
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|number		|R			|删除的接口ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status						|number		|R			|true表示删除成功,false表示删除失败
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 11,
+            "status": true
+        },
+        {
+            "id": 12,
+            "status": true
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
 
 ### 2.8  添加接口用例
 - **接口说明：** 添加用例接口
@@ -418,20 +441,22 @@ data						|object		|R			|&nbsp;true表示删除用例成功
 &emsp;scriptName			|string		|R			|脚本名称
 &emsp;header			    |Object		|O			|header参数
 &emsp;param			        |string		|O			|接口参数
-&emsp;type			        |string		|O			|请求类型（GET,POST,DELETE,PUT）默认GET
-
+&emsp;type			        |string		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）默认GET
+&emsp;assertText			        |string		|O			|断言
+&emsp;endpoint			|string		|R			|endpoint值
+&emsp;path			|string		|R			|接口路径
 
 请求示例：
 
 ```
 {
-   "scriptId": 1001,
-   "scriptName": "测试",
-   "header":{
-     "Content-Type": "application/json"
-     }
-   "param": "",
-   "type": "GET"
+"name":"小米",
+"endpoint":"http://www.lsl.com",
+"path":"/api/lsl",
+"assertText":"\"code\":0",
+"type":1,
+"catalogId":3,
+"endpointId":3
 }
 
 ```
@@ -441,7 +466,20 @@ data						|object		|R			|&nbsp;true表示删除用例成功
 :----						|:---		|:------	|:---	
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;true表示添加用例成功
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|object		|R			|&nbsp;添加成功的id
+
+返回成功示例
+
+```
+{
+    "data": {
+        "id": 18
+    },
+    "code": 0,
+    "message": "success"
+}
+```
 
 ### 2.9  执行接口用例
 - **接口说明：** 执行用例接口
@@ -556,21 +594,22 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 - **请求方式：** POST
 - **接口地址：** /api/env/endpoint
 - `注意事项` endpoint值唯一，不能重复
+
 #### 3.1.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 &emsp;name			        |string		|R			|endpoint名称
 &emsp;endpoint			    |string	    |R		    |前缀地址
-&emsp;envs			        |string		|R			|环境id（多个环境用英文逗号隔开,eg:1,2,3）
+&emsp;envs			        |number[]		|R			|环境id集合
 
 请求示例：
 
 ```
 {
   "name": "百度",
-  "endponit": "http://www.baidu.com",
-  "envs": "1,2,3"
+  "endpoint": "http://www.baidu.com",
+  "envs": [2,3,4]
 }
 
 ```
@@ -591,23 +630,23 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ```
 {
     "data": {
-        "name": "腾讯",
-        "endpoint": "http://www.sina.com",
+        "name": "百度",
+        "endpoint": "http://www.baidu.co",
         "envs": [
-            {
-                "id": 1,
-                "name": "dev"
-            },
             {
                 "id": 2,
                 "name": "hotfix"
             },
             {
                 "id": 3,
-                "name": "online"
+                "name": "stress"
+            },
+            {
+                "id": 4,
+                "name": "prod"
             }
         ],
-        "id": 6
+        "id": 4
     },
     "code": 0,
     "message": "success"
@@ -623,7 +662,16 @@ data						|object		|R			|&nbsp;true表示执行用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;envIds			        |string		|O			|环境ID,同时获取多个环境id用逗号隔开
+&emsp;envIds			        |number[]		|O			|环境ID集合(如果为空，查询所有)
+
+
+请求示例：
+```
+{
+"envIds": [1,2,3]
+}
+```
+
 
 返回结果
 
@@ -706,12 +754,14 @@ data						|object		|R			|&nbsp;true表示执行用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;envIds			    |string		|R			|环境id(多个id用英文逗号隔开:eg：1,2,3)
+&emsp;ids			    |number[]		|R			|环境id集合
 
 请求示例：
 
 ```
-/api/env?envIds=1,2,3
+{
+"ids":[1,2,3]
+}
 
 ```
 返回结果
@@ -759,12 +809,14 @@ data						|object		|R			|&nbsp;true表示执行用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;endpointIds			|string		|R			|endpoint ID(多个id用英文逗号隔开:eg：1,2,3)
+&emsp;endpointIds			|string		|R			|endpoint ID集合
 
 请求示例：
 
 ```
-/api/env/endpoint?endpointIds=1,2,3
+{
+	"endpointIds": [1,"2"]
+}
 
 ```
 返回结果
@@ -816,12 +868,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 :----						|:---		|:------	|:---
 
 
-请求示例：
-
-```
-/api/env?envIds=1,2,3
-
-```
 返回结果
 
 参数名称						|类型		|出现要求	|描述  
@@ -873,12 +919,14 @@ data						|object		|R			|&nbsp;true表示执行用例成功
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;caseListId			|string		|O		|caseList ID(多个id用英文逗号隔开:eg：1,2,3)
-
+&emsp;isTask			    |string		|O		    |true(查询定时任务类型的用例)
+&emsp;envId			        |number		|O		    |查询该环境下的用例
+page	                    |number		|O			|页数(默认1)
+limit	                    |number		|O			|每页展示个数(默认10)
 请求示例：
 
 ```
-/api/caseList?caseListId=1,2,3
+/api/caselist?isTask=false&envId=1
 
 ```
 返回结果
@@ -895,110 +943,356 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 返回成功示例
 ```
 {
+    "data": {
+        "items": [
+            {
+                "id": 4,
+                "name": "测试用例2.1",
+                "desc": "注册信息如下：",
+                "cron": "2 * * * * *",
+                "isTask": false,
+                "createDate": "2019-12-30T08:28:39.193Z",
+                "updateDate": "2019-12-30T08:28:39.193Z",
+                "cases": [],
+                "env": null
+            }
+        ],
+        "itemCount": 1,
+        "totalItems": 1,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+
+### 3.7  添加定时任务
+- **接口说明：** 添加定时任务接口
+- **请求方式：** POST
+- **接口地址：** /api/scheduler
+
+#### 3.7.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;caseListId			|string		|R		|caseList ID
+&emsp;envIds                |number[]		|R		|env ID集合
+
+请求示例：
+
+```
+{
+	"caseListId": 3,
+	"envIds": [1,2,3]
+}
+
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;md5		|string		|R			|&nbsp; 定时任务名称ID(用于查找运行中的定时任务)
+&nbsp;&nbsp;&nbsp;env		|Object		|R			|&nbsp; 定时任务运行的环境
+&nbsp;&nbsp;&nbsp;caseList		|Object		|R			|&nbsp; 定时任务运行的用例
+&nbsp;&nbsp;&nbsp;status		|number		|R			|&nbsp; 定时任务运行的状态(0:RUNNING,1:STOP,2:DELETE)
+&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;定时任务id
+
+
+返回成功示例
+```
+{
     "data": [
         {
-            "id": 4,
-            "name": "注册接口",
-            "desc": "注册信息如下：",
-            "cron": "* * * * * ?",
-            "isTask": true,
-            "cases": [
-                {
-                    "id": 26,
-                    "name": "山竹",
-                    "header": {},
-                    "param": null,
-                    "paramType": 0,
-                    "path": "/api/sz",
-                    "endpoint": "http://www.sz.com",
-                    "type": 1,
-                    "createDate": "2019-12-26T04:59:49.412Z",
-                    "updateDate": "2019-12-26T04:59:49.412Z",
-                    "assertText": "\"code\":0"
-                },
-                {
-                    "id": 27,
-                    "name": "松鼠",
-                    "header": {},
-                    "param": null,
-                    "paramType": 0,
-                    "path": "/api/ss",
-                    "endpoint": "http://www.ss.com",
-                    "type": 1,
-                    "createDate": "2019-12-26T05:00:05.446Z",
-                    "updateDate": "2019-12-26T05:00:05.446Z",
-                    "assertText": "\"code\":0"
-                }
-            ],
+            "md5": "7225de143eaaf349cffc09ef7269ffa03ffde8dc658fb8323484f1f575da4c41",
+            "createDate": "2019-12-27T09:51:25.708Z",
             "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
+            },
+            "status": "0",
+            "id": 93,
+            "updateDate": "2019-12-27T09:51:25.888Z"
+        },
+        {
+            "md5": "4d67b5de0426a9e22db0eddd7e23de7105e7605bf4c46bd54887239db28746b7",
+            "createDate": "2019-12-27T09:51:26.060Z",
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
                 "id": 2,
-                "name": "hotfix",
-                "endpoints": [
-                    {
-                        "id": 6,
-                        "name": "腾讯",
-                        "endpoint": "http://www.sina.com"
-                    },
-                    {
-                        "id": 5,
-                        "name": "百度",
-                        "endpoint": "http://www.baidu.com"
-                    }
-                ]
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
+            },
+            "status": "0",
+            "id": 94,
+            "updateDate": "2019-12-27T09:51:26.133Z"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 3.8  获取运行中的定时任务
+- **接口说明：** 获取运行中的定时任务接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/running
+
+#### 3.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;md5		|string		|R			|&nbsp; 定时任务名称ID(用于查找运行中的定时任务)
+&nbsp;&nbsp;&nbsp;env		|Object		|R			|&nbsp; 定时任务运行的环境
+&nbsp;&nbsp;&nbsp;caseList		|Object		|R			|&nbsp; 定时任务运行的用例
+&nbsp;&nbsp;&nbsp;status		|number		|R			|&nbsp; 定时任务运行的状态(0:RUNNING,1:STOP,2:DELETE)
+&nbsp;&nbsp;&nbsp;&nbsp;id		|number		|R			|&nbsp;定时任务id
+
+
+返回成功示例
+```
+{
+    "data": [
+        {
+            "id": 91,
+            "md5": "d6dad2892106ce0e5270972af0dc269584ea1a91d1aa56f51fb782bd498a694a",
+            "createDate": "2019-12-27T09:24:21.216Z",
+            "updateDate": "2019-12-27T09:24:21.384Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
             }
         },
         {
-            "id": 5,
-            "name": "登录接口",
-            "desc": "注册信息如下：",
-            "cron": "* * * * * ?",
-            "isTask": true,
-            "cases": [
-                {
-                    "id": 26,
-                    "name": "山竹",
-                    "header": {},
-                    "param": null,
-                    "paramType": 0,
-                    "path": "/api/sz",
-                    "endpoint": "http://www.sz.com",
-                    "type": 1,
-                    "createDate": "2019-12-26T04:59:49.412Z",
-                    "updateDate": "2019-12-26T04:59:49.412Z",
-                    "assertText": "\"code\":0"
-                },
-                {
-                    "id": 27,
-                    "name": "松鼠",
-                    "header": {},
-                    "param": null,
-                    "paramType": 0,
-                    "path": "/api/ss",
-                    "endpoint": "http://www.ss.com",
-                    "type": 1,
-                    "createDate": "2019-12-26T05:00:05.446Z",
-                    "updateDate": "2019-12-26T05:00:05.446Z",
-                    "assertText": "\"code\":0"
-                }
-            ],
+            "id": 92,
+            "md5": "4e333e1a4c073c0fdf7b20cc85b79dcd9156ae1cb6226c301fb190f349d2caf5",
+            "createDate": "2019-12-27T09:24:21.558Z",
+            "updateDate": "2019-12-27T09:24:21.728Z",
+            "status": 0,
             "env": {
-                "id": 3,
-                "name": "online",
-                "endpoints": [
-                    {
-                        "id": 6,
-                        "name": "腾讯",
-                        "endpoint": "http://www.sina.com"
-                    },
-                    {
-                        "id": 5,
-                        "name": "百度",
-                        "endpoint": "http://www.baidu.com"
-                    }
-                ]
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 2,
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
             }
         }
     ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 3.9  停止运行中的定时任务
+- **接口说明：** 获取运行中的定时任务接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/stop
+
+#### 3.9.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;md5List			        |string[]		|O		    |定时任务的md5集合
+
+请求示例
+
+```
+{
+	"md5List":["11188194ab9275621c041f5eab4aaaa5ec462600c6bb8876aa44a0fba38421e9"]
+}
+```
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;success	|[]		    |R			|&nbsp; 停止成功的任务ID
+&nbsp;&nbsp;&nbsp;fail		|【】		|R			|&nbsp; 停止失败的任务ID
+
+
+
+返回成功示例
+```
+{
+    "data": {
+        "success": [
+            91,
+            92
+        ],
+        "fail": []
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 4.0  删除运行中的定时任务
+- **接口说明：** 删除运行中的定时任务接口
+- **请求方式：** DETELE
+- **接口地址：** /api/scheduler/running
+
+#### 3.9.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;md5List			        |string[]		|O		    |定时任务的md5集合
+
+请求示例
+
+```
+{
+	"md5List":["11188194ab9275621c041f5eab4aaaa5ec462600c6bb8876aa44a0fba38421e9"]
+}
+```
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;success	|[]		    |R			|&nbsp; 停止成功的任务ID
+&nbsp;&nbsp;&nbsp;fail		|【】		|R			|&nbsp; 停止失败的任务ID
+
+
+
+返回成功示例
+```
+
+    "data": [
+        {
+            "id": 91,
+            "md5": "d6dad2892106ce0e5270972af0dc269584ea1a91d1aa56f51fb782bd498a694a",
+            "createDate": "2019-12-27T09:24:21.216Z",
+            "updateDate": "2019-12-27T09:24:21.384Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 1,
+                "name": "测试用例1",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:03:43.154Z",
+                "updateDate": "2019-12-27T04:03:43.154Z"
+            }
+        },
+        {
+            "id": 92,
+            "md5": "4e333e1a4c073c0fdf7b20cc85b79dcd9156ae1cb6226c301fb190f349d2caf5",
+            "createDate": "2019-12-27T09:24:21.558Z",
+            "updateDate": "2019-12-27T09:24:21.728Z",
+            "status": 0,
+            "env": {
+                "id": 1,
+                "name": "dev"
+            },
+            "caseList": {
+                "id": 2,
+                "name": "测试用例2",
+                "desc": "注册信息如下：",
+                "cron": "1 * * * * *",
+                "isTask": true,
+                "createDate": "2019-12-27T04:04:06.756Z",
+                "updateDate": "2019-12-27T04:04:06.756Z"
+            }
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
+
+
+### 4.1  停止数据库扫描监控
+- **接口说明：** 停止数据库扫描监控接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/stop_system_task
+- `使用说明`: 用于服务更新时暂停扫描数据库监控
+
+#### 4.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;status	|boolean	    |R			|&nbsp; true表示删除成功
+
+
+
+
+返回成功示例
+```
+{
+    "data": {
+        "status": true
+    },
     "code": 0,
     "message": "success"
 }
@@ -1012,9 +1306,20 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 :----	|:---
 0		|处理成功
 -1		|未知错误
-10001	|用户ID不存在
-10002	|创建用户失败
-20001	|目录ID无效
+19999	|参数验证失败
+20000	| 执行数据库操作失败
+10001	|用户ID无效
+20002	|目录ID无效
+20001   |目录parentID无效
+30001   |endpoint ID无效
+30002   |环境ID无效
+30003   |环境名称无效
+30004   |endpoint重复
+40001   |接口ID无效
+50001   |用例ID无效
+60001   |定时任务md5值重复
+60002   |定时任务md5值无效
+60003   |定时任务已删除或已停止
 
 
 

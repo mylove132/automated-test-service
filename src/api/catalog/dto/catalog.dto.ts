@@ -1,4 +1,4 @@
-import {IsBoolean, IsNotEmpty} from 'class-validator';
+import {IsArray, IsBoolean, IsNotEmpty} from 'class-validator';
 
 export class CreateCatalogDto {
 
@@ -21,4 +21,10 @@ export class UpdateCatalogDto{
 
   readonly isPub: string;
 
+}
+
+export class QueryCatalogDto {
+
+  @IsArray()
+  ids: number[];
 }

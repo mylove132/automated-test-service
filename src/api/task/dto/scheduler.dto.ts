@@ -1,11 +1,24 @@
-import {IsNotEmpty} from 'class-validator';
-import {Optional} from '@nestjs/common';
+import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber} from 'class-validator';
 
 export class AddCaselistTaskDto {
 
-    @IsNotEmpty()
-    caseListIds: string
+   @IsNumber()
+    caseListId: number
 
-    @Optional()
-    envIds: string
+    @ArrayMinSize(1)
+    @IsArray()
+    envIds: number[]
+}
+
+export class Md5ListDto {
+
+
+    md5s: Set<string>;
+}
+
+export class DeleteRunningTaskDto {
+
+    @ArrayMinSize(1,{message: "删除的md5不能为空"})
+    @IsArray()
+    md5List: string[];
 }

@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query} from
 import {CatalogService} from './catalog.service';
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
-import {CreateCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {CatalogEntity} from './catalog.entity';
 
 
@@ -29,10 +29,9 @@ export class CatalogController {
 
   @ApiOperation({ title: 'delete catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
-  @Delete(':ids')
-  async deleteCatalog(@Param('ids') ids: string) {
-    console.log(ids)
-    return this.catalogService.deleteById(ids);
+  @Delete('')
+  async deleteCatalog(@Body() queryCatalogDto: QueryCatalogDto) {
+    return this.catalogService.deleteById(queryCatalogDto);
   }
 
   @ApiOperation({ title: 'update catalog' })

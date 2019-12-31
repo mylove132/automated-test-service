@@ -35,7 +35,7 @@ export class CaselistEntity {
     @Column({default: false,comment:'是否是定时任务'})
     isTask: boolean;
 
-    @ManyToOne(type => EnvEntity, env => env.caseLists,{cascade: true})
+    @ManyToOne(type => EnvEntity, env => env.caseLists,{cascade: true, onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     env: EnvEntity;
 
     @CreateDateColumn()
@@ -44,6 +44,6 @@ export class CaselistEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @OneToOne(type => SchedulerEntity, secheduler => secheduler.caseList)
-    secheduler: SchedulerEntity;
+    @OneToMany(type => SchedulerEntity, secheduler => secheduler.caseList)
+    sechedulers: SchedulerEntity[];
 }

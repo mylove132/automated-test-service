@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Post, Put, Query, ValidationPipe} from '@
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
 import {EnvService} from './env.service';
 import {EnvEntity} from './env.entity';
-import {AddEndpointDto} from './dto/env.dto';
+import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
 
 @ApiBearerAuth()
 @ApiUseTags('env')
@@ -35,8 +35,8 @@ export class EnvController {
     @ApiOperation({ title: 'delete env' })
     @ApiResponse({ status: 200, description: 'delete env success.'})
     @Delete()
-    async deleteEnv(@Query('envIds') envIds: string) {
-        return this.envService.deleteEnv(envIds);
+    async deleteEnv(@Body() queryEnvDto: QueryEnvDto) {
+        return this.envService.deleteEnv(queryEnvDto);
     }
 
     @ApiOperation({ title: 'create endpoint' })
@@ -49,15 +49,15 @@ export class EnvController {
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')
-    async findEndpointByEnvId( @Query('envIds')envIds: string = null){
-        return this.envService.findEndpointByEnv(envIds);
+    async findEndpointByEnvId( @Body() queryEndpointDto: QueryEndpointDto){
+        return this.envService.findEndpointByEnv(queryEndpointDto);
     }
 
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Delete('/endpoint')
-    async deleteEndpointByIds(@Query('endpointIds') endpointIds: string = null){
-        return this.envService.deleteEndpointByIds(endpointIds);
+    async deleteEndpointByIds(@Body() deleteEndpointDto: DeleteEndpointDto){
+        return this.envService.deleteEndpointByIds(deleteEndpointDto);
     }
 
 }

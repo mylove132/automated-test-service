@@ -20,5 +20,5 @@ export class EnvEntity {
     caseLists: CaselistEntity[]
 
     @OneToOne(type => SchedulerEntity, secheduler => secheduler.env)
-    secheduler: SchedulerEntity;
+    sechedulers: SchedulerEntity[];
 }

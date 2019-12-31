@@ -1,7 +1,7 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {InsertResult, Repository} from 'typeorm';
 import {CaseEntity} from './case.entity';
-import {CreateCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
@@ -10,6 +10,7 @@ import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
+import {CommonUtil} from '../../util/common.util';
 
 export class CaseService {
     constructor(
@@ -39,15 +40,15 @@ export class CaseService {
             }
         );
         if (!catalog) {
-            throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
         if (typeof createCaseDto.type != "undefined"){
-            const type = this.getRequestType(Number(createCaseDto.type));
+            const type = this.getRequestType(createCaseDto.type);
             caseObj.type = type;
         }
         console.log(createCaseDto.paramType)
         if (typeof createCaseDto.paramType != "undefined"){
-            caseObj.paramType = this.getParamType(Number(createCaseDto.paramType));
+            caseObj.paramType = this.getParamType(createCaseDto.paramType);
         }
         if (createCaseDto.endpointId != null){
             const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id',{id:createCaseDto.endpointId}).getOne().catch(
@@ -57,7 +58,7 @@ export class CaseService {
                 }
             );
             if (!endpoint) {
-                throw new ApiException(`endpointId:${createCaseDto.endpointId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                throw new ApiException(`endpointId:${createCaseDto.endpointId}不存在`, ApiErrorCode.ENDPOINT_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
             caseObj.endpointObject = endpoint;
         }
@@ -102,40 +103,49 @@ export class CaseService {
                 }
             );
             if (!catalog) {
-                throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
             const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).orderBy('case.updateDate', 'DESC');
             return await paginate<CaseEntity>(queryBuilder, options);
         }
     }
 
-    async deleteById(ids: string) {
-        let delList = ids.split(',');
-        let result = [];
-        for (const delId of delList) {
-            console.log(delId);
-            const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: Number(delId)}).getOne().catch(
-                err => {
-                    console.log(err);
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    async deleteById(deleteCaseDto: DeleteCaseDto) {
+        deleteCaseDto.ids.forEach(
+            id => {
+                if (!CommonUtil.isNumber(id)){
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
                 }
-            );
-            console.log(caseObj);
-            if (!caseObj) {
-                throw new ApiException(`删除的ID: ${delId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
             }
-            await this.caseRepository.createQueryBuilder().delete().where('id = :id', {id: Number(delId)}).execute().catch(
+        );
+        let result = [];
+        for (const delId of deleteCaseDto.ids) {
+            const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: delId}).getOne().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
-            result.push(
-                {
-                    id: delId,
-                    result: true
+            if (!caseObj) {
+                throw new ApiException(`删除的ID: ${delId}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
+            }
+            const res = await this.caseRepository.createQueryBuilder().delete().where('id = :id', {id: delId}).execute().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
+            if (res.affected == 1){
+                result.push({
+                    id: delId,
+                    status: true
+                })
+            }else {
+                result.push({
+                    id: delId,
+                    status: false
+                })
+            }
         }
         return result;
     }
@@ -159,12 +169,12 @@ export class CaseService {
                 }
             );
             if (!endpoint) {
-                throw new ApiException(`endpointId:${updateCaseDto.endpointId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                throw new ApiException(`endpointId:${updateCaseDto.endpointId}不存在`, ApiErrorCode.ENDPOINT_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
             cases.endpointObject = endpoint;
         }
         if (!caseObj) {
-            throw new ApiException(`查询case的id:${id}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+            throw new ApiException(`查询case的id:${id}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
         }
         if (updateCaseDto.catalogId != null) {
             const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: updateCaseDto.catalogId}).getOne().catch(
@@ -174,7 +184,7 @@ export class CaseService {
                 }
             );
             if (!catalog) {
-                throw new ApiException(`查询catalog的id:${updateCaseDto.catalogId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+                throw new ApiException(`查询catalog的id:${updateCaseDto.catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
             cases.catalog = catalog;
         }
