@@ -43,7 +43,13 @@ export class ConfigService {
 
       LOG_DIR: Joi.string().default(join(__dirname, '..', 'logs')),
 
-      JAVA_OAPI: Joi.string()
+      JAVA_OAPI: Joi.string(),
+      
+      QUEUE_NAME: Joi.string().required(),
+
+      REDIS_HOST: Joi.string().required().default('127.0.0.1'),
+
+      REDIS_PORT: Joi.number().default(6379)
 
     });
 
@@ -71,6 +77,18 @@ export class ConfigService {
 
   get databaseType(): string {
     return this.envConfig.DATABASE_TYPE;
+  }
+
+  get queueName(): string {
+    return this.envConfig.QUEUE_NAME;
+  }
+
+  get redisHost(): string {
+    return this.envConfig.REDIS_HOST;
+  }
+
+  get redisPort(): string {
+    return this.envConfig.REDIS_PORT;
   }
 
   get databaseHost(): string {
@@ -123,8 +141,19 @@ export class ConfigService {
       cli: {
         migrationsDir: 'src/migrations',
       },
+      maxQueryExecutionTime: 1000,
       logging: "all",
       logger: "file"
+    }
+  }
+
+  getQueueConfig(): Record<string, any> {
+    return {
+      name: this.queueName,
+      redis: {
+        host: this.redisHost,
+        port: this.redisPort
+      }
     }
   }
 }

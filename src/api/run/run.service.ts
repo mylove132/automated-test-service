@@ -38,7 +38,7 @@ export class RunService {
     if (result.result) {
       return result.data
     } else {
-      throw new ApiException('请求失败', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      throw new ApiException('请求失败', ApiErrorCode.RUN_INTERFACE_FAIL, HttpStatus.OK);
     }
   }
 
@@ -62,6 +62,7 @@ export class RunService {
           throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     );
+    console.log(caseObj);
     if (caseObj instanceof CaseEntity) {
       const endpoint = generateEndpointByEnv(caseObj.endpointObject.envs[0].name, caseObj.endpointObject.endpoint)
       const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {

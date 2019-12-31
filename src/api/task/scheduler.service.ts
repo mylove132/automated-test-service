@@ -12,6 +12,8 @@ import {EnvEntity} from '../env/env.entity';
 import {AddCaselistTaskDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
 import {CommonUtil} from '../../util/common.util';
+import {InjectQueue} from '@nestjs/bull';
+import {Queue} from 'bull';
 
 export class SchedulerService {
 
@@ -20,6 +22,7 @@ export class SchedulerService {
                 private readonly scheRepository: Repository<SchedulerEntity>,
                 @InjectRepository(CaselistEntity)
                 private readonly caseListRepository: Repository<CaselistEntity>,
+                @InjectQueue('automated') private readonly caseListService: Queue,
                 @InjectRepository(EnvEntity)
                 private readonly envRepository: Repository<EnvEntity>,) {
     }
@@ -163,7 +166,7 @@ export class SchedulerService {
     }
 
 
-    @Cron('* * * * * *',{name:'checkStatus'})
+    //@Cron('* * * * * *',{name:'checkStatus'})
     async checkJobRunStatus() {
         console.log('------------------------排查定时任务--------------------')
         const result = await this.scheRepository.createQueryBuilder('sechu').where('sechu.status = :status',{status: RunStatus.RUNNING}).getMany().catch(
@@ -202,6 +205,10 @@ export class SchedulerService {
     }
 
     private async runCaseList(envId, caseListId){
+        await this.caseListService.add('addCaseList',{
+            caseListId: caseListId,
+            envId: envId
+        },{delay: 3});
         console.log("定时任务环境:"+envId+"定时任务用例id："+caseListId);
     }
 }
