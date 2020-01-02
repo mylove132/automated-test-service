@@ -111,6 +111,9 @@ export class RunService {
           throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     );
+    if (!caseList) {
+      throw new ApiException('未找到相关用例', ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.OK);
+    }
     const caseIdList = []
     const requestList = caseList.cases.map(v => {
       if (v instanceof CaseEntity) {
