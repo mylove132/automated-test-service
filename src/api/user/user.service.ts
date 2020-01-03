@@ -91,14 +91,12 @@ export class UserService {
   }
 
   public generateJWT(user) {
-    let today = new Date();
-    let exp = new Date(today);
-    exp.setDate(today.getDate() + 7);
     return jwt.sign({
       id: user.id,
       userId: user.userId,
-      username: user.username,
-      exp: exp.getTime() / 1000,
-    }, SECRET);
+      username: user.username
+    }, SECRET, {
+      expiresIn: '7d' // 7天过期时间
+    });
   };
 }
