@@ -48,21 +48,21 @@ export class WsService{
                const runCaseDto = new RunCaseDto(cas.id, envId);
                const result = await this.runService.runCaseById(runCaseDto);
                const res = {caseId: cas.id, envId: envId, result: result};
-               const history = new HistoryEntity();
-               history.case = cas;
-               history.result = JSON.stringify(res);
-               history.executor = Executor.MANUAL;
-               if (result.toString().indexOf(cas.assertText) != -1){
-                   history.status = RequestStatusEnum.SUCCESS
-               }else {
-                   history.status = RequestStatusEnum.FAIL
-               }
-               await this.historyRepository.createQueryBuilder().insert().into(HistoryEntity).values(history).execute().catch(
-                   err => {
-                       console.log(err);
-                       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                   }
-               )
+               // const history = new HistoryEntity();
+               // history.case = cas;
+               // history.result = JSON.stringify(res);
+               // history.executor = Executor.MANUAL;
+               // if (result.toString().indexOf(cas.assertText) != -1){
+               //     history.status = RequestStatusEnum.SUCCESS
+               // }else {
+               //     history.status = RequestStatusEnum.FAIL
+               // }
+               // await this.historyRepository.createQueryBuilder().insert().into(HistoryEntity).values(history).execute().catch(
+               //     err => {
+               //         console.log(err);
+               //         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+               //     }
+               // )
                re.push(res);
            }
        }

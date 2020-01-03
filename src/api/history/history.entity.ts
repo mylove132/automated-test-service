@@ -23,6 +23,12 @@ export class HistoryEntity {
 
     @Column('text',{nullable: true})
     result: string;
+
+    @Column({default: new Date()})
+    startTime: Date;
+
+    @Column({default: new Date()})
+    endTime: Date;
 }
 
 

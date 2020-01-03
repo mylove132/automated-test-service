@@ -9,10 +9,13 @@ import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { AxiosRequestConfig } from 'axios';
 import { getRequestMethodTypeString, generateEndpointByEnv } from '../../utils'
+import { HistoryService } from '../history/history.service';
 import { forkJoin } from 'rxjs';
 import * as FormData from 'form-data';
 import * as request from 'request';
 import {IRunCaseById, IRunCaseList} from './run.interface';
+import { map } from 'rxjs/operators';
+
 
 @Injectable()
 export class RunService {
@@ -21,7 +24,8 @@ export class RunService {
     private readonly caseRepository: Repository<CaseEntity>,
     @InjectRepository(CaselistEntity)
     private readonly caseListRepository: Repository<CaselistEntity>,
-    private readonly curlService: CurlService
+    private readonly curlService: CurlService,
+    private readonly historyService: HistoryService,
   ) {}
 
   /**
@@ -69,8 +73,29 @@ export class RunService {
         endpoint: endpoint,
         type: String(caseObj.type),
       });
+      console.log("requestBaseData", requestBaseData)
       const requestData = this.generateRequestData(requestBaseData);
+      const startTime = new Date();
       const result = await this.curlService.makeRequest(requestData).toPromise();
+      const endTime = new Date();
+      const res = JSON.stringify(result.data);
+      console.log(res)
+      // 保存历史记录
+      const historyData = {
+        caseId: runCaseById.caseId,
+        status: result.result ? 0 : 1,
+        executor: 0,
+        re: res,
+        startTime: startTime,
+        endTime: endTime
+      };
+      console.log(historyData);
+      await this.historyService.createHistory(historyData).catch(
+          err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+          }
+      )
       if (result.result) {
         return result.data
       } else {
@@ -101,6 +126,11 @@ export class RunService {
           throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     );
+    if (!caseList) {
+      throw new ApiException('未找到相关用例', ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.OK);
+    }
+    const caseIdList = []
+    const startTime = new Date();
     const requestList = caseList.cases.map(v => {
       if (v instanceof CaseEntity) {
         const endpoint = generateEndpointByEnv(v.endpointObject.envs[0].name, v.endpointObject.endpoint)
@@ -108,13 +138,29 @@ export class RunService {
           endpoint: endpoint,
           type: String(v.type),
         });
+        caseIdList.push(v.id);
         const requestData = this.generateRequestData(requestBaseData);
         return this.curlService.makeRequest(requestData);
       } else {
         throw new ApiException('样例中接口未找到', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     })
-    const resultList = await forkJoin(requestList).toPromise();
+    const endTime = new Date();
+    const resultList = await forkJoin(requestList).pipe(map(res => {
+      res.forEach(async (value, index) => {
+        // 保存历史记录
+        const historyData = {
+          caseId: caseIdList[index].id,
+          status: value.result ? 0 : 1,
+          executor: 0,
+          re: JSON.stringify(value.data),
+          startTime: startTime,
+          endTime: endTime
+        }
+        await this.historyService.createHistory(historyData);
+      })
+      return res
+    })).toPromise();
     return resultList
   }
 
@@ -139,9 +185,9 @@ export class RunService {
     } else {
       // 如果为get方法，则参数为params，否则为data
       if (runCaseDto.type === '0') {
-        requestData.params = runCaseDto.param
+        requestData.params = JSON.parse(runCaseDto.param)
       } else {
-        requestData.data = runCaseDto.param
+        requestData.data = JSON.parse(runCaseDto.param)
       }
     }
     return requestData

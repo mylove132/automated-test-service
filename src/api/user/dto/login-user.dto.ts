@@ -3,7 +3,7 @@ import { IsNotEmpty } from 'class-validator';
 export class LoginUserDto {
 
   @IsNotEmpty()
-  readonly email: string;
+  readonly userName: string;
 
   @IsNotEmpty()
   readonly password: string;

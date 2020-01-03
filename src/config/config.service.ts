@@ -43,6 +43,8 @@ export class ConfigService {
 
       LOG_DIR: Joi.string().default(join(__dirname, '..', 'logs')),
 
+      JAVA_OAPI: Joi.string(),
+      
       QUEUE_NAME: Joi.string().required(),
 
       REDIS_HOST: Joi.string().required().default('127.0.0.1'),
@@ -119,6 +121,10 @@ export class ConfigService {
 
   get databaseDropSchema(): boolean {
     return Boolean(this.envConfig.DATABASE_DROPSCHEMA);
+  }
+
+  get javaOapi(): string {
+    return this.envConfig.JAVA_OAPI;
   }
 
   getTypeOrmConfig(): Record<string, any> {
