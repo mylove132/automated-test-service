@@ -20,6 +20,9 @@ export class HistoryEntity {
 
     @Column('enum',{default: Executor.MANUAL, nullable:false, comment: '执行者', enum: Executor })
     executor: Executor;
+
+    @Column('text',{nullable: true})
+    result: string;
 }
 
 

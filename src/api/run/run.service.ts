@@ -12,6 +12,7 @@ import { getRequestMethodTypeString, generateEndpointByEnv } from '../../utils'
 import { forkJoin } from 'rxjs';
 import * as FormData from 'form-data';
 import * as request from 'request';
+import {IRunCaseById, IRunCaseList} from './run.interface';
 
 @Injectable()
 export class RunService {
@@ -47,14 +48,14 @@ export class RunService {
    * @param {RunCaseByIdDto}: 接口Id及环境Id
    * @return {Promise<any>}: 发起请求后的响应结果
    */
-  async runCaseById(runCaseByIdDto: RunCaseByIdDto): Promise<any> {
+  async runCaseById(runCaseById: IRunCaseById): Promise<any> {
     const caseObj = await this.caseRepository
     .createQueryBuilder('case')
     .select()
     .leftJoinAndSelect("case.endpointObject", 'endpointObj')
-    .where('case.id = :id', {id: runCaseByIdDto.caseId})
+    .where('case.id = :id', {id: runCaseById.caseId})
     .leftJoinAndSelect("endpointObj.envs", 'envObj')
-    .where('envObj.id = :id', {id: runCaseByIdDto.envId})
+    .where('envObj.id = :id', {id: runCaseById.envId})
     .getOne()
     .catch(
       err => {
@@ -62,7 +63,6 @@ export class RunService {
           throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     );
-    console.log(caseObj);
     if (caseObj instanceof CaseEntity) {
       const endpoint = generateEndpointByEnv(caseObj.endpointObject.envs[0].name, caseObj.endpointObject.endpoint)
       const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
@@ -86,14 +86,14 @@ export class RunService {
    * @param {RunCaseListByIdDto}: 用例Id及环境Id
    * @return {Promise<any>}: 发起请求后的响应结果
    */
-  async runCaseListById(runCaseListByIdDto: RunCaseListByIdDto):Promise<any[]> {
+  async runCaseListById(runcaseList: IRunCaseList):Promise<any[]> {
     const caseList = await this.caseListRepository
     .createQueryBuilder('caselist')
-    .where('caselist.id = :id', {id: runCaseListByIdDto.caseListId})
+    .where('caselist.id = :id', {id: runcaseList.caseListId})
     .leftJoinAndSelect('caselist.cases','cases')
     .leftJoinAndSelect('cases.endpointObject','end')
     .leftJoinAndSelect('end.envs','envObj')
-    .where('envObj.id = :id', {id: runCaseListByIdDto.envId})
+    .where('envObj.id = :id', {id: runcaseList.envId})
     .getOne()
     .catch(
       err => {

@@ -12,5 +12,6 @@ import { CaselistEntity } from '../caselist/caselist.entity';
   imports: [CurlModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity])],
   providers: [RunService],
   controllers: [RunController],
+  exports: [RunService]
 })
 export class RunModule {}

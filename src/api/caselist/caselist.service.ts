@@ -120,7 +120,7 @@ export class CaselistService {
             }
         caseList.env = envObj;
         }
-        const result = await this.caseListRepository.save(caseList).catch(
+        const result = await this.caseListRepository.createQueryBuilder().update(CaselistEntity).set(caseList).where('id = :id',{id: updateCaseListDto.id}).execute().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -182,7 +182,7 @@ export class CaselistService {
             if (!caseListObj){
                 throw new ApiException(`caselist ID:${delId}不存在`,ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
-            const result = await this.caseListRepository.createQueryBuilder().delete().where('id = :id',{id: delId}).execute().catch(
+           await this.caseListRepository.createQueryBuilder().delete().where('id = :id',{id: delId}).execute().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
