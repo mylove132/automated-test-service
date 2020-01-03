@@ -29,14 +29,13 @@ export class AuthGuard implements CanActivate {
       const authHeaders = req.headers.token;
       if (authHeaders) {
         const token = authHeaders;
-        const decoded: any = await jwt.verify(token, SECRET, err => {
-          if (err && err.name == 'TokenExpiredError') {
-            // 过期
+        let decoded;
+        try {
+          decoded = await jwt.verify(token, SECRET);
+        } catch (error) {
+          if (error && error.name == 'TokenExpiredError') {
             throw new HttpException('Token expired.', HttpStatus.UNAUTHORIZED);
           }
-        });
-        // 错误的token
-        if (!decoded || !decoded.id) {
           throw new HttpException('Token error.', HttpStatus.UNAUTHORIZED);
         }
         const user = await this.userService.findById(decoded.id);
