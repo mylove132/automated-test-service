@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HistoryEntity } from './history.entity';
@@ -6,6 +6,7 @@ import { CreateHistoryDto } from './dto/history.dto';
 import { CaseEntity } from '../case/case.entity';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class HistoryService {
@@ -34,5 +35,23 @@ export class HistoryService {
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     })
     return result
+  }
+  /**
+   * 获取所有的历史记录列表
+   * @param {number, IPaginationOptions}: id, 页码信息
+   * @return {Promise<Pagination<HistoryEntity>>}: 历史记录列表
+   */
+  async findHistoryList(historyId: number, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
+    if (!historyId) {
+        const queryBuilder = this.historyRepository.createQueryBuilder('history')
+        .leftJoinAndSelect('history.case','case')
+        .orderBy('history.createDate', 'DESC');
+        return await paginate<HistoryEntity>(queryBuilder, options);
+    } else {
+        const queryBuilder = this.historyRepository.createQueryBuilder('history')
+        .where('history.id = :id', {id: historyId})
+        .leftJoinAndSelect('history.case','case');
+        return await paginate<HistoryEntity>(queryBuilder, options);
+    }
   }
 }

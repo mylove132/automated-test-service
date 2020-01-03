@@ -1,17 +1,16 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { ApiException } from '../exceptions/api.exception';
 
 var logger = require('log4js').getLogger("HttpExceptionFilter");
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception, host: ArgumentsHost) {
+    console.log(exception)
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-
-    const status = exception.getStatus && exception.getStatus();
+    const status = exception.getStatus ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
     logger.error(exception);
-    console.log(exception && exception.message)
     if (exception instanceof ApiException) {
 
       response

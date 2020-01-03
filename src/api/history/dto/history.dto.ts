@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsNumberString } from 'class-validator';
 
 export class CreateHistoryDto {
 

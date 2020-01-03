@@ -15,6 +15,7 @@ import { SchedulerModule } from './api/task/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WsModule } from './api/ws/ws.module';
 import { AuthGuard } from './shared/guard/auth.guard';
+import { HistoryModule } from './api/history/history.module';
 
 const Orm = (): DynamicModule => {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
@@ -33,6 +34,7 @@ const Orm = (): DynamicModule => {
     CaseListModule,
     WsModule,
     RunModule,
+    HistoryModule,
     // SchedulerModule,
   ],
   controllers: [
