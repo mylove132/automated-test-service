@@ -18,6 +18,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "typeorm:migration:generate": "npm run typeorm -- migration:generate -n migration",
     "typeorm:migration:run": "npm run typeorm -- migration:run",
+    "typeorm:migration:revert": "npm run typeorm -- migration:revert",
     "pretypeorm": "(rm ormconfig.json || :) && ts-node -r tsconfig-paths/register src/scripts/write-type-orm-config.ts",
     "migration": "export NODE_ENV=test && npm run typeorm:migration:generate && npm run typeorm:migration:run",
     "migration:dev": "export NODE_ENV=development && npm run typeorm:migration:generate && npm run typeorm:migration:run"
