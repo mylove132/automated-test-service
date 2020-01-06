@@ -2,10 +2,8 @@ import { IsString, IsJSON, IsNotEmpty, IsUrl, IsNumber, IsNumberString, IsOption
 import { ParamType } from '../../case/dto/http.enum';
 import {IRunCaseById, IRunCaseList} from '../run.interface';
 import {Executor} from '../../history/dto/history.enum';
-<<<<<<< HEAD
 import {Optional} from '@nestjs/common';
-=======
->>>>>>> 077999d2baa8a42278f6c7f190a304a1aa03e0da
+
 
 export class RunCaseDto {
     @IsNotEmpty()
@@ -46,15 +44,10 @@ export class RunCaseByIdDto implements IRunCaseById{
     @IsNotEmpty()
     @IsNumber()
     readonly envId: number;
-<<<<<<< HEAD
 
     @Optional()
     readonly executor: Executor;
-=======
-    
-    @IsOptional()
-    executor: Executor;
->>>>>>> 077999d2baa8a42278f6c7f190a304a1aa03e0da
+
 }
 export class RunCaseListByIdDto implements IRunCaseList{
      @IsNotEmpty()
@@ -65,7 +58,6 @@ export class RunCaseListByIdDto implements IRunCaseList{
      @IsNumber()
     readonly envId: number;
 
-<<<<<<< HEAD
     @Optional()
     readonly executor: Executor;
 }
@@ -84,9 +76,4 @@ export class CovertDto {
     @IsOptional()
     @IsJSON()
     header: string;
-=======
-    @IsOptional()
-    readonly executor: Executor;
-
->>>>>>> 077999d2baa8a42278f6c7f190a304a1aa03e0da
 }

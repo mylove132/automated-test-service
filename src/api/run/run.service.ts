@@ -224,8 +224,17 @@ export class RunService {
           }
       )
     }
+    let args;
+    if (covertDto.args){
+      args = covertDto.args;
+    }else {
+      args = "";
+    }
+
     let result;
-    result += `curl -g -i -X ${type} ${covertDto.url} ${ht} `
+    result = `curl -g -i -X ${type} ${covertDto.url} ${ht} -d ${args}`;
+
+    return result;
   }
 }
 
