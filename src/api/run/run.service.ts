@@ -152,7 +152,7 @@ export class RunService {
         const historyData = {
           caseId: caseIdList[index].id,
           status: value.result ? 0 : 1,
-          executor: 0,
+          executor: runcaseList.executor,
           re: JSON.stringify(value.data),
           startTime: startTime,
           endTime: endTime
