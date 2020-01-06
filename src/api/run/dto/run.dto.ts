@@ -1,6 +1,7 @@
 import { IsString, IsJSON, IsNotEmpty, IsUrl, IsNumber, IsNumberString, IsOptional } from 'class-validator';
 import { ParamType } from '../../case/dto/http.enum';
 import {IRunCaseById, IRunCaseList} from '../run.interface';
+import {Executor} from '../../history/dto/history.enum';
 
 export class RunCaseDto {
     @IsNotEmpty()
@@ -30,6 +31,7 @@ export class RunCaseDto {
     @IsString()
     @IsOptional()
     assertText: string;
+
 }
 
 export class RunCaseByIdDto implements IRunCaseById{
@@ -40,6 +42,9 @@ export class RunCaseByIdDto implements IRunCaseById{
     @IsNotEmpty()
     @IsNumber()
     readonly envId: number;
+    
+    @IsOptional()
+    executor: Executor;
 }
 export class RunCaseListByIdDto implements IRunCaseList{
      @IsNotEmpty()
@@ -48,4 +53,8 @@ export class RunCaseListByIdDto implements IRunCaseList{
     @IsNotEmpty()
      @IsNumber()
     readonly envId: number;
+
+    @IsOptional()
+    readonly executor: Executor;
+
 }
