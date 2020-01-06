@@ -49,8 +49,9 @@ export class ConfigService {
 
       REDIS_HOST: Joi.string().required().default('127.0.0.1'),
 
-      REDIS_PORT: Joi.number().default(6379)
+      REDIS_PORT: Joi.number().default(6379),
 
+      DINGTALK_ACCESS_TOKEN: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
@@ -125,6 +126,10 @@ export class ConfigService {
 
   get javaOapi(): string {
     return this.envConfig.JAVA_OAPI;
+  }
+
+  get dingtalkAccessToken(): string {
+    return this.envConfig.DINGTALK_ACCESS_TOKEN;
   }
 
   getTypeOrmConfig(): Record<string, any> {
