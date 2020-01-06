@@ -1,4 +1,4 @@
-import {Cron, SchedulerRegistry} from '@nestjs/schedule';
+import {SchedulerRegistry} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {Repository} from 'typeorm';
@@ -12,8 +12,9 @@ import {EnvEntity} from '../env/env.entity';
 import {AddCaselistTaskDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
 import {CommonUtil} from '../../util/common.util';
-import {InjectQueue} from '@nestjs/bull';
-import {Queue} from 'bull';
+import {RunService} from '../run/run.service';
+import {IRunCaseList} from '../run/run.interface';
+import {Executor} from '../history/dto/history.enum';
 
 export class SchedulerService {
 
@@ -22,9 +23,9 @@ export class SchedulerService {
                 private readonly scheRepository: Repository<SchedulerEntity>,
                 @InjectRepository(CaselistEntity)
                 private readonly caseListRepository: Repository<CaselistEntity>,
-                @InjectQueue('automated') private readonly caseListService: Queue,
                 @InjectRepository(EnvEntity)
-                private readonly envRepository: Repository<EnvEntity>,) {
+                private readonly envRepository: Repository<EnvEntity>,
+                private readonly runService: RunService) {
     }
 
     async startTask(addCaselistTaskDto: AddCaselistTaskDto) {
@@ -205,10 +206,24 @@ export class SchedulerService {
     }
 
     private async runCaseList(envId, caseListId){
-        await this.caseListService.add('addCaseList',{
-            caseListId: caseListId,
-            envId: envId
-        },{delay: 3});
+        const caseListDto = new RunCaseListDto(caseListId, envId, Executor.SCHEDULER);
+        await this.runService.runCaseListById(caseListDto);
         console.log("定时任务环境:"+envId+"定时任务用例id："+caseListId);
+
     }
+}
+
+class RunCaseListDto implements IRunCaseList{
+    readonly caseListId: number;
+    readonly envId: number;
+    readonly executor: Executor;
+
+    constructor(private readonly clId: number, private readonly eId: number, private readonly exec: Executor) {
+        this.caseListId = clId;
+        this.envId = eId;
+        this.executor = exec;
+    }
+
+
+
 }
