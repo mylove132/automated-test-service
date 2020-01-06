@@ -11,7 +11,7 @@ import {HttpStatus} from '@nestjs/common';
 import {HistoryEntity} from '../history/history.entity';
 import {from} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Executor, RequestStatusEnum} from '../history/dto/history.enum';
+import {Executor} from '../history/dto/history.enum';
 
 @WebSocketGateway(3003)
 export class WsService{
@@ -45,7 +45,7 @@ export class WsService{
         const re = [];
        for (const cas of cases){
            for (const envId of envIds){
-               const runCaseDto = new RunCaseDto(cas.id, envId);
+               const runCaseDto = new RunCaseDto(cas.id, envId, Executor.MANUAL);
                const result = await this.runService.runCaseById(runCaseDto);
                const res = {caseId: cas.id, envId: envId, result: result};
                // const history = new HistoryEntity();
@@ -84,7 +84,7 @@ export class WsService{
         leftJoinAndSelect('caselist.cases','case').getOne();
         const cases = caseList.cases;
         return from(cases).pipe(map(async item => {
-            const runCaseDto = new RunCaseDto(item.id, envId);
+            const runCaseDto = new RunCaseDto(item.id, envId, Executor.MANUAL);
             const result = await this.runService.runCaseById(runCaseDto);
             console.log(result);
             const rs = {caseId: item.id,envId: envId,result: result};
@@ -100,9 +100,13 @@ export class RunCaseDto implements IRunCaseById{
 
     readonly caseId: number;
     readonly envId: number;
+    readonly executor: Executor;
 
-    constructor(readonly cId: number, readonly eId: number){
+    constructor(readonly cId: number, readonly eId: number, et: Executor){
         this.caseId = cId;
         this.envId = eId;
+        this.executor = et;
     }
+
+
 }

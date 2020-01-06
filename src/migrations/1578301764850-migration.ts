@@ -1,12 +1,12 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class migration1577683328005 implements MigrationInterface {
-    name = 'migration1577683328005'
+export class migration1578301764850 implements MigrationInterface {
+    name = 'migration1578301764850'
 
     public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "email" character varying NOT NULL, "bio" character varying NOT NULL DEFAULT '', "image" character varying NOT NULL DEFAULT '', "password" character varying NOT NULL, CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`, undefined);
+        await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "userId" integer NOT NULL, CONSTRAINT "UQ_d72ea127f30e21753c9e229891e" UNIQUE ("userId"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`, undefined);
         await queryRunner.query(`CREATE TABLE "catalog" ("id" SERIAL NOT NULL, "createDate" TIMESTAMP NOT NULL DEFAULT now(), "updateDate" TIMESTAMP NOT NULL DEFAULT now(), "name" character varying NOT NULL, "isPub" boolean NOT NULL DEFAULT false, "parentId" integer DEFAULT null, "userId" integer, CONSTRAINT "PK_782754bded12b4e75ad4afff913" PRIMARY KEY ("id"))`, undefined);
-        await queryRunner.query(`CREATE TABLE "history" ("id" SERIAL NOT NULL, "createDate" TIMESTAMP NOT NULL DEFAULT now(), "status" "history_status_enum" NOT NULL DEFAULT '0', "caseId" integer, CONSTRAINT "PK_9384942edf4804b38ca0ee51416" PRIMARY KEY ("id"))`, undefined);
+        await queryRunner.query(`CREATE TABLE "history" ("id" SERIAL NOT NULL, "createDate" TIMESTAMP NOT NULL DEFAULT now(), "status" "history_status_enum" NOT NULL DEFAULT '0', "executor" "history_executor_enum" NOT NULL DEFAULT '0', "result" text, "startTime" TIMESTAMP NOT NULL DEFAULT '"2020-01-06T09:09:26.376Z"', "endTime" TIMESTAMP NOT NULL DEFAULT '"2020-01-06T09:09:26.376Z"', "caseId" integer, CONSTRAINT "PK_9384942edf4804b38ca0ee51416" PRIMARY KEY ("id"))`, undefined);
         await queryRunner.query(`CREATE TABLE "endpoint" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "endpoint" character varying NOT NULL, CONSTRAINT "UQ_3c76020e315271d53d01e13d897" UNIQUE ("endpoint"), CONSTRAINT "PK_7785c5c2cf24e6ab3abb7a2e89f" PRIMARY KEY ("id"))`, undefined);
         await queryRunner.query(`CREATE TABLE "secheduler" ("id" SERIAL NOT NULL, "md5" character varying NOT NULL, "createDate" TIMESTAMP NOT NULL DEFAULT now(), "updateDate" TIMESTAMP NOT NULL DEFAULT now(), "status" "secheduler_status_enum" NOT NULL DEFAULT '1', "caseListId" integer, "envId" integer, CONSTRAINT "UQ_7df896c01ff7c4192a3dfb83f70" UNIQUE ("md5"), CONSTRAINT "PK_3405795f816a3563ba9600f5f89" PRIMARY KEY ("id"))`, undefined);
         await queryRunner.query(`CREATE TABLE "env" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_3afda6f649f449e9f94b509aaff" PRIMARY KEY ("id"))`, undefined);

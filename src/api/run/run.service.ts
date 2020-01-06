@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CaseEntity } from '../case/case.entity';
 import { CaselistEntity } from '../caselist/caselist.entity';
-import { RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto } from './dto/run.dto';
+import {RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto, CovertDto} from './dto/run.dto';
 import { CurlService } from '../curl/curl.service';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
@@ -198,6 +198,34 @@ export class RunService {
     const form = new FormData();
     form.append(paramName, request(address))
     return form
+  }
+
+  async covertCurl(covertDto: CovertDto){
+    let type;
+    switch (covertDto.type) {
+      case 0:
+        type = "GET";
+        break;
+      case 1:
+        type = "POST";
+        break;
+      case 2:
+        type = "DELETE";
+        break;
+      default:
+        type = "GET";
+    }
+    let ht;
+    if (covertDto.header != null){
+      const header: Map<String, Object> = JSON.parse(covertDto.header);
+      header.forEach(
+          (k, v) => {
+            ht += ` -H ${k}:${v}`
+          }
+      )
+    }
+    let result;
+    result += `curl -g -i -X ${type} ${covertDto.url} ${ht} `
   }
 }
 
