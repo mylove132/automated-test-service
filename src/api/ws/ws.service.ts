@@ -100,11 +100,7 @@ export class RunCaseDto implements IRunCaseById{
 
     readonly caseId: number;
     readonly envId: number;
-<<<<<<< HEAD
     readonly executor: Executor;
-=======
-    readonly executor: number;
->>>>>>> 077999d2baa8a42278f6c7f190a304a1aa03e0da
 
     constructor(readonly cId: number, readonly eId: number, et: Executor){
         this.caseId = cId;
