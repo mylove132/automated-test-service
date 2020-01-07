@@ -11,8 +11,8 @@ var log4js = require('log4js');
 async function bootstrap() {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
   log4js.configure(join(__dirname,'../log4js.json'));
-  const appOptions = {cors: true};
-  const app = await NestFactory.create(ApplicationModule, appOptions);
+  const app = await NestFactory.create(ApplicationModule);
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());

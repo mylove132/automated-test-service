@@ -1286,7 +1286,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 
 
 
-
 返回成功示例
 ```
 {
@@ -1297,6 +1296,28 @@ data						|object		|R			|&nbsp;true表示执行用例成功
     "message": "success"
 }
 ```
+
+### 5.1  登录
+- **接口说明：** 登录接口
+- **请求方式：** POST
+- **接口地址：** /api/user/login
+
+#### 5.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;userName			        |string		|R		    |用户名
+&emsp;password			        |string		|R		    |密码
+
+请求示例
+
+```
+{
+	"userName": "crmadmin",
+	"password": "bling123!@#"
+}
+```
+
 
 
 <span id="jump"></span>
