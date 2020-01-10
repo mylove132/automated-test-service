@@ -35,7 +35,7 @@ const Orm = (): DynamicModule => {
     WsModule,
     RunModule,
     HistoryModule,
-    // SchedulerModule,
+    SchedulerModule,
   ],
   controllers: [
     AppController

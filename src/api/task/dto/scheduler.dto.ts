@@ -22,3 +22,10 @@ export class DeleteRunningTaskDto {
     @IsArray()
     md5List: string[];
 }
+
+export class CheckCronDto {
+
+    @IsNotEmpty()
+    cron: string;
+
+}
