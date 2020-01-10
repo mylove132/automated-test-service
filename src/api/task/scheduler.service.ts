@@ -16,6 +16,8 @@ import {RunService} from '../run/run.service';
 import {IRunCaseList} from '../run/run.interface';
 import {Executor} from '../history/dto/history.enum';
 
+var parser = require('cron-parser');
+
 export class SchedulerService {
 
     constructor(private readonly schedulerRegistry: SchedulerRegistry,
@@ -29,7 +31,6 @@ export class SchedulerService {
     }
 
     async startTask(addCaselistTaskDto: AddCaselistTaskDto) {
-
         let result = [];
         for (const envId of addCaselistTaskDto.envIds){
             const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: envId}).getOne().catch(
@@ -164,6 +165,15 @@ export class SchedulerService {
         }
 
         return {status: true};
+    }
+
+    async checkCron(cron: string){
+        try {
+            var result = parser.parseExpression(cron);
+            return {result: true};
+        }catch (e) {
+            return {result: false};
+        }
     }
 
 

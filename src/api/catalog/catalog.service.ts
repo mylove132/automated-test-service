@@ -62,16 +62,24 @@ export class CatalogService {
     }
 
     async findCatalog(userId: number, isPub: boolean): Promise<CatalogEntity[]> {
+        let result;
         if (userId == null){
-            throw new ApiException('userId不能为空', ApiErrorCode.USER_ID_INVALID, HttpStatus.OK);
+            result = await this.catalogRepository.createQueryBuilder('catalog').select().orderBy('catalog.createDate','DESC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+        }else {
+            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
+            orderBy('id', 'ASC').getMany().catch(
+                err => {
+                    console.log(err)
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
         }
-        const result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
-                orderBy('id', 'ASC').getMany().catch(
-                    err => {
-                        console.log(err)
-                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                    }
-                );
+
         return this.getTree(result, isPub);
     }
 

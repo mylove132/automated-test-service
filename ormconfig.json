@@ -6,11 +6,11 @@
   "password": "17uZxuk55K6NWxCaygqedIoZ",
   "database": "automated_test",
   "entities": [
-    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/**/**.entity{.ts,.js}"
+    "/Users/liuzhanhui/lzh/workspace/node/automated-test-service/src/**/**.entity{.ts,.js}"
   ],
   "synchronize": false,
   "migrations": [
-    "/Users/liuzhanhui/lzh/workspace/service/automated-test-service/src/migrations/*{.ts,.js}"
+    "/Users/liuzhanhui/lzh/workspace/node/automated-test-service/src/migrations/*{.ts,.js}"
   ],
   "cli": {
     "migrationsDir": "src/migrations"
