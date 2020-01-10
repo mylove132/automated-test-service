@@ -10,6 +10,7 @@ import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate'
 import {AddCaseListDto, CaseListIdsDto, UpdateCaseListDto} from './dto/caselist.dto';
 import {EnvEntity} from '../env/env.entity';
 
+var parser = require('cron-parser');
 
 export class CaselistService {
 
@@ -25,7 +26,10 @@ export class CaselistService {
 
 
     async addCaseList(addCaseListDto: AddCaseListDto){
-
+        const rt = await this.checkCron(addCaseListDto.cron);
+        if (!rt){
+            throw new ApiException(`cron表达式：${addCaseListDto.cron}  格式不正确`,ApiErrorCode.SCHEDULER_CRON_INVAILD, HttpStatus.BAD_REQUEST);
+        }
         const caseListOBj = new CaselistEntity();
         caseListOBj.name = addCaseListDto.caseListName;
         if (addCaseListDto.cron){
@@ -69,6 +73,15 @@ export class CaselistService {
         );
         return result;
 
+    }
+
+    async checkCron(cron: string){
+        try {
+            await parser.parseExpression(cron);
+            return true;
+        }catch (e) {
+            return false;
+        }
     }
 
     async updateCaseList(updateCaseListDto: UpdateCaseListDto) {

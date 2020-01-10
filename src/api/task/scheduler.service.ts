@@ -31,7 +31,6 @@ export class SchedulerService {
     }
 
     async startTask(addCaselistTaskDto: AddCaselistTaskDto) {
-
         let result = [];
         for (const envId of addCaselistTaskDto.envIds){
             const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: envId}).getOne().catch(

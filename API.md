@@ -1297,6 +1297,42 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 }
 ```
 
+### 4.2  检查定时任务cron表达式
+- **接口说明：** 停止数据库扫描监控接口
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/check-cron
+- `使用说明`: 用于服务更新时暂停扫描数据库监控
+
+#### 4.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;cron			        |string		|O		    |定时任务的cron表达式
+
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;result	|boolean	    |R			|&nbsp; true表示正确，false表示错误
+
+
+
+返回成功示例
+```
+{
+    "data": {
+        "status": true
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
 ### 5.1  登录
 - **接口说明：** 登录接口
 - **请求方式：** POST
@@ -1341,6 +1377,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 60001   |定时任务md5值重复
 60002   |定时任务md5值无效
 60003   |定时任务已删除或已停止
-
+60004   |定时任务cron表达式不正确
 
 
