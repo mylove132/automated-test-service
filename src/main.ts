@@ -6,14 +6,12 @@ import {join} from "path";
 import {HttpExceptionFilter} from "./shared/filters/http.exception.filter";
 import {TransformInterceptor} from "./shared/filters/http.response.filter";
 import {ValidationPipe} from './shared/pipes/validation.pipe';
-import { cors } from './shared/middleware/cors.middleware';
 var log4js = require('log4js');
 
 async function bootstrap() {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
   log4js.configure(join(__dirname,'../log4js.json'));
-  const app = await NestFactory.create(ApplicationModule);
-  app.use(cors);
+  const app = await NestFactory.create(ApplicationModule, {cors: true});
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
