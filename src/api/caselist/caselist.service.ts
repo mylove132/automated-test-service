@@ -85,6 +85,10 @@ export class CaselistService {
     }
 
     async updateCaseList(updateCaseListDto: UpdateCaseListDto) {
+        const rt = await this.checkCron(updateCaseListDto.cron);
+        if (!rt){
+            throw new ApiException(`cron表达式：${updateCaseListDto.cron}  格式不正确`,ApiErrorCode.SCHEDULER_CRON_INVAILD, HttpStatus.BAD_REQUEST);
+        }
         const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id = :id',{id: updateCaseListDto.id}).getOne().catch(
             err => {
                 console.log(err);
