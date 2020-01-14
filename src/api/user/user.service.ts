@@ -49,6 +49,8 @@ export class UserService {
       const user = await this.saveUser(userData);
       const token = this.generateJWT(user);
       result.data.data.userInfoVO.token = token;
+      result.data.data.userInfoVO.userId = result.data.data.userInfoVO.id;
+      result.data.data.userInfoVO.id = user.id;
       return result.data.data
     } else if (result.data.code === 21010 || result.data.code === 190003) {
       return result.data.msg
