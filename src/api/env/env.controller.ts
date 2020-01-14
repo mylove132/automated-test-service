@@ -49,8 +49,9 @@ export class EnvController {
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')
-    async findEndpointByEnvId( @Body() queryEndpointDto: QueryEndpointDto){
-        return this.envService.findEndpointByEnv(queryEndpointDto);
+    async findEndpointByEnvId( @Query('envIds') envIds){
+        console.log(typeof envIds)
+        return this.envService.findEndpointByEnv(envIds);
     }
 
     @ApiOperation({ title: 'find endpoint' })

@@ -168,6 +168,9 @@ export class SchedulerService {
     }
 
     async checkCron(cron: string){
+        if (cron == null){
+            throw new ApiException(`cron不能为空`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+        }
         try {
             var result = parser.parseExpression(cron);
             return {result: true};

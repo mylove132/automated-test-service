@@ -175,7 +175,7 @@ export class EnvService {
        );
     }
 
-    async findEndpointByEnv(queryEndpointDto: QueryEndpointDto){
+    async findEndpointByEnv(envIds){
 
         const result = await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
             .getMany().catch(
@@ -183,17 +183,18 @@ export class EnvService {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
                 }
             );
-        if (typeof queryEndpointDto.envIds == 'undefined'){
+        if (envIds == 'undefined'){
             return result;
         }
-        queryEndpointDto.envIds.forEach(
+        envIds = envIds.split(',');
+        envIds.forEach(
             id => {
                 if (!CommonUtil.isNumber(id)){
                     throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
                 }
             }
         );
-        for (const findId of queryEndpointDto.envIds){
+        for (const findId of envIds){
             const envObj = await this.envRepository.createQueryBuilder().select().where('id =  :id',{id: findId}).getOne().catch(
                 err => {
                     console.log(err);
@@ -207,7 +208,7 @@ export class EnvService {
 
         let rs = [];
         for (const res of result){
-            for (const findId of queryEndpointDto.envIds){
+            for (const findId of envIds){
                 if (Number(res.id) == findId){
                     rs.push(res);
                 }
