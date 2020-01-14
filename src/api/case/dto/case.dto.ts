@@ -26,7 +26,7 @@ export class CreateCaseDto {
     @IsOptional()
     readonly param: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsUrl()
     readonly endpoint: string;
 

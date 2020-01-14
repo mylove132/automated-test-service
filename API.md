@@ -452,6 +452,7 @@ data						|object		|R			|
 &emsp;assertText			        |string		|O			|断言
 &emsp;endpoint			|string		|R			|endpoint值
 &emsp;path			|string		|R			|接口路径
+&emsp;endpointId			|number		|R			|endpointId
 
 请求示例：
 
