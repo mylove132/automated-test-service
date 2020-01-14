@@ -284,6 +284,13 @@ limit	                    |number		|O			|每页展示个数(默认10)
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;name |string		|R			|&nbsp;接口名称
+&nbsp;&nbsp;&nbsp;&nbsp;header |string		|R			|&nbsp;接口header值
+&nbsp;&nbsp;&nbsp;&nbsp;param |string		|R			|&nbsp;接口参数
+&nbsp;&nbsp;&nbsp;&nbsp;url |string		|R			|&nbsp;接口url
+&nbsp;&nbsp;&nbsp;&nbsp;type |number		|R			|&nbsp;请求类型（GET = 0,POST = 1,DELETE = 2,PUT = 3）
+&nbsp;&nbsp;&nbsp;&nbsp;paramType |number		|R			|&nbsp参数类型（TEXT = 0,FILE = 1）
+
 
 返回成功示例
 ```
@@ -338,8 +345,8 @@ data						|object		|R			|&nbsp;
 &emsp;name			        |string		|O			|脚本名称
 &emsp;header			    |string		|O			|header参数{JSON类型}
 &emsp;param			        |string		|O			|接口参数{JSON类型}
-&emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）默认0
-
+&emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）
+&emsp;paramType			        |number		|O			|请求类型（0:TEXT,1:FILE)
 
 请求示例：
 
@@ -1354,6 +1361,27 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 }
 ```
 
+## 参数类型说明
+
+响应码	|说明  
+:----	|:---
+0		|处理成功
+-1		|未知错误
+19999	|参数验证失败
+20000	| 执行数据库操作失败
+10001	|用户ID无效
+20002	|目录ID无效
+20001   |目录parentID无效
+30001   |endpoint ID无效
+30002   |环境ID无效
+30003   |环境名称无效
+30004   |endpoint重复
+40001   |接口ID无效
+50001   |用例ID无效
+60001   |定时任务md5值重复
+60002   |定时任务md5值无效
+60003   |定时任务已删除或已停止
+60004   |定时任务cron表达式不正确
 
 
 <span id="jump"></span>
