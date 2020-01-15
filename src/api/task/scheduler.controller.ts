@@ -41,7 +41,8 @@ export class SchedulerController {
     }
 
     @Get('check-cron')
-    async checkCron(@Query('cron') cron){
+    async checkCron(@Query('cron') cron: string){
+        console.log(cron)
         return await this.schedulerService.checkCron(cron);
     }
 }
