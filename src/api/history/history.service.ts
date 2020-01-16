@@ -42,16 +42,20 @@ export class HistoryService {
    * @param {number, IPaginationOptions}: id, 页码信息
    * @return {Promise<Pagination<HistoryEntity>>}: 历史记录列表
    */
-  async findHistoryList(historyId: number, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
-    if (!historyId) {
+  async findHistoryList(historyPath: string, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
+    if (!historyPath) {
         const queryBuilder = this.historyRepository.createQueryBuilder('history')
         .leftJoinAndSelect('history.case','case')
         .orderBy('history.createDate', 'DESC');
         return await paginate<HistoryEntity>(queryBuilder, options);
     } else {
         const queryBuilder = this.historyRepository.createQueryBuilder('history')
-        .where('history.id = :id', {id: historyId})
-        .leftJoinAndSelect('history.case','case');
+        .leftJoinAndSelect('history.case','case')
+        .where("case.path LIKE :param")
+        .setParameters({
+            param: '%'+historyPath+'%'
+        })
+        .orderBy('history.createDate', 'DESC');
         return await paginate<HistoryEntity>(queryBuilder, options);
     }
   }

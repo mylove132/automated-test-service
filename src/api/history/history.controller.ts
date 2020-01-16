@@ -14,7 +14,7 @@ export class HistoryController {
   @ApiOperation({ title: 'history list', description: '查询历史记录列表' })
   @ApiResponse({ status: 200, description: 'query history list success.'})
   @Get('list')
-  async findHistoryList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('id') id?: number): Promise<Pagination<HistoryEntity>> {
-    return this.historyService.findHistoryList(id, {page, limit});
+  async findHistoryList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('path') path?: string): Promise<Pagination<HistoryEntity>> {
+    return this.historyService.findHistoryList(path, {page, limit});
   }
 }
