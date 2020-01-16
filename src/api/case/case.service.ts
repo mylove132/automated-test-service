@@ -46,7 +46,6 @@ export class CaseService {
             const type = this.getRequestType(createCaseDto.type);
             caseObj.type = type;
         }
-        console.log(createCaseDto.paramType)
         if (typeof createCaseDto.paramType != "undefined"){
             caseObj.paramType = this.getParamType(createCaseDto.paramType);
         }

@@ -3,7 +3,6 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/co
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
 import { CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
-import {IsNotEmpty} from 'class-validator';
 
 
 @ApiBearerAuth()
