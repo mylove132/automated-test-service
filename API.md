@@ -1362,7 +1362,79 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 }
 ```
 
-## 参数类型说明
+
+### 6.1 运行临时接口
+- **接口说明：** 运行临时接口
+- **请求方式：** POST
+- **接口地址：** /api/run/script
+##### 参数类型说明
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;userName			        |string		|R		    |用户名
+&emsp;password			        |string		|R		    |密码
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;运行case结果的返回值
+
+
+
+### 6.2 运行某接口请求
+- **接口说明：** 运行某具体样例请求
+- **请求方式：** POST
+- **接口地址：** /api/run/case-script
+##### 参数类型说明
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;caseId			        |number		|R		    |case id
+&emsp;envId			        |number		|R		    |环境 id
+&emsp;executor			        |number		|R		    |0手动 1定时任务
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;运行case结果的返回值
+
+
+
+
+### 6.3 运行样例里的所有接口请求
+- **接口说明：** 运行样例里的所有接口请求
+- **请求方式：** POST
+- **接口地址：** /api/run/script
+##### 参数类型说明
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;caseListId			        |number		|R		   |用例 id
+&emsp;envId			        |number		|R		    |环境 id
+&emsp;executor			        |number		|R		    |0手动 1定时任务
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any[]		|R			|&nbsp;运行结果的返回值列表
+
+
+
+
+
+
+
+
+
+
+
 
 响应码	|说明  
 :----	|:---
