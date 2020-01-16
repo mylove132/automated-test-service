@@ -224,6 +224,11 @@ export class EnvService {
 	 * @return {string}: 当前环境的endpoint
      */
     public async formatEndpoint(envId: number, endpoint: string):Promise<string> {
+        const reg = new RegExp('^https:\/\/[^\S]+.[^\S\s]*blingabc.com$', 'g')
+        // 如果不是blingabc的API则直接返回
+        if (!reg.test(endpoint)) {
+            return endpoint
+        }
         let result = ''
         const envData = await this.envRepository.createQueryBuilder()
         .select()
@@ -234,8 +239,7 @@ export class EnvService {
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
             }
         );
-        // 正则
-        // const reg = new RegExp('^https:\/\/[^\S]+.[^\S\s]*blingabc.com$', 'g')
+        
         let urlList: any = endpoint.split('.');
 
         // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
@@ -247,7 +251,8 @@ export class EnvService {
                 urlList.splice(1, 0, '');
             } else {
                 urlList[0] = urlList[0].split('-')
-                urlList = urlList.flat();
+                // urlList = urlList.flat();
+                urlList.splice(0, 1, ...urlList[0])
             }
         }
         switch(envData.name) {

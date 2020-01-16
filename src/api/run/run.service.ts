@@ -5,6 +5,7 @@ import { CaseEntity } from '../case/case.entity';
 import { CaselistEntity } from '../caselist/caselist.entity';
 import {RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto, CovertDto} from './dto/run.dto';
 import { CurlService } from '../curl/curl.service';
+import { EnvService } from '../env/env.service';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { AxiosRequestConfig } from 'axios';
@@ -26,6 +27,7 @@ export class RunService {
     private readonly caseListRepository: Repository<CaselistEntity>,
     private readonly curlService: CurlService,
     private readonly historyService: HistoryService,
+    private readonly envService: EnvService,
   ) {}
 
   /**
@@ -58,8 +60,6 @@ export class RunService {
     .select()
     .leftJoinAndSelect("case.endpointObject", 'endpointObj')
     .where('case.id = :id', {id: runCaseById.caseId})
-    .leftJoinAndSelect("endpointObj.envs", 'envObj')
-    .where('envObj.id = :id', {id: runCaseById.envId})
     .getOne()
     .catch(
       err => {
@@ -68,7 +68,7 @@ export class RunService {
       }
     );
     if (caseObj instanceof CaseEntity) {
-      const endpoint = generateEndpointByEnv(caseObj.endpointObject.envs[0].name, caseObj.endpointObject.endpoint)
+      const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
       const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
         endpoint: endpoint,
         type: String(caseObj.type),
@@ -117,8 +117,6 @@ export class RunService {
     .where('caselist.id = :id', {id: runcaseList.caseListId})
     .leftJoinAndSelect('caselist.cases','cases')
     .leftJoinAndSelect('cases.endpointObject','end')
-    .leftJoinAndSelect('end.envs','envObj')
-    .where('envObj.id = :id', {id: runcaseList.envId})
     .getOne()
     .catch(
       err => {
@@ -131,9 +129,9 @@ export class RunService {
     }
     const caseIdList = []
     const startTime = new Date();
-    const requestList = caseList.cases.map(v => {
+    const requestAsyncList = caseList.cases.map(async v => {
       if (v instanceof CaseEntity) {
-        const endpoint = generateEndpointByEnv(v.endpointObject.envs[0].name, v.endpointObject.endpoint)
+        const endpoint = await this.envService.formatEndpoint(runcaseList.envId, v.endpointObject.endpoint)
         const requestBaseData: RunCaseDto = Object.assign({}, v, {
           endpoint: endpoint,
           type: String(v.type),
@@ -145,6 +143,7 @@ export class RunService {
         throw new ApiException('样例中接口未找到', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
     })
+    const requestList = await Promise.all(requestAsyncList)
     const endTime = new Date();
     const resultList = await forkJoin(requestList).pipe(map(res => {
       res.forEach(async (value, index) => {

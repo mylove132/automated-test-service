@@ -6,11 +6,12 @@ import { CaseEntity } from '../case/case.entity';
 import { RunService } from './run.service';
 import { RunController } from './run.controller';
 import { CurlModule } from '../curl/curl.module'
+import { EnvModule } from '../env/env.module'
 import { CaselistEntity } from '../caselist/caselist.entity';
 import { HistoryModule } from '../history/history.module';
 
 @Module({
-  imports: [CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity])],
+  imports: [EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity])],
   providers: [RunService],
   controllers: [RunController],
   exports: [RunService]

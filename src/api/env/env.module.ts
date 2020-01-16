@@ -13,7 +13,8 @@ import {EnvController} from './env.controller';
     providers: [EnvService],
     controllers: [
         EnvController
-    ]
+    ],
+    exports: [EnvService]
 })
 export class EnvModule {
 
