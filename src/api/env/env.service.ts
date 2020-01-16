@@ -7,6 +7,7 @@ import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
 import {CommonUtil} from '../../util/common.util';
+import { url } from 'inspector';
 
 export class EnvService {
 
@@ -215,5 +216,53 @@ export class EnvService {
             }
         }
         return rs;
+    }
+
+    /**
+     * 通过环境ID改变endpoint
+	 * @param {number, string}
+	 * @return {string}: 当前环境的endpoint
+     */
+    public async formatEndpoint(envId: number, endpoint: string):Promise<string> {
+        let result = ''
+        const envData = await this.envRepository.createQueryBuilder()
+        .select()
+        .where('id = :id',{id: envId})
+        .getOne()
+        .catch(
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
+            }
+        );
+        // 正则
+        // const reg = new RegExp('^https:\/\/[^\S]+.[^\S\s]*blingabc.com$', 'g')
+        let urlList: any = endpoint.split('.');
+
+        // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
+        if (urlList.length == 3) { // 生产环境
+            urlList.splice(1, 0, '', 't');
+        } else { // 长度为4则为测试环境
+            const tempList = urlList[0].split('-')
+            if (tempList.length == 1) {
+                urlList.splice(1, 0, '');
+            } else {
+                urlList[0] = urlList[0].split('-')
+                urlList = urlList.flat();
+            }
+        }
+        switch(envData.name) {
+            case 'test':
+                urlList.splice(1, 1)
+                result = urlList.join('.')
+                break;
+            case 'prod':
+                urlList.splice(1, 2)
+                result = urlList.join('.')
+                break;
+            default:
+                result = `${urlList[0]}-${envData.name}.` + urlList.splice(2).join('.')
+                break;
+        }
+        return result
     }
 }
