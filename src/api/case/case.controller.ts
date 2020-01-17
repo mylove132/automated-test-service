@@ -22,9 +22,9 @@ export class CaseController {
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
-  async findCaseById(@Query('catalogId') catalogId: number ,@Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
-   return this.caseService.findCase(catalogId,{page, limit});
+   return this.caseService.findCase(catalogId, envId, {page, limit});
   }
 
   @ApiOperation({ title: 'delete case' })

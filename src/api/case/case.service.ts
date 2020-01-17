@@ -11,6 +11,7 @@ import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate'
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {CommonUtil} from '../../util/common.util';
+import {EnvService} from "../env/env.service";
 
 export class CaseService {
     constructor(
@@ -22,6 +23,7 @@ export class CaseService {
         private readonly caseListRepository: Repository<CaselistEntity>,
         @InjectRepository(EndpointEntity)
         private readonly endpointRepository: Repository<EndpointEntity>,
+        private readonly envService: EnvService
     ) {
     }
 
@@ -90,10 +92,18 @@ export class CaseService {
         return {id: addId};
     }
 
-    async findCase(catalogId: number, options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
+    async findCase(catalogId: number, envId: number, options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
+        if (envId == 0 || envId == null){
+            throw new ApiException(`envId不能为空或者0`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
         if (typeof catalogId == 'undefined') {
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').orderBy('case.updateDate', 'DESC');
-            return await paginate<CaseEntity>(queryBuilder, options);
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').leftJoinAndSelect('case.endpointObject','endpoint').orderBy('case.updateDate', 'DESC');
+            const result = await paginate<CaseEntity>(queryBuilder, options);
+            for (let item of result.items){
+                const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
+                item.endpoint = endpoint;
+            }
+            return result;
         } else {
             const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
                 err => {
@@ -104,8 +114,13 @@ export class CaseService {
             if (!catalog) {
                 throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).orderBy('case.updateDate', 'DESC');
-            return await paginate<CaseEntity>(queryBuilder, options);
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).leftJoinAndSelect('case.endpointObject','endpoint').orderBy('case.updateDate', 'DESC');
+            const result = await paginate<CaseEntity>(queryBuilder, options);
+            for (let item of result.items){
+                const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
+                item.endpoint = endpoint;
+            }
+            return result;
         }
     }
 

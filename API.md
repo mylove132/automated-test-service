@@ -269,6 +269,7 @@ data						|object		|R			|&nbsp;true表示删除成功
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 catalogId				    |number		|O			|目录id(默认查询所有用例)
+envId				    |number		|R			|运行环境ID
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
 
