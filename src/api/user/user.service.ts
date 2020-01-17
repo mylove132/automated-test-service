@@ -48,6 +48,9 @@ export class UserService {
       }
       const user = await this.saveUser(userData);
       const token = this.generateJWT(user);
+      // 保存java平台的token
+      result.data.data.userInfoVO.javaToken = result.data.data.userInfoVO.token;
+      // 自动化测试平台的token
       result.data.data.userInfoVO.token = token;
       result.data.data.userInfoVO.userId = result.data.data.userInfoVO.id;
       result.data.data.userInfoVO.id = user.id;
