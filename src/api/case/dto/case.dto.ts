@@ -1,7 +1,7 @@
 import {
     ArrayMaxSize,
     ArrayMinSize,
-    IsArray,
+    IsArray, IsBoolean,
     IsJSON,
     IsNotEmpty,
     IsNumber,
@@ -50,6 +50,9 @@ export class CreateCaseDto {
     @IsNotEmpty()
     endpointId: number;
 
+    @IsBoolean()
+    @IsOptional()
+    isNeedToken: boolean;
 }
 
 export class UpdateCaseDto {
@@ -91,6 +94,10 @@ export class UpdateCaseDto {
 
     @Optional()
     endpointId: number;
+
+    @IsBoolean()
+    @IsOptional()
+    isNeedToken: boolean;
 
 }
 

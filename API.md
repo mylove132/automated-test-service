@@ -350,6 +350,7 @@ data						|object		|R			|&nbsp;
 &emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）
 &emsp;paramType			        |number		|O			|请求类型（0:TEXT,1:FILE)
 &emsp;endpointId			        |number		|O			|
+&emsp;isNeedToken			        |boolean		|O			|
 
 请求示例：
 
@@ -456,6 +457,7 @@ data						|object		|R			|
 &emsp;endpoint			|string		|O			|endpoint值
 &emsp;path			|string		|R			|接口路径
 &emsp;endpointId			|number		|R			|endpointId
+&emsp;isNeedToken			        |boolean		|O			|
 
 请求示例：
 
@@ -504,6 +506,7 @@ data						|object		|R			|&nbsp;
 :----						|:---		|:------	|:---
 &emsp;caseIds			    |number[]		|R			|需要运行的接口ID集合
 &emsp;envId			    |number		|R			|环境ID
+&emsp;token			    |string		|O			|登录的token值
 
 
 请求示例：

@@ -34,6 +34,9 @@ export class CaseService {
     async addCase(createCaseDto: CreateCaseDto) {
 
         const caseObj = new CaseEntity();
+        if (createCaseDto.isNeedToken != null){
+            caseObj.isNeedToken = createCaseDto.isNeedToken;
+        }
         const catalogId = createCaseDto.catalogId;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
             err => {
@@ -168,6 +171,9 @@ export class CaseService {
     async updateCase(updateCaseDto: UpdateCaseDto): Promise<Object> {
 
         const cases = new CaseEntity();
+        if (updateCaseDto.isNeedToken != null){
+            cases.isNeedToken = updateCaseDto.isNeedToken;
+        }
         const id = updateCaseDto.id;
         const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: id}).getOne().catch(
             err => {

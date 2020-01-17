@@ -54,6 +54,9 @@ export class CaseEntity {
 
     @ManyToOne(type => EndpointEntity, endpoint => endpoint.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     endpointObject: EndpointEntity;
+
+    @Column({default: false})
+    isNeedToken: boolean;
 }
 
 

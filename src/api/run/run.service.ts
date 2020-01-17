@@ -82,6 +82,10 @@ export class RunService {
         resultObj['expect'] = caseObj.assertText;
         console.log("requestBaseData", requestBaseData)
         const requestData = this.generateRequestData(requestBaseData);
+        let token;
+        if (runCaseById.token != null && runCaseById.token != ''){
+          token = runCaseById.token;
+        }
         const result = await this.curlService.makeRequest(requestData).toPromise();
         const endTime = new Date();
         resultObj['endTime'] = endTime;

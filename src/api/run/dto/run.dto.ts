@@ -48,6 +48,9 @@ export class RunCaseByIdDto implements IRunCaseById{
     @Optional()
     readonly executor: Executor;
 
+    @Optional()
+    readonly token: string;
+
 }
 export class RunCaseListByIdDto implements IRunCaseList{
      @IsNotEmpty()
