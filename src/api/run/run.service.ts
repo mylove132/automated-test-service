@@ -78,7 +78,6 @@ export class RunService {
       if (caseObj instanceof CaseEntity) {
         const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
         const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
-          token: runCaseById.token,
           endpoint: endpoint,
           type: String(caseObj.type),
         });

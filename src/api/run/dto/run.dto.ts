@@ -46,7 +46,7 @@ export class RunCaseDto {
     
 
     @IsOptional()
-    token: string;
+    token?: string;
 
 }
 
