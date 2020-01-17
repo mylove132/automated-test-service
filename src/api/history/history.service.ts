@@ -32,6 +32,8 @@ export class HistoryService {
     historyObj.status = createHistoryDto.status;
     historyObj.executor = createHistoryDto.executor;
     historyObj.result = createHistoryDto.re;
+    historyObj.startTime = createHistoryDto.startTime;
+    historyObj.endTime = createHistoryDto.endTime;
     const result = await this.historyRepository.save(historyObj).catch(err => {
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     })

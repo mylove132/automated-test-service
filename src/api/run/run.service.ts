@@ -55,55 +55,67 @@ export class RunService {
    * @return {Promise<any>}: 发起请求后的响应结果
    */
   async runCaseById(runCaseById: IRunCaseById): Promise<any> {
-    const caseObj = await this.caseRepository
-    .createQueryBuilder('case')
-    .select()
-    .leftJoinAndSelect("case.endpointObject", 'endpointObj')
-    .where('case.id = :id', {id: runCaseById.caseId})
-    .getOne()
-    .catch(
-      err => {
-          console.log(err);
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    );
-    if (caseObj instanceof CaseEntity) {
-      const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
-      const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
-        endpoint: endpoint,
-        type: String(caseObj.type),
-      });
-      console.log("requestBaseData", requestBaseData)
-      const requestData = this.generateRequestData(requestBaseData);
+    let resultList = [];
+    for (let caseId of runCaseById.caseIds) {
+      let resultObj = {};
       const startTime = new Date();
-      const result = await this.curlService.makeRequest(requestData).toPromise();
-      const endTime = new Date();
-      const res = JSON.stringify(result.data);
-      console.log(res)
-      // 保存历史记录
-      const historyData = {
-        caseId: runCaseById.caseId,
-        status: result.result ? 0 : 1,
-        executor: 0,
-        re: res,
-        startTime: startTime,
-        endTime: endTime
-      };
-      console.log(historyData);
-      await this.historyService.createHistory(historyData).catch(
-          err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-      )
-      if (result.result) {
-        return result.data
-      } else {
-        throw new ApiException('请求失败', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      resultObj['startTime'] = startTime;
+      const caseObj = await this.caseRepository
+          .createQueryBuilder('case')
+          .select()
+          .leftJoinAndSelect("case.endpointObject", 'endpointObj')
+          .where('case.id = :id', {id: caseId})
+          .getOne()
+          .catch(
+              err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+              }
+          );
+      if (caseObj instanceof CaseEntity) {
+        const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
+        const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
+          endpoint: endpoint,
+          type: String(caseObj.type),
+        });
+        resultObj['caseId'] = caseId;
+        resultObj['expect'] = caseObj.assertText;
+        console.log("requestBaseData", requestBaseData)
+        const requestData = this.generateRequestData(requestBaseData);
+        const result = await this.curlService.makeRequest(requestData).toPromise();
+        const endTime = new Date();
+        resultObj['endTime'] = endTime;
+        const rumTime = endTime.getTime() - startTime.getTime();
+        resultObj['rumTime'] = rumTime;
+        const res = JSON.stringify(result.data);
+        if (result.result){
+          resultObj['result'] = result.data;
+        }else {
+          resultObj['result'] = result;
+        }
+        console.log(res)
+        // 保存历史记录
+        const historyData = {
+          caseId: caseId,
+          status: result.result ? 0 : 1,
+          executor: 0,
+          re: res,
+          startTime: startTime,
+          endTime: endTime
+        };
+        console.log(historyData);
+        await this.historyService.createHistory(historyData).catch(
+            err => {
+              console.log(err);
+              throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+
       }
-    } else {
-      throw new ApiException('没有找到该接口', ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      resultList.push(resultObj);
+
     }
+    return resultList;
   }
 
   /**

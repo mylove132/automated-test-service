@@ -11,7 +11,7 @@ export interface IRunCaseList {
 
 export interface IRunCaseById {
 
-    readonly caseId: number;
+    readonly caseIds: number[];
 
     readonly envId: number;
 

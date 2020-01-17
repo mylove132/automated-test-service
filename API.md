@@ -529,25 +529,24 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ### 2.9  通过用例Id执行接口用例
 - **接口说明：** 执行用例接口
 - **请求方式：** POST
-- **接口地址：** /api/run/scriptById
+- **接口地址：** /api/run/case-script
 
 #### 2.9.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;scriptId			    |number		|R			|脚本名称
+&emsp;caseIds			    |number[]		|R			|需要运行的接口ID集合
+&emsp;envId			    |number		|R			|环境ID
+
 
 请求示例：
 
 ```
 {
-   "scriptName": "测试",
-   "header":{
-     "Content-Type": "application/json"
-     }
-   "param": "",
-   "type": "GET"
+	"caseIds": [1,2],
+	"envId": 1
 }
+
 
 ```
 返回结果
@@ -557,6 +556,99 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示执行用例成功
+&nbsp;&nbsp;&nbsp;&nbsp;startTime |date		|R			|&nbsp;接口开始执行时间
+&nbsp;&nbsp;&nbsp;&nbsp;endTime |date		|R			|&nbsp;接口结束执行时间
+&nbsp;&nbsp;&nbsp;&nbsp;caseId |number		|R			|&nbsp;接口ID
+&nbsp;&nbsp;&nbsp;&nbsp;expect |string		|R			|&nbsp;接口断言结果
+&nbsp;&nbsp;&nbsp;&nbsp;rumTime |number		|R			|&nbsp;接口执行耗时（毫秒）
+&nbsp;&nbsp;&nbsp;&nbsp;result |OBject		|R			|&nbsp;接口执行返回结果（毫秒）
+
+返回示例
+
+```
+{
+    "data": [
+        {
+            "startTime": "2020-01-17T03:55:03.981Z",
+            "caseId": 1,
+            "expect": "\"code\":0",
+            "endTime": "2020-01-17T03:55:04.265Z",
+            "rumTime": 284,
+            "result": {
+                "data": [
+                    {
+                        "id": 3,
+                        "createDate": "2020-01-08T08:21:00.207Z",
+                        "updateDate": "2020-01-10T09:34:56.086Z",
+                        "name": "外教产品线",
+                        "isPub": true,
+                        "parentId": null,
+                        "children": [
+                            {
+                                "id": 5,
+                                "createDate": "2020-01-10T05:50:20.986Z",
+                                "updateDate": "2020-01-10T05:50:20.986Z",
+                                "name": "外教相关API",
+                                "isPub": false,
+                                "parentId": 3
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "createDate": "2020-01-08T08:20:17.715Z",
+                        "updateDate": "2020-01-10T09:34:48.816Z",
+                        "name": "基础业务线",
+                        "isPub": true,
+                        "parentId": null,
+                        "children": [
+                            {
+                                "id": 4,
+                                "createDate": "2020-01-10T05:50:07.168Z",
+                                "updateDate": "2020-01-10T05:50:07.168Z",
+                                "name": "课件相关API",
+                                "isPub": false,
+                                "parentId": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": 1,
+                        "createDate": "2020-01-07T09:49:50.402Z",
+                        "updateDate": "2020-01-10T08:31:39.154Z",
+                        "name": "唐朝",
+                        "isPub": true,
+                        "parentId": null,
+                        "children": [
+                            {
+                                "id": 11,
+                                "createDate": "2020-01-10T08:55:03.359Z",
+                                "updateDate": "2020-01-10T08:55:03.359Z",
+                                "name": "12312aadsas",
+                                "isPub": false,
+                                "parentId": 1
+                            }
+                        ]
+                    }
+                ],
+                "code": 0,
+                "message": "success"
+            }
+        },
+        {
+            "startTime": "2020-01-17T03:55:04.714Z",
+            "caseId": 2,
+            "expect": "\"code\":0",
+            "endTime": "2020-01-17T03:55:04.829Z",
+            "rumTime": 115,
+            "result": "失败的请求: TypeError: name.toUpperCase is not a function"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+
+```
 
 ### 3.0  添加环境
 - **接口说明：** 添加环境接口
