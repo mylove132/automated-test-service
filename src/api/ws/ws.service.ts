@@ -72,17 +72,4 @@ export class WsService{
 }
 
 
-export class RunCaseDto implements IRunCaseById{
 
-    readonly caseIds: number[];
-    readonly envId: number;
-    readonly executor: Executor;
-
-    constructor(readonly cId: number[], readonly eId: number, et: Executor){
-        this.caseIds = cId;
-        this.envId = eId;
-        this.executor = et;
-    }
-
-
-}

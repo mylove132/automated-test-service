@@ -1,4 +1,14 @@
-import {IsString, IsJSON, IsNotEmpty, IsUrl, IsNumber, IsNumberString, IsOptional, IsArray} from 'class-validator';
+import {
+    IsString,
+    IsJSON,
+    IsNotEmpty,
+    IsUrl,
+    IsNumber,
+    IsNumberString,
+    IsOptional,
+    IsArray,
+    IsBoolean
+} from 'class-validator';
 import { ParamType } from '../../case/dto/http.enum';
 import {IRunCaseById, IRunCaseList} from '../run.interface';
 import {Executor} from '../../history/dto/history.enum';
@@ -33,6 +43,9 @@ export class RunCaseDto {
     @IsString()
     @IsOptional()
     assertText: string;
+
+    @IsOptional()
+    token: string;
 
 }
 

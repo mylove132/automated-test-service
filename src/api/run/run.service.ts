@@ -38,7 +38,10 @@ export class RunService {
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
     // 生成请求数据
     const requestData = this.generateRequestData(runCaseDto);
-
+    let token;
+    if (runCaseDto.token != null && runCaseDto.token != ""){
+      token = runCaseDto.token;
+    }
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
     console.log(result)
@@ -75,6 +78,7 @@ export class RunService {
       if (caseObj instanceof CaseEntity) {
         const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
         const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
+          token: runCaseById.token,
           endpoint: endpoint,
           type: String(caseObj.type),
         });
@@ -118,7 +122,6 @@ export class RunService {
 
       }
       resultList.push(resultObj);
-
     }
     return resultList;
   }
@@ -150,6 +153,7 @@ export class RunService {
       if (v instanceof CaseEntity) {
         const endpoint = await this.envService.formatEndpoint(runcaseList.envId, v.endpointObject.endpoint)
         const requestBaseData: RunCaseDto = Object.assign({}, v, {
+          token: '',
           endpoint: endpoint,
           type: String(v.type),
         });
