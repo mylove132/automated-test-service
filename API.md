@@ -344,10 +344,12 @@ data						|object		|R			|&nbsp;
 &emsp;id				    |number		|R			|脚本ID
 &emsp;catalogId				|number		|O			|目录ID
 &emsp;name			        |string		|O			|脚本名称
+&emsp;assertText			        |string		|O			|断言内容
 &emsp;header			    |string		|O			|header参数{JSON类型}
 &emsp;param			        |string		|O			|接口参数{JSON类型}
 &emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）
 &emsp;paramType			        |number		|O			|请求类型（0:TEXT,1:FILE)
+&emsp;endpointId			        |number		|O			|
 
 请求示例：
 
@@ -390,7 +392,7 @@ data						|object		|R			|&nbsp;true表示更新用例成功
 ### 2.7  删除接口用例
 - **接口说明：** 删除用例接口
 - **请求方式：** DETELE
-- **接口地址：** /api/script
+- **接口地址：** /api/case
 
 #### 2.7.1 请求参数
   
@@ -439,7 +441,7 @@ data						|object		|R			|
 ### 2.8  添加接口用例
 - **接口说明：** 添加用例接口
 - **请求方式：** POST
-- **接口地址：** /api/script
+- **接口地址：** /api/case
 
 #### 2.8.1 请求参数
   
@@ -451,7 +453,7 @@ data						|object		|R			|
 &emsp;param			        |string		|O			|接口参数
 &emsp;type			        |string		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）默认GET
 &emsp;assertText			        |string		|O			|断言
-&emsp;endpoint			|string		|R			|endpoint值
+&emsp;endpoint			|string		|O			|endpoint值
 &emsp;path			|string		|R			|接口路径
 &emsp;endpointId			|number		|R			|endpointId
 
@@ -490,41 +492,6 @@ data						|object		|R			|&nbsp;
 }
 ```
 
-### 2.9  执行接口用例
-- **接口说明：** 执行用例接口
-- **请求方式：** POST
-- **接口地址：** /api/run/script
-
-#### 2.9.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;scriptName			|string		|R			|脚本名称
-&emsp;header			    |Object		|O			|header参数
-&emsp;param			        |string		|O			|接口参数
-&emsp;type			        |string		|O			|请求类型（GET,POST,DELETE,PUT）默认GET
-
-
-请求示例：
-
-```
-{
-   "scriptName": "测试",
-   "header":{
-     "Content-Type": "application/json"
-     }
-   "param": "",
-   "type": "GET"
-}
-
-```
-返回结果
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;true表示执行用例成功
 
 ### 2.9  通过用例Id执行接口用例
 - **接口说明：** 执行用例接口

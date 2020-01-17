@@ -9,7 +9,7 @@ import { EnvService } from '../env/env.service';
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { AxiosRequestConfig } from 'axios';
-import { getRequestMethodTypeString, generateEndpointByEnv } from '../../utils'
+import { getRequestMethodTypeString } from '../../utils'
 import { HistoryService } from '../history/history.service';
 import { forkJoin } from 'rxjs';
 import * as FormData from 'form-data';
@@ -91,7 +91,8 @@ export class RunService {
         if (result.result){
           resultObj['result'] = result.data;
         }else {
-          resultObj['result'] = result;
+          resultObj['result'] = null;
+          resultObj['errMsg'] = result;
         }
         console.log(res)
         // 保存历史记录
