@@ -17,5 +17,5 @@ export interface IRunCaseById {
 
     readonly executor: Executor;
 
-    readonly token: string;
+    readonly token?: string;
 }

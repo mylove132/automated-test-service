@@ -85,7 +85,9 @@ export class RunService {
         let token;
         if (runCaseById.token != null && runCaseById.token != ''){
           token = runCaseById.token;
+          requestData.headers['token'] = token
         }
+        console.log(requestData)
         const result = await this.curlService.makeRequest(requestData).toPromise();
         const endTime = new Date();
         resultObj['endTime'] = endTime;
@@ -184,10 +186,18 @@ export class RunService {
 
   // 生成请求参数
   private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
+    let headers = runCaseDto.header ? JSON.parse(runCaseDto.header) : {};
+    let contentTypeFlag = false
+    for (const key in headers) {
+      if (headers.hasOwnProperty(key) && key.toLocaleLowerCase() === 'content-type') {
+        contentTypeFlag = true
+      }
+    }
+    if (!contentTypeFlag) headers['content-type'] = 'application/json'; // 默认为json
     const requestData: AxiosRequestConfig = {
       url: runCaseDto.endpoint + runCaseDto.path,
       method: getRequestMethodTypeString(Number(runCaseDto.type)),
-      headers: runCaseDto.header
+      headers: headers
     }
     // 判断是否是上传文件
     if (runCaseDto.paramType == '1') {
