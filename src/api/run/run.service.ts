@@ -46,14 +46,13 @@ export class RunService {
       token = runCaseDto.token;
       requestData.headers['token'] = token
     }
-
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
     const endTime = new Date();
     resultObj['endTime'] = endTime;
     console.log(result)
     if (result.result) {
-      resultObj['result'] = result.result;
+      resultObj['result'] = result.data;
       resultObj['errMsg'] = null;
     } else {
       resultObj['result'] = null;
