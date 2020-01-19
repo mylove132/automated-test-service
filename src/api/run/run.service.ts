@@ -36,6 +36,9 @@ export class RunService {
    * @return {Promise<any>}: 发起请求后的响应结果
    */
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
+    let resultObj = {};
+    const startTime = new Date();
+    resultObj['startTime'] = startTime;
     // 生成请求数据
     const requestData = this.generateRequestData(runCaseDto);
     let token;
@@ -44,12 +47,17 @@ export class RunService {
     }
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
+    const endTime = new Date();
+    resultObj['endTime'] = endTime;
     console.log(result)
     if (result.result) {
-      return result.data
+      resultObj['result'] = result.result;
+      resultObj['errMsg'] = null;
     } else {
-      throw new ApiException('请求失败', ApiErrorCode.RUN_INTERFACE_FAIL, HttpStatus.OK);
+      resultObj['result'] = null;
+      resultObj['errMsg'] = result;
     }
+    return resultObj;
   }
 
   /**
@@ -99,6 +107,7 @@ export class RunService {
         const res = JSON.stringify(result.data);
         if (result.result){
           resultObj['result'] = result.data;
+          resultObj['errMsg'] = null;
         }else {
           resultObj['result'] = null;
           resultObj['errMsg'] = result;
