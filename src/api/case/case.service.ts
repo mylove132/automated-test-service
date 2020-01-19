@@ -35,9 +35,10 @@ export class CaseService {
     async paginate(options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
         return await paginate<CaseEntity>(this.caseRepository, options);
     }
+
     async addCase(createCaseDto: CreateCaseDto) {
         const caseObj = new CaseEntity();
-        if (createCaseDto.isNeedToken != null){
+        if (createCaseDto.isNeedToken != null) {
             caseObj.isNeedToken = createCaseDto.isNeedToken;
         }
         const catalogId = createCaseDto.catalogId;
@@ -50,15 +51,15 @@ export class CaseService {
         if (!catalog) {
             throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
-        if (typeof createCaseDto.type != "undefined"){
+        if (typeof createCaseDto.type != "undefined") {
             const type = this.getRequestType(createCaseDto.type);
             caseObj.type = type;
         }
-        if (typeof createCaseDto.paramType != "undefined"){
+        if (typeof createCaseDto.paramType != "undefined") {
             caseObj.paramType = this.getParamType(createCaseDto.paramType);
         }
-        if (createCaseDto.endpointId != null){
-            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id',{id:createCaseDto.endpointId}).getOne().catch(
+        if (createCaseDto.endpointId != null) {
+            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id', {id: createCaseDto.endpointId}).getOne().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -70,20 +71,41 @@ export class CaseService {
             caseObj.endpointObject = endpoint;
         }
         let pa;
-        if (createCaseDto.path.charAt(0) != '/'){
-            pa = "/"+createCaseDto.path;
-        }else {
+        if (createCaseDto.path.charAt(0) != '/') {
+            pa = "/" + createCaseDto.path;
+        } else {
             pa = createCaseDto.path;
         }
-        const caObj = this.caseRepository.createQueryBuilder('case').select().where('case.path = :path',{path: pa.trim()}).andWhere('case.name = :caseName',{caseName: createCaseDto.name}).getOne().catch(
+        const caObj = await this.caseRepository.createQueryBuilder('case').select().where('case.path = :path', {path: pa.trim()}).andWhere('case.name = :caseName', {caseName: createCaseDto.name}).getOne().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
-        )
-        if(caObj){
+        );
+        if (caObj) {
             throw new ApiException(`path:${createCaseDto.path}与名称：${createCaseDto.name}已存在`, ApiErrorCode.CASE_NAME_PATH_INVALID, HttpStatus.BAD_REQUEST);
         }
+        const assertType = await this.assertTypeRepository.findOne(createCaseDto.assertType).catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+
+        if (!assertType) {
+            throw new ApiException(`assertTypeId:${createCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        const assertJudge = await this.assertJudgeRepository.findOne(createCaseDto.assertJudge).catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+        if (!assertJudge) {
+            throw new ApiException(`assertJudgeId:${createCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        caseObj.assertType = assertType;
+        caseObj.assertJudge = assertJudge;
         caseObj.catalog = catalog;
         caseObj.endpoint = createCaseDto.endpoint;
         caseObj.assertText = createCaseDto.assertText;
@@ -108,13 +130,13 @@ export class CaseService {
     }
 
     async findCase(catalogId: number, envId: number, options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
-        if (envId == 0 || envId == null){
-            throw new ApiException(`envId不能为空或者0`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        if (envId == 0 || envId == null) {
+            throw new ApiException(`envId不能为空或者0`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
         if (typeof catalogId == 'undefined') {
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').leftJoinAndSelect('case.endpointObject','endpoint').orderBy('case.updateDate', 'DESC');
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').leftJoinAndSelect('case.endpointObject', 'endpoint').leftJoinAndSelect('case.assertType', 'assertType').leftJoinAndSelect('case.assertJudge', 'assertJudge').orderBy('case.updateDate', 'DESC');
             const result = await paginate<CaseEntity>(queryBuilder, options);
-            for (let item of result.items){
+            for (let item of result.items) {
                 const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
                 item.endpoint = endpoint;
             }
@@ -129,9 +151,10 @@ export class CaseService {
             if (!catalog) {
                 throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).leftJoinAndSelect('case.endpointObject','endpoint').orderBy('case.updateDate', 'DESC');
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).leftJoinAndSelect('case.endpointObject', 'endpoint')
+                .leftJoinAndSelect('case.assertType', 'assertType').leftJoinAndSelect('case.assertJudge', 'assertJudge').orderBy('case.updateDate', 'DESC');
             const result = await paginate<CaseEntity>(queryBuilder, options);
-            for (let item of result.items){
+            for (let item of result.items) {
                 const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
                 item.endpoint = endpoint;
             }
@@ -142,8 +165,8 @@ export class CaseService {
     async deleteById(deleteCaseDto: DeleteCaseDto) {
         deleteCaseDto.ids.forEach(
             id => {
-                if (!CommonUtil.isNumber(id)){
-                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+                if (!CommonUtil.isNumber(id)) {
+                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                 }
             }
         );
@@ -164,12 +187,12 @@ export class CaseService {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
-            if (res.affected == 1){
+            if (res.affected == 1) {
                 result.push({
                     id: delId,
                     status: true
                 })
-            }else {
+            } else {
                 result.push({
                     id: delId,
                     status: false
@@ -179,7 +202,7 @@ export class CaseService {
         return result;
     }
 
-    async getAllAssertType(){
+    async getAllAssertType() {
         const result = await this.assertTypeRepository.createQueryBuilder().getMany().catch(
             err => {
                 console.log(err);
@@ -189,7 +212,7 @@ export class CaseService {
         return result;
     }
 
-    async getAllAssertJudge(){
+    async getAllAssertJudge() {
         const result = await this.assertJudgeRepository.createQueryBuilder().getMany().catch(
             err => {
                 console.log(err);
@@ -202,7 +225,7 @@ export class CaseService {
     async updateCase(updateCaseDto: UpdateCaseDto): Promise<Object> {
 
         const cases = new CaseEntity();
-        if (updateCaseDto.isNeedToken != null){
+        if (updateCaseDto.isNeedToken != null) {
             cases.isNeedToken = updateCaseDto.isNeedToken;
         }
         const id = updateCaseDto.id;
@@ -212,8 +235,8 @@ export class CaseService {
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
         );
-        if (updateCaseDto.endpointId != null){
-            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id',{id:updateCaseDto.endpointId}).getOne().catch(
+        if (updateCaseDto.endpointId != null) {
+            const endpoint = await this.endpointRepository.createQueryBuilder().select().where('id = :id', {id: updateCaseDto.endpointId}).getOne().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -249,9 +272,9 @@ export class CaseService {
         cases.id = id;
         if (updateCaseDto.path) {
             let pa;
-            if (updateCaseDto.path.charAt(0) != '/'){
-                pa = "/"+updateCaseDto.path;
-            }else {
+            if (updateCaseDto.path.charAt(0) != '/') {
+                pa = "/" + updateCaseDto.path;
+            } else {
                 pa = updateCaseDto.path;
             }
             cases.path = pa;
@@ -265,7 +288,27 @@ export class CaseService {
         if (updateCaseDto.assertText) {
             cases.assertText = updateCaseDto.assertText;
         }
+        const assertType = await this.assertTypeRepository.findOne(updateCaseDto.assertType).catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
 
+        if (!assertType) {
+            throw new ApiException(`assertTypeId:${updateCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        const assertJudge = await this.assertJudgeRepository.findOne(updateCaseDto.assertJudge).catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+        if (!assertJudge) {
+            throw new ApiException(`assertJudgeId:${updateCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        cases.assertJudge = assertJudge;
+        cases.assertType = assertType;
         await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).where('id = :id', {id: id}).execute().catch(
             err => {
                 console.log(err);
@@ -277,11 +320,11 @@ export class CaseService {
         };
     }
 
-    async findCaseByEndpointAndPath(){
+    async findCaseByEndpointAndPath() {
         return
     }
 
-    async unionFindAllEndpoint(){
+    async unionFindAllEndpoint() {
         const result = await this.caseRepository.createQueryBuilder('case').select('case.endpoint').groupBy('case.endpoint').addGroupBy('case.id').getMany().catch(
             err => {
                 console.log(err);

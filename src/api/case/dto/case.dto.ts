@@ -53,6 +53,12 @@ export class CreateCaseDto {
     @IsBoolean()
     @IsOptional()
     isNeedToken: boolean;
+
+    @IsNumber()
+    assertType: number;
+
+    @IsNumber()
+    assertJudge: number;
 }
 
 export class UpdateCaseDto {
@@ -78,9 +84,9 @@ export class UpdateCaseDto {
     @IsOptional()
     readonly endpoint: string;
 
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
-    readonly type: string;
+    readonly type: number;
 
     @IsOptional()
     catalogId: string;
@@ -98,6 +104,14 @@ export class UpdateCaseDto {
     @IsBoolean()
     @IsOptional()
     isNeedToken: boolean;
+
+    @IsNumber()
+    @IsOptional()
+    assertType: number;
+
+    @IsNumber()
+    @IsOptional()
+    assertJudge: number;
 
 }
 
