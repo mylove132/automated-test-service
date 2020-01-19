@@ -49,4 +49,18 @@ export class CaseController {
     return this.caseService.unionFindAllEndpoint();
   }
 
+  @ApiOperation({ title: 'get all assertType' })
+  @ApiResponse({ status: 200, description: 'get all assertType success.'})
+  @Get('assert-type')
+  async allAssertType(){
+    return this.caseService.getAllAssertType();
+  }
+
+  @ApiOperation({ title: 'get all assertType' })
+  @ApiResponse({ status: 200, description: 'get all assertType success.'})
+  @Get('assert-judge')
+  async allAssertJudge(){
+    return this.caseService.getAllAssertJudge();
+  }
+
 }

@@ -4,6 +4,7 @@ import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
+import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 
 
 @Entity('case')
@@ -44,6 +45,12 @@ export class CaseEntity {
 
     @UpdateDateColumn()
     updateDate: Date;
+
+    @ManyToOne(type => AssertTypeEntity, assert => assert.cases, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    assertType: AssertTypeEntity;
+
+    @ManyToOne(type => AssertJudgeEntity, assertJudge => assertJudge.cases, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    assertJudge: AssertJudgeEntity;
 
     @Column({comment: '断言内容'})
     assertText: string;

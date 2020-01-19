@@ -12,6 +12,7 @@ import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {CommonUtil} from '../../util/common.util';
 import {EnvService} from "../env/env.service";
+import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 
 export class CaseService {
     constructor(
@@ -23,6 +24,10 @@ export class CaseService {
         private readonly caseListRepository: Repository<CaselistEntity>,
         @InjectRepository(EndpointEntity)
         private readonly endpointRepository: Repository<EndpointEntity>,
+        @InjectRepository(AssertTypeEntity)
+        private readonly assertTypeRepository: Repository<AssertTypeEntity>,
+        @InjectRepository(AssertJudgeEntity)
+        private readonly assertJudgeRepository: Repository<AssertJudgeEntity>,
         private readonly envService: EnvService
     ) {
     }
@@ -30,9 +35,7 @@ export class CaseService {
     async paginate(options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
         return await paginate<CaseEntity>(this.caseRepository, options);
     }
-
     async addCase(createCaseDto: CreateCaseDto) {
-
         const caseObj = new CaseEntity();
         if (createCaseDto.isNeedToken != null){
             caseObj.isNeedToken = createCaseDto.isNeedToken;
@@ -71,6 +74,15 @@ export class CaseService {
             pa = "/"+createCaseDto.path;
         }else {
             pa = createCaseDto.path;
+        }
+        const caObj = this.caseRepository.createQueryBuilder('case').select().where('case.path = :path',{path: pa.trim()}).andWhere('case.name = :caseName',{caseName: createCaseDto.name}).getOne().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        if(caObj){
+            throw new ApiException(`path:${createCaseDto.path}与名称：${createCaseDto.name}已存在`, ApiErrorCode.CASE_NAME_PATH_INVALID, HttpStatus.BAD_REQUEST);
         }
         caseObj.catalog = catalog;
         caseObj.endpoint = createCaseDto.endpoint;
@@ -167,6 +179,25 @@ export class CaseService {
         return result;
     }
 
+    async getAllAssertType(){
+        const result = await this.assertTypeRepository.createQueryBuilder().getMany().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        return result;
+    }
+
+    async getAllAssertJudge(){
+        const result = await this.assertJudgeRepository.createQueryBuilder().getMany().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+        return result;
+    }
 
     async updateCase(updateCaseDto: UpdateCaseDto): Promise<Object> {
 
@@ -246,7 +277,9 @@ export class CaseService {
         };
     }
 
-    async findCaseByEndpointAndPath(){}
+    async findCaseByEndpointAndPath(){
+        return
+    }
 
     async unionFindAllEndpoint(){
         const result = await this.caseRepository.createQueryBuilder('case').select('case.endpoint').groupBy('case.endpoint').addGroupBy('case.id').getMany().catch(
@@ -289,4 +322,6 @@ export class CaseService {
                 throw new ApiException(`param type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
     }
+
+
 }
