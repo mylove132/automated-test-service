@@ -91,7 +91,8 @@ export class RunService {
           type: String(caseObj.type),
         });
         resultObj['caseId'] = caseId;
-        resultObj['expect'] = caseObj.assertText;
+        resultObj['caseName'] = caseObj.name;
+        const assertText = caseObj.assertText;
         console.log("requestBaseData", requestBaseData)
         const requestData = this.generateRequestData(requestBaseData);
         let token;
@@ -106,9 +107,15 @@ export class RunService {
         const rumTime = endTime.getTime() - startTime.getTime();
         resultObj['rumTime'] = rumTime;
         const res = JSON.stringify(result.data);
+        resultObj['status'] = false;
+        let execResult = false;
         if (result.result){
           resultObj['result'] = result.data;
           resultObj['errMsg'] = null;
+          if (result.data.code == assertText){
+            resultObj['status'] = true;
+            execResult = true;
+          }
         }else {
           resultObj['result'] = null;
           resultObj['errMsg'] = result;
@@ -117,7 +124,7 @@ export class RunService {
         // 保存历史记录
         const historyData = {
           caseId: caseId,
-          status: result.result ? 0 : 1,
+          status: execResult ? 0 : 1,
           executor: 0,
           re: res,
           startTime: startTime,
