@@ -44,7 +44,9 @@ export class RunService {
     let token;
     if (runCaseDto.token != null && runCaseDto.token != ""){
       token = runCaseDto.token;
+      requestData.headers['token'] = token
     }
+
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
     const endTime = new Date();
