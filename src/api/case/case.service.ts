@@ -104,6 +104,7 @@ export class CaseService {
         if (!assertJudge) {
             throw new ApiException(`assertJudgeId:${createCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        caseObj.assertKey = createCaseDto.assertKey;
         caseObj.assertType = assertType;
         caseObj.assertJudge = assertJudge;
         caseObj.catalog = catalog;
@@ -288,27 +289,36 @@ export class CaseService {
         if (updateCaseDto.assertText) {
             cases.assertText = updateCaseDto.assertText;
         }
-        const assertType = await this.assertTypeRepository.findOne(updateCaseDto.assertType).catch(
-            err => {
-                console.log(err);
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        );
+        if (updateCaseDto.assertType){
+            const assertType = await this.assertTypeRepository.findOne(updateCaseDto.assertType).catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
 
-        if (!assertType) {
-            throw new ApiException(`assertTypeId:${updateCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        const assertJudge = await this.assertJudgeRepository.findOne(updateCaseDto.assertJudge).catch(
-            err => {
-                console.log(err);
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            if (!assertType) {
+                throw new ApiException(`assertTypeId:${updateCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             }
-        );
-        if (!assertJudge) {
-            throw new ApiException(`assertJudgeId:${updateCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            cases.assertType = assertType;
         }
-        cases.assertJudge = assertJudge;
-        cases.assertType = assertType;
+
+        if (updateCaseDto.assertJudge){
+            const assertJudge = await this.assertJudgeRepository.findOne(updateCaseDto.assertJudge).catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            if (!assertJudge) {
+                throw new ApiException(`assertJudgeId:${updateCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+            cases.assertJudge = assertJudge;
+        }
+
+        if (updateCaseDto.assertKey){
+            cases.assertKey = updateCaseDto.assertKey;
+        }
         await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).where('id = :id', {id: id}).execute().catch(
             err => {
                 console.log(err);

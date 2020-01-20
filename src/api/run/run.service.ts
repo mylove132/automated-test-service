@@ -1,21 +1,21 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CaseEntity } from '../case/case.entity';
-import { CaselistEntity } from '../caselist/caselist.entity';
-import {RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto, CovertDto} from './dto/run.dto';
-import { CurlService } from '../curl/curl.service';
-import { EnvService } from '../env/env.service';
-import { ApiException } from '../../shared/exceptions/api.exception';
-import { ApiErrorCode } from '../../shared/enums/api.error.code';
-import { AxiosRequestConfig } from 'axios';
-import { getRequestMethodTypeString } from '../../utils'
-import { HistoryService } from '../history/history.service';
-import { forkJoin } from 'rxjs';
+import {HttpStatus, Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {CaseEntity} from '../case/case.entity';
+import {CaselistEntity} from '../caselist/caselist.entity';
+import {CovertDto, RunCaseByIdDto, RunCaseDto, RunCaseListByIdDto} from './dto/run.dto';
+import {CurlService} from '../curl/curl.service';
+import {EnvService} from '../env/env.service';
+import {ApiException} from '../../shared/exceptions/api.exception';
+import {ApiErrorCode} from '../../shared/enums/api.error.code';
+import {AxiosRequestConfig} from 'axios';
+import {getAssertObjectValue, getRequestMethodTypeString} from '../../utils'
+import {HistoryService} from '../history/history.service';
+import {forkJoin} from 'rxjs';
 import * as FormData from 'form-data';
 import * as request from 'request';
 import {IRunCaseById, IRunCaseList} from './run.interface';
-import { map } from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 
 @Injectable()
@@ -67,6 +67,7 @@ export class RunService {
    * @return {Promise<any>}: 发起请求后的响应结果
    */
   async runCaseById(runCaseById: IRunCaseById): Promise<any> {
+
     let resultList = [];
     for (let caseId of runCaseById.caseIds) {
       let resultObj = {};
@@ -92,7 +93,6 @@ export class RunService {
         });
         resultObj['caseId'] = caseId;
         resultObj['caseName'] = caseObj.name;
-        const assertText = caseObj.assertText;
         console.log("requestBaseData", requestBaseData)
         const requestData = this.generateRequestData(requestBaseData);
         let token;
@@ -107,16 +107,14 @@ export class RunService {
         const rumTime = endTime.getTime() - startTime.getTime();
         resultObj['rumTime'] = rumTime;
         const res = JSON.stringify(result.data);
-        resultObj['status'] = false;
-        let execResult = false;
         if (result.result){
+          const assert = await this.execAssert(caseId, result.data);
           resultObj['result'] = result.data;
+          resultObj['status'] = assert['result'];
+          resultObj['assert'] = assert;
           resultObj['errMsg'] = null;
-          if (result.data.code == assertText){
-            resultObj['status'] = true;
-            execResult = true;
-          }
         }else {
+          resultObj['status'] = false;
           resultObj['result'] = null;
           resultObj['errMsg'] = result;
         }
@@ -124,7 +122,7 @@ export class RunService {
         // 保存历史记录
         const historyData = {
           caseId: caseId,
-          status: execResult ? 0 : 1,
+          status: resultObj['status'] ? 0 : 1,
           executor: 0,
           re: res,
           startTime: startTime,
@@ -203,7 +201,6 @@ export class RunService {
   }
 
 
-
   // 生成请求参数
   private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
     let headers = runCaseDto.header ? JSON.parse(runCaseDto.header) : {};
@@ -246,6 +243,10 @@ export class RunService {
     return form
   }
 
+  /**
+   * 转换curl请求
+   * @param covertDto
+   */
   async covertCurl(covertDto: CovertDto){
     let type;
     switch (covertDto.type) {
@@ -281,6 +282,82 @@ export class RunService {
     result = `curl -g -i -X ${type} ${covertDto.url} ${ht} -d ${args}`;
 
     return result;
+  }
+
+  /**
+   * 处理断言结果
+   * @param caseId
+   * @param result
+   */
+  private async execAssert(caseId, result) {
+
+    const caseObj = await this.caseRepository.createQueryBuilder('case').
+    where('case.id = :id',{id: caseId}).
+    leftJoinAndSelect('case.assertType','assertType').
+    leftJoinAndSelect('case.assertJudge','assertJudge').getOne().catch(
+        err => {
+          console.log(err);
+          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    );
+    if (!caseObj){
+      throw new ApiException(`caseId: ${caseId} 不存在`,ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
+    }
+    /**
+     * 处理请求结果
+     */
+    let execResult = getAssertObjectValue(result, caseObj.assertKey);
+    execResult = execResult ? execResult : null
+    let assertResult = {};
+    switch (caseObj.assertType.id) {
+      case 1:
+        throw new ApiException('暂不支持header断言', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+      case 2:
+        switch (caseObj.assertJudge.id) {
+          case 1:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult == caseObj.assertText);
+            break;
+          case 2:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult < caseObj.assertText);
+            break;
+          case 3:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult <= caseObj.assertText);
+            break;
+          case 4:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult > caseObj.assertText);
+            break;
+          case 5:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult >= caseObj.assertText);
+            break;
+          case 6:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult != caseObj.assertText);
+            break;
+          case 7:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult.toString().indexOf(caseObj.assertText) != -1);
+            break;
+          case 8:
+            assertResult['expect'] = caseObj.assertText;
+            assertResult['actual'] = execResult;
+            assertResult['result'] = (execResult.toString().indexOf(caseObj.assertText) == -1);
+            break;
+        }
+        return assertResult;
+    }
+
   }
 }
 

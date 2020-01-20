@@ -43,7 +43,6 @@ export class RunCaseDto {
     @IsString()
     @IsOptional()
     assertText: string;
-    
 
     @IsOptional()
     token?: string;
@@ -63,7 +62,7 @@ export class RunCaseByIdDto implements IRunCaseById{
     readonly executor: Executor;
 
     @Optional()
-    readonly token: string;
+    readonly token?: string;
 
 }
 export class RunCaseListByIdDto implements IRunCaseList{

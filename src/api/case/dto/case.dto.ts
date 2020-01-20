@@ -54,6 +54,9 @@ export class CreateCaseDto {
     @IsOptional()
     isNeedToken: boolean;
 
+    @IsString()
+    assertKey: string;
+
     @IsNumber()
     assertType: number;
 
@@ -104,6 +107,9 @@ export class UpdateCaseDto {
     @IsBoolean()
     @IsOptional()
     isNeedToken: boolean;
+
+    @Optional()
+    assertKey: string;
 
     @IsNumber()
     @IsOptional()

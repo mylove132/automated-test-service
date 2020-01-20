@@ -55,6 +55,9 @@ export class CaseEntity {
     @Column({comment: '断言内容'})
     assertText: string;
 
+    @Column({name:'assertKey',nullable:true,comment: '断言key值'})
+    assertKey: string;
+
     @ManyToMany(type => CaselistEntity, caselist => caselist.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     @JoinTable()
     caseLists: CaselistEntity[];
