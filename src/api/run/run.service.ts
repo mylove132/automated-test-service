@@ -315,41 +315,49 @@ export class RunService {
       case 2:
         switch (caseObj.assertJudge.id) {
           case 1:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult == caseObj.assertText);
             break;
           case 2:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult < caseObj.assertText);
             break;
           case 3:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult <= caseObj.assertText);
             break;
           case 4:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult > caseObj.assertText);
             break;
           case 5:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult >= caseObj.assertText);
             break;
           case 6:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult != caseObj.assertText);
             break;
           case 7:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult.toString().indexOf(caseObj.assertText) != -1);
             break;
           case 8:
+            assertResult['relation'] = caseObj.assertJudge.name;
             assertResult['expect'] = caseObj.assertText;
             assertResult['actual'] = execResult;
             assertResult['result'] = (execResult.toString().indexOf(caseObj.assertText) == -1);
