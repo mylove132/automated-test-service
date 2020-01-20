@@ -345,6 +345,9 @@ data						|object		|R			|&nbsp;
 &emsp;catalogId				|number		|O			|目录ID
 &emsp;name			        |string		|O			|脚本名称
 &emsp;assertText			        |string		|O			|断言内容
+&emsp;assertKey			        |string		|O			|断言key
+&emsp;assertType			        |number		|O			|断言类型
+&emsp;assertJudge			        |number		|O			|断言关系
 &emsp;header			    |string		|O			|header参数{JSON类型}
 &emsp;param			        |string		|O			|接口参数{JSON类型}
 &emsp;type			        |number		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）
@@ -453,7 +456,10 @@ data						|object		|R			|
 &emsp;header			    |Object		|O			|header参数
 &emsp;param			        |string		|O			|接口参数
 &emsp;type			        |string		|O			|请求类型（0:GET,1:POST,2:DELETE,3:PUT）默认GET
-&emsp;assertText			        |string		|O			|断言
+&emsp;assertText			        |string		|R			|断言value
+&emsp;assertKey			        |string		|R			|断言key
+&emsp;assertType			        |number		|R			|断言类型
+&emsp;assertJudge			        |number		|R			|断言关系
 &emsp;endpoint			|string		|O			|endpoint值
 &emsp;path			|string		|R			|接口路径
 &emsp;endpointId			|number		|R			|endpointId
@@ -493,6 +499,111 @@ data						|object		|R			|&nbsp;
     "message": "success"
 }
 ```
+
+### 2.8.1  获取断言类型
+- **接口说明：** 添加用例接口
+- **请求方式：** GET
+- **接口地址：** /api/case/assert-type
+
+#### 2.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|number		|R			|&nbsp;类型ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type						|string		|R			|&nbsp;类型名称
+
+返回成功示例
+
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "type": "header"
+        },
+        {
+            "id": 2,
+            "type": "data-json"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 2.8.2  获取断言关系
+- **接口说明：** 添加用例接口
+- **请求方式：** GET
+- **接口地址：** /api/case/assert-judge
+
+#### 2.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|number		|R			|&nbsp;关系ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name						|string		|R			|&nbsp;关系名称
+
+返回成功示例
+
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "等于"
+        },
+        {
+            "id": 2,
+            "name": "小于"
+        },
+        {
+            "id": 3,
+            "name": "小于等于"
+        },
+        {
+            "id": 4,
+            "name": "大于"
+        },
+        {
+            "id": 5,
+            "name": "大于等于"
+        },
+        {
+            "id": 6,
+            "name": "不等于"
+        },
+        {
+            "id": 7,
+            "name": "包含"
+        },
+        {
+            "id": 8,
+            "name": "不包含"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
 
 ### 2.8 执行接口用例
 - **接口说明：** 执行用例接口
