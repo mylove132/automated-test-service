@@ -330,10 +330,6 @@ export class CaseService {
         };
     }
 
-    async findCaseByEndpointAndPath() {
-        return
-    }
-
     async unionFindAllEndpoint() {
         const result = await this.caseRepository.createQueryBuilder('case').select('case.endpoint').groupBy('case.endpoint').addGroupBy('case.id').getMany().catch(
             err => {

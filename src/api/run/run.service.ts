@@ -311,8 +311,6 @@ export class RunService {
     let assertResult = {};
     switch (caseObj.assertType.id) {
       case 1:
-        throw new ApiException('暂不支持header断言', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-      case 2:
         switch (caseObj.assertJudge.id) {
           case 1:
             assertResult['relation'] = caseObj.assertJudge.name;
@@ -363,9 +361,9 @@ export class RunService {
             assertResult['result'] = (execResult.toString().indexOf(caseObj.assertText) == -1);
             break;
         }
-        return assertResult;
+        break;
     }
-
+    return assertResult;
   }
 }
 
