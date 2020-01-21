@@ -96,7 +96,6 @@ export class EnvService {
     }
 
     async deleteEndpointByIds( deleteEndpointDto: DeleteEndpointDto){
-
         deleteEndpointDto.endpointIds.forEach(
             id => {
                 if (!CommonUtil.isNumber(id)){

@@ -288,10 +288,15 @@ data						|object		|R			|&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;name |string		|R			|&nbsp;接口名称
 &nbsp;&nbsp;&nbsp;&nbsp;header |string		|R			|&nbsp;接口header值
 &nbsp;&nbsp;&nbsp;&nbsp;param |string		|R			|&nbsp;接口参数
-&nbsp;&nbsp;&nbsp;&nbsp;url |string		|R			|&nbsp;接口url
+&nbsp;&nbsp;&nbsp;&nbsp;path |string		|R			|&nbsp;接口url
 &nbsp;&nbsp;&nbsp;&nbsp;type |number		|R			|&nbsp;请求类型（GET = 0,POST = 1,DELETE = 2,PUT = 3）
 &nbsp;&nbsp;&nbsp;&nbsp;paramType |number		|R			|&nbsp参数类型（TEXT = 0,FILE = 1）
-
+&nbsp;&nbsp;&nbsp;&nbsp;assertText |string		|R			|&nbsp;断言结果
+&nbsp;&nbsp;&nbsp;&nbsp;assertKey |string		|R			|&nbsp;断言表达式
+&nbsp;&nbsp;&nbsp;&nbsp;isNeedToken |bool		|R			|&nbsp;接口是否需要token
+&nbsp;&nbsp;&nbsp;&nbsp;endpointObject |Object		|R			|&nbsp;关联的endpoint实体
+&nbsp;&nbsp;&nbsp;&nbsp;assertType |Object		|R			|&nbsp;关联的断言类型
+&nbsp;&nbsp;&nbsp;&nbsp;assertJudge |Object		|R			|&nbsp;关联的断言条件
 
 返回成功示例
 ```
@@ -299,29 +304,265 @@ data						|object		|R			|&nbsp;
     "data": {
         "items": [
             {
-                "id": 2,
-                "name": "获取腾讯信息",
-                "header": null,
-                "param": null,
-                "url": "http://www.sina.com",
-                "type": 0,
-                "createDate": "2019-12-24T10:04:02.792Z",
-                "updateDate": "2019-12-24T10:04:02.792Z"
+                "id": 50,
+                "name": "获取测试列表",
+                "header": "{}",
+                "param": "{\"stuNum\":\"795571161\",\"page\":1,\"size\":5,\"type\":0}",
+                "paramType": 0,
+                "path": "/cms/user-api/student/homework/v2/homeworklist",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-20T10:29:36.707Z",
+                "updateDate": "2020-01-20T10:29:36.707Z",
+                "assertText": "10",
+                "assertKey": "data.list.length",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 1,
+                    "name": "smix1",
+                    "endpoint": "https://oapi-smix1.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 4,
+                    "name": "大于"
+                }
             },
             {
-                "id": 1,
-                "name": "获取首页信息",
-                "header": null,
+                "id": 49,
+                "name": "获取百度首页105",
+                "header": "{}",
+                "param": "{\"stuNum\":\"795571161\",\"page\":1,\"size\":5,\"type\":0}",
+                "paramType": 0,
+                "path": "/cms/user-api/student/homework/v2/homeworklist",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-20T08:11:41.944Z",
+                "updateDate": "2020-01-20T08:11:41.944Z",
+                "assertText": "10000",
+                "assertKey": "data.code",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 5,
+                    "name": "test",
+                    "endpoint": "https://oapi.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 1,
+                    "name": "等于"
+                }
+            },
+            {
+                "id": 48,
+                "name": "获取百度首页104",
+                "header": "{}",
+                "param": "{\"stuNum\":\"795571161\",\"page\":1,\"size\":5,\"type\":0}",
+                "paramType": 0,
+                "path": "/cms/user-api/student/homework/v2/homeworklist",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-20T08:10:29.039Z",
+                "updateDate": "2020-01-20T08:10:29.039Z",
+                "assertText": "10000",
+                "assertKey": "data.code",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 5,
+                    "name": "test",
+                    "endpoint": "https://oapi.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 1,
+                    "name": "等于"
+                }
+            },
+            {
+                "id": 47,
+                "name": "获取百度首页103",
+                "header": "{}",
+                "param": "{\"stuNum\":\"795571161\",\"page\":1,\"size\":5,\"type\":0}",
+                "paramType": 0,
+                "path": "/cms/user-api/student/homework/v2/homeworklist",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-20T07:55:13.024Z",
+                "updateDate": "2020-01-20T07:55:13.024Z",
+                "assertText": "10000",
+                "assertKey": "data.code",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 5,
+                    "name": "test",
+                    "endpoint": "https://oapi.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 1,
+                    "name": "等于"
+                }
+            },
+            {
+                "id": 46,
+                "name": "获取百度首页102",
+                "header": "{}",
+                "param": "{\"stuNum\":\"795571161\",\"page\":1,\"size\":5,\"type\":0}",
+                "paramType": 0,
+                "path": "/cms/user-api/student/homework/v2/homeworklist",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-20T05:41:20.020Z",
+                "updateDate": "2020-01-20T05:41:20.020Z",
+                "assertText": "测试-",
+                "assertKey": "data.data.list[0].className",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 5,
+                    "name": "test",
+                    "endpoint": "https://oapi.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 7,
+                    "name": "包含"
+                }
+            },
+            {
+                "id": 45,
+                "name": "获取百度首页102",
+                "header": "{}",
                 "param": null,
-                "url": "http://www.baidu.com",
+                "paramType": 0,
+                "path": "/api/catalog",
+                "endpoint": "https://oapi.t.blingabc.com",
                 "type": 0,
-                "createDate": "2019-12-24T10:00:18.744Z",
-                "updateDate": "2019-12-24T10:00:18.744Z"
+                "createDate": "2020-01-19T11:44:35.266Z",
+                "updateDate": "2020-01-19T11:48:54.508Z",
+                "assertText": "\"code\":0",
+                "assertKey": "data.code",
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 1,
+                    "name": "smix1",
+                    "endpoint": "https://oapi-smix1.t.blingabc.com"
+                },
+                "assertType": {
+                    "id": 1,
+                    "type": "响应参数"
+                },
+                "assertJudge": {
+                    "id": 1,
+                    "name": "等于"
+                }
+            },
+            {
+                "id": 20,
+                "name": "获取外教排班",
+                "header": null,
+                "param": "\"{\\\"foreignTeacherId\\\":2413,\\\"beginTime\\\":\\\"2020-01-12 00:00:00\\\",\\\"endTime\\\":\\\"2020-01-18 23:59:59\\\"}\"",
+                "paramType": 0,
+                "path": "/foreign/user-api/foreign/v1/schedule_red_point",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 1,
+                "createDate": "2020-01-17T07:12:42.394Z",
+                "updateDate": "2020-01-17T07:12:42.394Z",
+                "assertText": "\"code\":0",
+                "assertKey": null,
+                "isNeedToken": true,
+                "endpointObject": {
+                    "id": 2,
+                    "name": "smix2",
+                    "endpoint": "https://oapi-smix2.t.blingabc.com"
+                },
+                "assertType": null,
+                "assertJudge": null
+            },
+            {
+                "id": 15,
+                "name": "获取目录定时任务列表",
+                "header": "{\"age\":2,\"oa\":3}",
+                "param": "{\"gae\":1}",
+                "paramType": 0,
+                "path": "/api/scheduler",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 0,
+                "createDate": "2020-01-16T12:48:08.688Z",
+                "updateDate": "2020-01-16T12:48:08.688Z",
+                "assertText": "\"code\":0",
+                "assertKey": null,
+                "isNeedToken": false,
+                "endpointObject": {
+                    "id": 2,
+                    "name": "smix2",
+                    "endpoint": "https://oapi-smix2.t.blingabc.com"
+                },
+                "assertType": null,
+                "assertJudge": null
+            },
+            {
+                "id": 12,
+                "name": "获取目录定时任务列表",
+                "header": {},
+                "param": null,
+                "paramType": 0,
+                "path": "/api/scheduler",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 0,
+                "createDate": "2020-01-15T10:45:32.277Z",
+                "updateDate": "2020-01-15T10:45:32.277Z",
+                "assertText": "\"code\":0",
+                "assertKey": null,
+                "isNeedToken": false,
+                "endpointObject": {
+                    "id": 2,
+                    "name": "smix2",
+                    "endpoint": "https://oapi-smix2.t.blingabc.com"
+                },
+                "assertType": null,
+                "assertJudge": null
+            },
+            {
+                "id": 11,
+                "name": "获取腾讯视频次页",
+                "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                "param": "{\"name\":\"zhangsan\",\"age\":12}",
+                "paramType": 0,
+                "path": "/api/catalog",
+                "endpoint": "https://oapi.t.blingabc.com",
+                "type": 0,
+                "createDate": "2020-01-14T09:01:08.903Z",
+                "updateDate": "2020-01-14T09:01:08.903Z",
+                "assertText": "\"code\":0",
+                "assertKey": null,
+                "isNeedToken": false,
+                "endpointObject": {
+                    "id": 1,
+                    "name": "smix1",
+                    "endpoint": "https://oapi-smix1.t.blingabc.com"
+                },
+                "assertType": null,
+                "assertJudge": null
             }
         ],
-        "itemCount": 2,
-        "totalItems": 2,
-        "pageCount": 1,
+        "itemCount": 10,
+        "totalItems": 20,
+        "pageCount": 2,
         "next": "",
         "previous": ""
     },
@@ -3533,6 +3774,7 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 - **接口说明：** 获取历史记录
 - **请求方式：** GET
 - **接口地址：** /api/history/list
+
 ##### 参数类型说明
 
 参数名称						|类型		|出现要求	|描述  
