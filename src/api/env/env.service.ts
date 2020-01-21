@@ -149,7 +149,7 @@ export class EnvService {
         }
         let envList = [];
        for (const env of addEndpointDto.envs){
-         const envObj = await this.envRepository.createQueryBuilder().select().where('id = :id',{id: env}).getOne().catch(
+         const envObj = await this.envRepository.findOne(env).catch(
              err => {
                  throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
              }
@@ -177,7 +177,6 @@ export class EnvService {
     }
 
     async findEndpointByEnv(envIds){
-
         const result = await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
             .getMany().catch(
                 err => {

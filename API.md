@@ -3529,15 +3529,15 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ```
 
 
-### 6.1 运行临时接口
-- **接口说明：** 运行临时接口
-- **请求方式：** POST
-- **接口地址：** /api/run/script
+### 6.1 获取历史记录
+- **接口说明：** 获取历史记录
+- **请求方式：** GET
+- **接口地址：** /api/history/list
 ##### 参数类型说明
+
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-&emsp;userName			        |string		|R		    |用户名
-&emsp;password			        |string		|R		    |密码
+&emsp;path			        |string		|O		    |模糊匹配接口路径
 
 ##### 返回结果
 
@@ -3545,52 +3545,276 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 :----						|:---		|:------	|:---	
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
-data						|any		|R			|&nbsp;运行case结果的返回值
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;items|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;历史记录ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;createDate|date		|R			|&nbsp;历史记录创建时间
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status|bool		|R			|&nbsp;接口执行结果
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executor|number		|R			|&nbsp;执行者（0：手动执行，1：定时任务执行）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executor|number		|R			|&nbsp;调用接口返回结果
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startTime|date		|R			|&nbsp;调用接口开始时间
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endTime|date		|R			|&nbsp;调用接口结束时间
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case|Objecr		|R			|&nbsp;调用接口的case实体
 
 
 
-### 6.2 运行某接口请求
-- **接口说明：** 运行某具体样例请求
-- **请求方式：** POST
-- **接口地址：** /api/run/case-script
-##### 参数类型说明
+返回示例
 
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;caseId			        |number		|R		    |case id
-&emsp;envId			        |number		|R		    |环境 id
-&emsp;executor			        |number		|R		    |0手动 1定时任务
-
-##### 返回结果
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|any		|R			|&nbsp;运行case结果的返回值
-
-
-
-
-### 6.3 运行样例里的所有接口请求
-- **接口说明：** 运行样例里的所有接口请求
-- **请求方式：** POST
-- **接口地址：** /api/run/script
-##### 参数类型说明
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;caseListId			        |number		|R		   |用例 id
-&emsp;envId			        |number		|R		    |环境 id
-&emsp;executor			        |number		|R		    |0手动 1定时任务
-
-##### 返回结果
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|any[]		|R			|&nbsp;运行结果的返回值列表
-
+```
+{
+    "data": {
+        "items": [
+            {
+                "id": 317,
+                "createDate": "2020-01-19T10:42:47.235Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.222Z",
+                "endTime": "2020-01-19T10:42:47.233Z",
+                "case": {
+                    "id": 5,
+                    "name": "获取百度首页3",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T08:59:26.158Z",
+                    "updateDate": "2020-01-14T08:59:26.158Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 316,
+                "createDate": "2020-01-19T10:42:47.220Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.205Z",
+                "endTime": "2020-01-19T10:42:47.217Z",
+                "case": {
+                    "id": 6,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:02.756Z",
+                    "updateDate": "2020-01-14T09:00:02.756Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 315,
+                "createDate": "2020-01-19T10:42:47.202Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.186Z",
+                "endTime": "2020-01-19T10:42:47.199Z",
+                "case": {
+                    "id": 7,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":14}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:22.163Z",
+                    "updateDate": "2020-01-14T09:00:22.163Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 314,
+                "createDate": "2020-01-19T10:42:47.184Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.172Z",
+                "endTime": "2020-01-19T10:42:47.182Z",
+                "case": {
+                    "id": 8,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":13}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:26.765Z",
+                    "updateDate": "2020-01-14T09:00:26.765Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 313,
+                "createDate": "2020-01-19T10:42:47.169Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.156Z",
+                "endTime": "2020-01-19T10:42:47.166Z",
+                "case": {
+                    "id": 10,
+                    "name": "获取腾讯视频首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":12}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:56.851Z",
+                    "updateDate": "2020-01-14T09:00:56.851Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 312,
+                "createDate": "2020-01-19T10:42:47.153Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:42:47.138Z",
+                "endTime": "2020-01-19T10:42:47.151Z",
+                "case": {
+                    "id": 11,
+                    "name": "获取腾讯视频次页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":12}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:01:08.903Z",
+                    "updateDate": "2020-01-14T09:01:08.903Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 311,
+                "createDate": "2020-01-19T10:41:45.500Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:41:45.486Z",
+                "endTime": "2020-01-19T10:41:45.497Z",
+                "case": {
+                    "id": 5,
+                    "name": "获取百度首页3",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": null,
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T08:59:26.158Z",
+                    "updateDate": "2020-01-14T08:59:26.158Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 310,
+                "createDate": "2020-01-19T10:41:45.483Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:41:45.465Z",
+                "endTime": "2020-01-19T10:41:45.481Z",
+                "case": {
+                    "id": 6,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:02.756Z",
+                    "updateDate": "2020-01-14T09:00:02.756Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 309,
+                "createDate": "2020-01-19T10:41:45.463Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:41:45.451Z",
+                "endTime": "2020-01-19T10:41:45.460Z",
+                "case": {
+                    "id": 7,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":14}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:22.163Z",
+                    "updateDate": "2020-01-14T09:00:22.163Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            },
+            {
+                "id": 308,
+                "createDate": "2020-01-19T10:41:45.448Z",
+                "status": 1,
+                "executor": 0,
+                "result": null,
+                "startTime": "2020-01-19T10:41:45.433Z",
+                "endTime": "2020-01-19T10:41:45.446Z",
+                "case": {
+                    "id": 8,
+                    "name": "获取百度首页",
+                    "header": "{\"name\":\"zhangsan\",\"age\":15}",
+                    "param": "{\"name\":\"zhangsan\",\"age\":13}",
+                    "paramType": 0,
+                    "path": "/api/catalog",
+                    "endpoint": "http://127.0.0.1:3000",
+                    "type": 0,
+                    "createDate": "2020-01-14T09:00:26.765Z",
+                    "updateDate": "2020-01-14T09:00:26.765Z",
+                    "assertText": "\"code\":0",
+                    "assertKey": null,
+                    "isNeedToken": false
+                }
+            }
+        ],
+        "itemCount": 10,
+        "totalItems": 123,
+        "pageCount": 13,
+        "next": "",
+        "previous": ""
+    },
+    "code": 0,
+    "message": "success"
+}
+```
 
 
 
