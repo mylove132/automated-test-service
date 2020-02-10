@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { RunService } from './run.service';
-import { RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto } from './dto/run.dto';
+import {RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto, CovertDto} from './dto/run.dto';
 import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('run')
@@ -29,5 +29,12 @@ export class RunController {
   @Post('caselist-script')
   async runCaseListById(@Body() runCaseListByIdDto: RunCaseListByIdDto): Promise<any> {
     return await this.runService.runCaseListById(runCaseListByIdDto);
+  }
+
+    @ApiOperation({ title: 'covert curl url', description: '接口转换为curl' })
+    @ApiResponse({ status: 200, description: 'run caselist success.'})
+    @Post('covert')
+  async covertCurl(@Body() covertDto: CovertDto){
+      return await this.runService.covertCurl(covertDto);
   }
 }
