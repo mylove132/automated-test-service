@@ -5,9 +5,10 @@ import { UserEntity } from '../user/user.entity';
 
 import { CatalogService } from './catalog.service';
 import {CatalogEntity} from "./catalog.entity";
+import {PlatformCodeEntity} from "./platformCode.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, CatalogEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, CatalogEntity, PlatformCodeEntity])],
   providers: [CatalogService],
   controllers: [
     CatalogController

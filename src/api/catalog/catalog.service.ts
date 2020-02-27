@@ -7,11 +7,12 @@ import {HttpStatus} from '@nestjs/common';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {CommonUtil} from '../../util/common.util';
+import {PlatformCodeEntity} from "./platformCode.entity";
 
 export class CatalogService {
     constructor(
-        @InjectRepository(UserEntity)
-        private readonly userRepository: Repository<UserEntity>,
+        @InjectRepository(PlatformCodeEntity)
+        private readonly platformRepository: Repository<PlatformCodeEntity>,
         @InjectRepository(CatalogEntity)
         private readonly catalogRepository: Repository<CatalogEntity>
     ) {
@@ -22,9 +23,11 @@ export class CatalogService {
      * @param createCatalogDto
      */
     async addCatalog(createCatalogDto: CreateCatalogDto) {
-        const { name, isPub, parentId} = createCatalogDto;
+        const { name, isPub, parentId, platformCode} = createCatalogDto;
         const catalog = new CatalogEntity();
-        catalog.platformCode = createCatalogDto.platformCode;
+        const platformObj = await this.platformRepository.createQueryBuilder('platform').
+        where('platform.platformCode = :platformCode',{platformCode: platformCode}).getOne();
+        catalog.platformCode = platformObj;
         catalog.name = createCatalogDto.name;
         let isFlag: boolean;
         if (isPub) {
@@ -63,14 +66,36 @@ export class CatalogService {
      */
     async findCatalog(platformCode: string, isPub?: boolean): Promise<CatalogEntity[]> {
         let result;
-        result = await this.catalogRepository.createQueryBuilder('catalog').select().
-        where('catalog.platformCode = :platformCode',{platformCode: platformCode}).
+        let platformCodes = [];
+        if (platformCode.indexOf(",") != -1){
+           const ps = platformCode.split(',');
+           for (let p of ps){
+               platformCodes.push(p.toString());
+           }}
+         else {
+            platformCodes.push(platformCode);
+        }
+        console.log(platformCodes)
+        const platformObjList = await this.platformRepository.createQueryBuilder('platform').
+            where("platform.platformCode IN (:...platformCodes)", { platformCodes: platformCodes }).getMany().catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+         let pcIds = [];
+         for (let pcObj of platformObjList){
+             pcIds.push(pcObj.id);
+         }
+        result = await this.catalogRepository.createQueryBuilder('catalog').
+        where('catalog.platformCode IN (:...platforms)',{platforms: pcIds}).
         orderBy('catalog.createDate','DESC').getMany().catch(
             err => {
                 console.log(err)
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
-        )
+        );
+        console.log(result);
         return this.getTree(result, isPub);
     }
 

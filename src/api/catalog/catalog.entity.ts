@@ -5,11 +5,12 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    TreeChildren, TreeParent, Tree, OneToMany
+    TreeChildren, TreeParent, Tree, OneToMany, OneToOne, JoinColumn
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
 import {CaseEntity} from '../case/case.entity';
 import {SceneEntity} from "../scene/scene.entity";
+import {PlatformCodeEntity} from "./platformCode.entity";
 
 @Entity('catalog')
 export class CatalogEntity {
@@ -39,6 +40,7 @@ export class CatalogEntity {
     @OneToMany(type => SceneEntity, cases => cases.catalog)
     scenes: SceneEntity[];
 
-    @Column({default: "000", comment: "平台code码", nullable: false})
-    platformCode: string;
+    @OneToOne(type => PlatformCodeEntity,platformCode =>platformCode.catalog)
+    @JoinColumn()
+    platformCode: PlatformCodeEntity;
 }
