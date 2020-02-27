@@ -51,13 +51,13 @@ restful风格
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
-&emsp;platformCode				|string		|R			|平台code码
+&emsp;platformCode				|string		|R			|平台code码,多个用逗号隔开
 
 
 请求示例：
 
 ```
-/api/catalog?platformCode=0003
+/api/catalog?platformCode=0003,0001
 
 ```
 返回结果
