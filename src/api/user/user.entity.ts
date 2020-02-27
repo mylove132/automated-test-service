@@ -13,7 +13,4 @@ export class UserEntity {
   @Column({unique: true})
   userId: number;
 
-  @OneToMany(type => CatalogEntity, catalog  => catalog.user)
-  catalogs: CatalogEntity[];
-
 }

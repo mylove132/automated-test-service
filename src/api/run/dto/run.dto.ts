@@ -93,3 +93,18 @@ export class CovertDto {
     @IsJSON()
     header: string;
 }
+
+export class RunSceneDto{
+
+    @IsNumber()
+    sceneId: number;
+
+    @IsNumber()
+    readonly envId: number;
+
+    @Optional()
+    readonly executor: Executor;
+
+    @Optional()
+    readonly token: string;
+}

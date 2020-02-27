@@ -7,10 +7,10 @@ export class CreateCatalogDto {
 
   readonly parentId: number;
 
-  @IsNotEmpty()
-  readonly userId: number;
+  readonly isPub?: string;
 
-  readonly isPub: string;
+  @IsNotEmpty()
+  readonly platformCode: string;
 }
 export class UpdateCatalogDto{
 
@@ -20,6 +20,8 @@ export class UpdateCatalogDto{
   readonly name: string;
 
   readonly isPub: string;
+
+  readonly platformCode: string;
 
 }
 

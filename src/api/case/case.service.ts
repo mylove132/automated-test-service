@@ -115,6 +115,9 @@ export class CaseService {
         caseObj.header = createCaseDto.header;
         caseObj.param = createCaseDto.param;
 
+        if (createCaseDto.alias){
+            caseObj.alias = createCaseDto.alias;
+        }
         await this.caseRepository.createQueryBuilder().insert()
         const result: InsertResult = await this.caseRepository.createQueryBuilder()
             .insert()
@@ -228,6 +231,9 @@ export class CaseService {
         const cases = new CaseEntity();
         if (updateCaseDto.isNeedToken != null) {
             cases.isNeedToken = updateCaseDto.isNeedToken;
+        }
+        if (updateCaseDto.alias){
+            cases.alias = updateCaseDto.alias;
         }
         const id = updateCaseDto.id;
         const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: id}).getOne().catch(

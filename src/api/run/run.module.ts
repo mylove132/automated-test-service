@@ -9,9 +9,10 @@ import { CurlModule } from '../curl/curl.module'
 import { EnvModule } from '../env/env.module'
 import { CaselistEntity } from '../caselist/caselist.entity';
 import { HistoryModule } from '../history/history.module';
+import {SceneEntity} from "../scene/scene.entity";
 
 @Module({
-  imports: [EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity])],
+  imports: [EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity, SceneEntity])],
   providers: [RunService],
   controllers: [RunController],
   exports: [RunService]

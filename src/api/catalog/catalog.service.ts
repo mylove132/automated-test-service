@@ -17,26 +17,20 @@ export class CatalogService {
     ) {
     }
 
+    /**
+     * 添加目录
+     * @param createCatalogDto
+     */
     async addCatalog(createCatalogDto: CreateCatalogDto) {
-        const {userId, name, isPub, parentId} = createCatalogDto;
+        const { name, isPub, parentId} = createCatalogDto;
         const catalog = new CatalogEntity();
-        const user = await this.userRepository.findOne(createCatalogDto.userId).catch(
-            err => {
-                console.log(err)
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        );
+        catalog.platformCode = createCatalogDto.platformCode;
         catalog.name = createCatalogDto.name;
         let isFlag: boolean;
         if (isPub) {
             isFlag = isPub.toLocaleLowerCase() == 'true' ? true : false;
         } else {
             isFlag = false;
-        }
-        if (user) {
-            catalog.user = user;
-        } else {
-            throw new ApiException('用户id不存在.', ApiErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
         if (createCatalogDto.parentId) {
             isFlag = false;
@@ -61,29 +55,31 @@ export class CatalogService {
         return saveResult;
     }
 
-    async findCatalog(userId: number, isPub: boolean): Promise<CatalogEntity[]> {
-        let result;
-        if (userId == null){
-            result = await this.catalogRepository.createQueryBuilder('catalog').select().orderBy('catalog.createDate','DESC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            )
-        }else {
-            result = await this.catalogRepository.createQueryBuilder().select().where('"userId" = :userId', {userId: userId}).
-            orderBy('id', 'ASC').getMany().catch(
-                err => {
-                    console.log(err)
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-        }
 
+    /**
+     * 查询目录
+     * @param platformCode
+     * @param isPub
+     */
+    async findCatalog(platformCode: string, isPub?: boolean): Promise<CatalogEntity[]> {
+        let result;
+        result = await this.catalogRepository.createQueryBuilder('catalog').select().
+        where('catalog.platformCode = :platformCode',{platformCode: platformCode}).
+        orderBy('catalog.createDate','DESC').getMany().catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
         return this.getTree(result, isPub);
     }
 
 
+    /**
+     * 目录改为树结构输出
+     * @param oldArr
+     * @param isPub
+     */
     private getTree(oldArr, isPub) {
         oldArr.forEach(element => {
             let parentId = element.parentId;
@@ -107,6 +103,10 @@ export class CatalogService {
         return oldArr;
     }
 
+    /**
+     * 删除目录
+     * @param queryCatalogDto
+     */
     async deleteById(queryCatalogDto: QueryCatalogDto) {
         queryCatalogDto.ids.forEach(
             id => {
@@ -147,6 +147,10 @@ export class CatalogService {
 
     }
 
+    /**
+     * 更新目录
+     * @param updateCatalogDto
+     */
     async updateCatalog(updateCatalogDto: UpdateCatalogDto): Promise<Object> {
         const {id, name, isPub} = updateCatalogDto;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(id)}).getOne();
@@ -166,6 +170,7 @@ export class CatalogService {
             id: id,
             name: name,
             isPub: isFlag
+
         }).where(
             '"id" = :id', {id: id}
         ).execute().catch(
@@ -175,27 +180,5 @@ export class CatalogService {
             }
         );
 
-    }
-
-    private buildCatalogRO(catalogs: CatalogEntity[]) {
-        let list = [];
-        catalogs.forEach(
-            cata => {
-                const catalogRO = {
-                    user: {
-                        username: cata.user.username,
-                        // email: cata.user.email,
-                        userId: cata.user.id,
-                    },
-                    catalogName: cata.name,
-                    catalogId: cata.id,
-                    createDate: cata.createDate,
-                    updateDate: cata.updateDate
-                };
-                list.push(catalogRO);
-            }
-        );
-
-        return {catalog: list};
     }
 }

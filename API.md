@@ -51,14 +51,13 @@ restful风格
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
-&emsp;userId				|number		|R			|用户id
-&emsp;isPub                 |bool       |O          |是否获取公共的目录（default：true）
+&emsp;platformCode				|string		|R			|平台code码
 
 
 请求示例：
 
 ```
-/api/catalog?userId=1&isPub=false
+/api/catalog?platformCode=0003
 
 ```
 返回结果
@@ -140,7 +139,7 @@ data						|object		|R			|&nbsp;
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
-&emsp;userId				|number		|R			|用户id
+&emsp;platformCode				|string		|R			|平台code码
 &emsp;isPub                 |bool       |O          |是否获取公共的目录,子目录不能为true（default：false）
 &emsp;name                  |string     |R          |目录名称
 &emsp;parentId              |number     |O          |父级目录ID(null则表示添加为根目录)

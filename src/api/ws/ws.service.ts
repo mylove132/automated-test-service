@@ -13,7 +13,7 @@ import {from} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Executor} from '../history/dto/history.enum';
 
-@WebSocketGateway(3003)
+@WebSocketGateway(3006)
 export class WsService{
 
     constructor(@InjectRepository(CaselistEntity)

@@ -1,11 +1,22 @@
-import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+    UpdateDateColumn
+} from 'typeorm';
 import {ParamType, RequestType} from './dto/http.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
-
+import {SceneEntity} from "../scene/scene.entity";
 
 @Entity('case')
 export class CaseEntity {
@@ -67,6 +78,14 @@ export class CaseEntity {
 
     @Column({default: false})
     isNeedToken: boolean;
+
+    //返回值别名
+    @Column({nullable: true})
+    alias: string;
+
+
+    @Column({default: false})
+    isDependenceParam: boolean;
 }
 
 
