@@ -148,8 +148,6 @@ data						|object		|R			|&nbsp;
 
 ```
 {
-   "userId": 1,
-   "isPub": false,
    "name": "课标目录",
    "parentId": 1002 
 }

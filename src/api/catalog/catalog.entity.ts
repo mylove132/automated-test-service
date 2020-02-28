@@ -40,7 +40,6 @@ export class CatalogEntity {
     @OneToMany(type => SceneEntity, cases => cases.catalog)
     scenes: SceneEntity[];
 
-    @OneToOne(type => PlatformCodeEntity,platformCode =>platformCode.catalog)
-    @JoinColumn()
+    @ManyToOne(type => PlatformCodeEntity,platformCode =>platformCode.catalog)
     platformCode: PlatformCodeEntity;
 }

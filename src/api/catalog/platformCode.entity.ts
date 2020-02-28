@@ -2,11 +2,10 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    OneToOne, Unique
+    OneToOne, Unique, OneToMany
 } from 'typeorm';
 import {CatalogEntity} from "./catalog.entity";
 
-@Unique(["platformCode"])
 @Entity('platform_code')
 export class PlatformCodeEntity {
 
@@ -16,7 +15,7 @@ export class PlatformCodeEntity {
     @Column({default: "000", comment: "平台code码", nullable: false})
     platformCode: string;
 
-    @OneToOne(type => CatalogEntity, catalog => catalog.platformCode)
-    catalog: CatalogEntity;
+    @OneToMany(type => CatalogEntity, catalog => catalog.platformCode)
+    catalog: CatalogEntity[];
 
 }
