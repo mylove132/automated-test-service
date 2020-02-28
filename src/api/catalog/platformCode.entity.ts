@@ -1,8 +1,7 @@
 import {
     Entity,
     PrimaryGeneratedColumn,
-    Column,
-    OneToOne, Unique, OneToMany
+    Column, OneToMany
 } from 'typeorm';
 import {CatalogEntity} from "./catalog.entity";
 

@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bull';
-import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {Body, Controller, Post} from '@nestjs/common';
 import { Queue } from 'bull';
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 
