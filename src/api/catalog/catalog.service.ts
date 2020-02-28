@@ -89,6 +89,7 @@ export class CatalogService {
          }
         result = await this.catalogRepository.createQueryBuilder('catalog').
         where('catalog.platformCode IN (:...platforms)',{platforms: pcIds}).
+        leftJoinAndSelect('catalog.platformCode','platformCode').
         orderBy('catalog.createDate','DESC').getMany().catch(
             err => {
                 console.log(err)
