@@ -178,8 +178,18 @@ export class CatalogService {
      * @param updateCatalogDto
      */
     async updateCatalog(updateCatalogDto: UpdateCatalogDto): Promise<Object> {
-        const {id, name, isPub} = updateCatalogDto;
-        const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: Number(id)}).getOne();
+        const {id, name, isPub, platformCode} = updateCatalogDto;
+        const catalog = await this.catalogRepository.createQueryBuilder().
+        where('id = :id', {id: Number(id)}).getOne();
+        const platformObj = await this.platformRepository.
+        createQueryBuilder('platform').
+        where('platform.platformCode = :platformCode',{platformCode: platformCode}).
+        getOne().catch(
+            err => {
+                console.log(err)
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
         if (!catalog) {
             throw new ApiException(`更新id:${id}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
@@ -195,8 +205,8 @@ export class CatalogService {
         return await this.catalogRepository.createQueryBuilder().update(CatalogEntity).set({
             id: id,
             name: name,
-            isPub: isFlag
-
+            isPub: isFlag,
+            platformCode: platformObj
         }).where(
             '"id" = :id', {id: id}
         ).execute().catch(
