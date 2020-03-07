@@ -107,6 +107,7 @@ export class RunService {
                 }
                 console.log(requestData)
                 const result = await this.curlService.makeRequest(requestData).toPromise();
+
                 const endTime = new Date();
                 resultObj['endTime'] = endTime;
                 const rumTime = endTime.getTime() - startTime.getTime();
@@ -293,7 +294,11 @@ export class RunService {
                 contentTypeFlag = true
             }
         }
-        if (!contentTypeFlag) headers['content-type'] = 'application/json'; // 默认为json
+        if (runCaseDto.type == "0"){
+            headers['content-type'] = 'application/x-www-form-urlencoded';
+        }else {
+            if (!contentTypeFlag) headers['content-type'] = 'application/json';
+        }
         const requestData: AxiosRequestConfig = {
             url: runCaseDto.endpoint + runCaseDto.path,
             method: getRequestMethodTypeString(Number(runCaseDto.type)),
