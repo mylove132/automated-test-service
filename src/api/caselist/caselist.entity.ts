@@ -44,6 +44,4 @@ export class CaselistEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @OneToMany(type => SchedulerEntity, secheduler => secheduler.caseList)
-    sechedulers: SchedulerEntity[];
 }

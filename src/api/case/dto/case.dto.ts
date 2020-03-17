@@ -37,6 +37,16 @@ export class CreateCaseDto {
     @IsOptional()
     readonly type: number;
 
+    //接口等级
+    @IsNumber()
+    @IsOptional()
+    readonly grade: number;
+
+    //用例类别
+    @IsNumber()
+    @IsOptional()
+    readonly caseType: number;
+
     @IsNotEmpty()
     catalogId: number;
 
@@ -90,6 +100,16 @@ export class UpdateCaseDto {
     @IsOptional()
     readonly endpoint: string;
 
+    //接口等级
+    @IsNumber()
+    @IsOptional()
+    readonly grade: number;
+
+    //用例类别
+    @IsNumber()
+    @IsOptional()
+    readonly caseType: number;
+
     @IsNumber()
     @IsOptional()
     readonly type: number;
@@ -134,4 +154,13 @@ export class DeleteCaseDto {
     @ArrayMaxSize(20,{message: "删除ID数组最多一次20个"})
     @IsArray()
     ids: number[];
+}
+
+
+export enum CaseGrade {
+    HIGH, IN, LOW
+}
+
+export enum CaseType {
+    SINGLE, SCENE, BLEND
 }

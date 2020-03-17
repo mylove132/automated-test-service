@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import {CatalogEntity} from "../catalog/catalog.entity";
 import {CaseEntity} from "../case/case.entity";
+import {CaseGrade} from "../case/dto/case.dto";
 
 
 @Entity('scene')
@@ -34,6 +35,9 @@ export class SceneEntity {
 
     @Column({comment: "场景描述"})
     desc: string;
+
+    @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '场景等级'})
+    sceneGrade: CaseGrade;
 
 }
 

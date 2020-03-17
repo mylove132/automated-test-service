@@ -57,14 +57,16 @@ export class SceneService {
    * @param {number, IPaginationOptions}: id, 页码信息
    * @return {Promise<Pagination<HistoryEntity>>}: 场景列表
    */
-  async findSceneService(catalogId: number, options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
+  async findSceneService(catalogId: number, caseGradeList:number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
     if (!catalogId) {
         const queryBuilder = await this.sceneRepository.createQueryBuilder("scene")
-            .where('scene.catalogId = :catalogId',{catalogId: catalogId}).orderBy('scene.createDate','DESC');
+            .where('scene.catalogId = :catalogId',{catalogId: catalogId}).
+            andWhere('scene.sceneGrade IN (:...sceneGrade)',{sceneGrade: caseGradeList}).orderBy('scene.createDate','DESC');
         return paginate<SceneEntity>(queryBuilder, options);
     } else {
-        const queryBuilder = await this.sceneRepository.createQueryBuilder("scene")
-           .orderBy('scene.createDate','DESC');
+        const queryBuilder = await this.sceneRepository.createQueryBuilder("scene").
+        where('scene.sceneGrade IN (:...sceneGrade)',{sceneGrade: caseGradeList}).
+        orderBy('scene.createDate','DESC');
         return paginate<SceneEntity>(queryBuilder, options);
         return await paginate<SceneEntity>(queryBuilder, options);
     }

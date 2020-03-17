@@ -2,16 +2,19 @@ import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber} from 'class-validator';
 
 export class AddCaselistTaskDto {
 
-   @IsNumber()
-    caseListId: number
+    @IsNotEmpty()
+    @IsArray()
+    readonly caseIds: number[];
 
     @ArrayMinSize(1)
     @IsArray()
     envIds: number[]
+
+    @IsNotEmpty()
+    cron: string;
 }
 
 export class Md5ListDto {
-
 
     md5s: Set<string>;
 }

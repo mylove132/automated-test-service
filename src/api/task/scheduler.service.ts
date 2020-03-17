@@ -1,6 +1,5 @@
 import {SchedulerRegistry} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
-import {CaselistEntity} from '../caselist/caselist.entity';
 import {Repository} from 'typeorm';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
@@ -13,7 +12,7 @@ import {AddCaselistTaskDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
 import {CommonUtil} from '../../util/common.util';
 import {RunService} from '../run/run.service';
-import {IRunCaseList} from '../run/run.interface';
+import {IRunCaseById, IRunCaseList} from '../run/run.interface';
 import {Executor} from '../history/dto/history.enum';
 
 var parser = require('cron-parser');
@@ -23,13 +22,15 @@ export class SchedulerService {
     constructor(private readonly schedulerRegistry: SchedulerRegistry,
                 @InjectRepository(SchedulerEntity)
                 private readonly scheRepository: Repository<SchedulerEntity>,
-                @InjectRepository(CaselistEntity)
-                private readonly caseListRepository: Repository<CaselistEntity>,
                 @InjectRepository(EnvEntity)
                 private readonly envRepository: Repository<EnvEntity>,
                 private readonly runService: RunService) {
     }
 
+    /**
+     * 开启一个定时任务
+     * @param addCaselistTaskDto
+     */
     async startTask(addCaselistTaskDto: AddCaselistTaskDto) {
         let result = [];
         for (const envId of addCaselistTaskDto.envIds){
@@ -42,18 +43,10 @@ export class SchedulerService {
             if (!envObj) {
                 throw new ApiException(`环境ID:${envId}不存在`, ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
-            const caseListObj = await this.caseListRepository.createQueryBuilder().select().where('id = :id',{id: addCaselistTaskDto.caseListId}).getOne().catch(
-                err => {
-                    console.log(err);
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            )
-            if (!caseListObj) {
-                throw new ApiException(`用例ID:${addCaselistTaskDto.caseListId}不存在`, ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
-            }
+
             const secheduler = new SchedulerEntity();
             const createDate = new Date();
-            const md5 = crypto.createHmac('sha256', caseListObj.id.toString() + createDate + CommonUtil.randomChar(10)).digest('hex');
+            const md5 = crypto.createHmac('sha256', createDate + CommonUtil.randomChar(10)).digest('hex');
             const scheObj = await this.scheRepository.createQueryBuilder().select().where('md5 = :md5', {md5: md5}).getOne().catch(
                 err => {
                     console.log(err);
@@ -66,15 +59,15 @@ export class SchedulerService {
             secheduler.md5 = md5;
             secheduler.createDate = createDate;
             secheduler.env = envObj;
-            secheduler.caseList = caseListObj;
+            secheduler.cron = addCaselistTaskDto.cron;
             secheduler.status = RunStatus.RUNNING;
             await this.scheRepository.createQueryBuilder().insert().into(SchedulerEntity).values(secheduler).execute().catch(
                 err => {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
                 }
             );
-            const job = new CronJob(caseListObj.cron, () => {
-                this.runCaseList(envId, addCaselistTaskDto.caseListId);
+            const job = new CronJob(addCaselistTaskDto.cron, () => {
+                this.runCaseList(envId, addCaselistTaskDto.caseIds);
             });
             this.schedulerRegistry.addCronJob(md5, job);
             job.start();
@@ -218,24 +211,25 @@ export class SchedulerService {
         }
     }
 
-    private async runCaseList(envId, caseListId){
-        const caseListDto = new RunCaseListDto(caseListId, envId, Executor.SCHEDULER);
-        await this.runService.runCaseListById(caseListDto);
-        console.log("定时任务环境:"+envId+"定时任务用例id："+caseListId);
-
+    private async runCaseList(envId, caseIds){
+        const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
+        await this.runService.runCaseById(caseListDto);
     }
 }
 
-class RunCaseListDto implements IRunCaseList{
-    readonly caseListId: number;
+class RunCaseListDto implements IRunCaseById{
+
+    readonly caseIds: number[];
     readonly envId: number;
     readonly executor: Executor;
 
-    constructor(private readonly clId: number, private readonly eId: number, private readonly exec: Executor) {
-        this.caseListId = clId;
+    constructor(private readonly cIds: number[], private readonly eId: number, private readonly exec: Executor) {
+        this.caseIds = cIds;
         this.envId = eId;
         this.executor = exec;
     }
+
+
 
 
 

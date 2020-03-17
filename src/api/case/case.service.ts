@@ -1,14 +1,13 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {InsertResult, Repository} from 'typeorm';
 import {CaseEntity} from './case.entity';
-import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {CaseGrade, CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
-import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {CommonUtil} from '../../util/common.util';
 import {EnvService} from "../env/env.service";
@@ -20,8 +19,6 @@ export class CaseService {
         private readonly caseRepository: Repository<CaseEntity>,
         @InjectRepository(CatalogEntity)
         private readonly catalogRepository: Repository<CatalogEntity>,
-        @InjectRepository(CaselistEntity)
-        private readonly caseListRepository: Repository<CaselistEntity>,
         @InjectRepository(EndpointEntity)
         private readonly endpointRepository: Repository<EndpointEntity>,
         @InjectRepository(AssertTypeEntity)
@@ -32,14 +29,28 @@ export class CaseService {
     ) {
     }
 
+    /**
+     * 分页信息
+     * @param options
+     */
     async paginate(options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
         return await paginate<CaseEntity>(this.caseRepository, options);
     }
 
+    /**
+     * 添加用例
+     * @param createCaseDto
+     */
     async addCase(createCaseDto: CreateCaseDto) {
         const caseObj = new CaseEntity();
         if (createCaseDto.isNeedToken != null) {
             caseObj.isNeedToken = createCaseDto.isNeedToken;
+        }
+        if (createCaseDto.grade){
+            caseObj.caseGrade = this.getCaseGrade(createCaseDto.grade)
+        }
+        if (createCaseDto.caseType){
+            caseObj.caseType = this.getCaseType(createCaseDto.caseType)
         }
         const catalogId = createCaseDto.catalogId;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
@@ -133,12 +144,25 @@ export class CaseService {
         return {id: addId};
     }
 
-    async findCase(catalogId: number, envId: number, options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
+    /**
+     * 查询用例
+     * @param catalogId 目录ID
+     * @param envId 环境ID
+     * @param options 分页信息
+     */
+    async findCase(catalogId: number, envId: number, caseType: number, caseGradeList: number[], options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
         if (envId == 0 || envId == null) {
             throw new ApiException(`envId不能为空或者0`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        const caseTypeVal = this.getCaseType(caseType);
         if (typeof catalogId == 'undefined') {
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').leftJoinAndSelect('case.endpointObject', 'endpoint').leftJoinAndSelect('case.assertType', 'assertType').leftJoinAndSelect('case.assertJudge', 'assertJudge').orderBy('case.updateDate', 'DESC');
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').
+            leftJoinAndSelect('case.endpointObject', 'endpoint').
+            leftJoinAndSelect('case.assertType', 'assertType').
+            leftJoinAndSelect('case.assertJudge', 'assertJudge').
+            where('case.caseType = :caseType',{caseType : caseTypeVal}).
+            andWhere('case.caseGrade  IN (:...caseGradeList)', {caseGradeList: caseGradeList}).
+            orderBy('case.updateDate', 'DESC');
             const result = await paginate<CaseEntity>(queryBuilder, options);
             for (let item of result.items) {
                 const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
@@ -146,7 +170,8 @@ export class CaseService {
             }
             return result;
         } else {
-            const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
+            const catalog = await this.catalogRepository.createQueryBuilder().select().
+            where('id = :id', {id: catalogId}).getOne().catch(
                 err => {
                     console.log(err);
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -155,8 +180,14 @@ export class CaseService {
             if (!catalog) {
                 throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
-            const queryBuilder = this.caseRepository.createQueryBuilder('case').where('case.catalog = :catalog', {catalog: catalogId}).leftJoinAndSelect('case.endpointObject', 'endpoint')
-                .leftJoinAndSelect('case.assertType', 'assertType').leftJoinAndSelect('case.assertJudge', 'assertJudge').orderBy('case.updateDate', 'DESC');
+            const queryBuilder = this.caseRepository.createQueryBuilder('case').
+            where('case.catalog = :catalog', {catalog: catalogId}).
+            leftJoinAndSelect('case.endpointObject', 'endpoint')
+                .leftJoinAndSelect('case.assertType', 'assertType').
+                leftJoinAndSelect('case.assertJudge', 'assertJudge').
+                where('case.caseType = :caseType',{caseType : caseTypeVal}).
+                andWhere('case.caseGrade  IN (:...caseGradeList)', {caseGradeList: caseGradeList}).
+                orderBy('case.updateDate', 'DESC');
             const result = await paginate<CaseEntity>(queryBuilder, options);
             for (let item of result.items) {
                 const endpoint = await this.envService.formatEndpoint(envId, item.endpointObject.endpoint);
@@ -166,6 +197,10 @@ export class CaseService {
         }
     }
 
+    /**
+     * 通过id删除用例
+     * @param deleteCaseDto
+     */
     async deleteById(deleteCaseDto: DeleteCaseDto) {
         deleteCaseDto.ids.forEach(
             id => {
@@ -206,6 +241,9 @@ export class CaseService {
         return result;
     }
 
+    /**
+     * 获取所有的断言类型
+     */
     async getAllAssertType() {
         const result = await this.assertTypeRepository.createQueryBuilder().getMany().catch(
             err => {
@@ -216,6 +254,9 @@ export class CaseService {
         return result;
     }
 
+    /**
+     * 获取所有的断言判断
+     */
     async getAllAssertJudge() {
         const result = await this.assertJudgeRepository.createQueryBuilder().getMany().catch(
             err => {
@@ -226,6 +267,10 @@ export class CaseService {
         return result;
     }
 
+    /**
+     * 更新接口用例
+     * @param updateCaseDto
+     */
     async updateCase(updateCaseDto: UpdateCaseDto): Promise<Object> {
 
         const cases = new CaseEntity();
@@ -234,6 +279,12 @@ export class CaseService {
         }
         if (updateCaseDto.alias){
             cases.alias = updateCaseDto.alias;
+        }
+        if (updateCaseDto.grade){
+            cases.caseGrade = this.getCaseGrade(updateCaseDto.grade)
+        }
+        if (updateCaseDto.caseType){
+            cases.caseType = this.getCaseType(updateCaseDto.caseType)
         }
         const id = updateCaseDto.id;
         const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: id}).getOne().catch(
@@ -346,7 +397,10 @@ export class CaseService {
         return result;
     }
 
-
+    /**
+     * 转换请求类型
+     * @param type
+     */
     private getRequestType(type: number): RequestType {
         switch (type) {
             case 0:
@@ -365,6 +419,10 @@ export class CaseService {
         }
     }
 
+    /**
+     * 转换参数类型
+     * @param type
+     */
     private getParamType(type: number): ParamType {
         switch (type) {
             case 0:
@@ -377,6 +435,47 @@ export class CaseService {
                 throw new ApiException(`param type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
     }
+
+    /**
+     * 转换用例等级
+     * @param grade
+     */
+    private getCaseGrade(grade: number): CaseGrade {
+        switch (grade) {
+            case 0:
+                return CaseGrade.HIGH;
+                break;
+            case 1:
+                return CaseGrade.IN;
+                break;
+            case 2:
+                return CaseGrade.LOW;
+                break;
+            default:
+                throw new ApiException(`grade 值在[0,1,2]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 转换用例类别
+     * @param grade
+     */
+    private getCaseType(type: number): CaseType {
+        switch (type) {
+            case 0:
+                return CaseType.SINGLE;
+                break;
+            case 1:
+                return CaseType.SCENE;
+                break;
+            case 2:
+                return CaseType.BLEND;
+                break;
+            default:
+                throw new ApiException(`caseType 值在[0,1,2]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 
 }

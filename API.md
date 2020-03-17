@@ -266,6 +266,8 @@ data						|object		|R			|&nbsp;true表示删除成功
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 catalogId				    |number		|O			|目录id(默认查询所有用例)
+caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
+caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 envId				    |number		|R			|运行环境ID
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
@@ -286,6 +288,7 @@ data						|object		|R			|&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;header |string		|R			|&nbsp;接口header值
 &nbsp;&nbsp;&nbsp;&nbsp;param |string		|R			|&nbsp;接口参数
 &nbsp;&nbsp;&nbsp;&nbsp;path |string		|R			|&nbsp;接口url
+&nbsp;&nbsp;&nbsp;&nbsp;alias |string		|R			|&nbsp;接口别名
 &nbsp;&nbsp;&nbsp;&nbsp;type |number		|R			|&nbsp;请求类型（GET = 0,POST = 1,DELETE = 2,PUT = 3）
 &nbsp;&nbsp;&nbsp;&nbsp;paramType |number		|R			|&nbsp参数类型（TEXT = 0,FILE = 1）
 &nbsp;&nbsp;&nbsp;&nbsp;assertText |string		|R			|&nbsp;断言结果
@@ -592,6 +595,9 @@ data						|object		|R			|&nbsp;
 &emsp;paramType			        |number		|O			|请求类型（0:TEXT,1:FILE)
 &emsp;endpointId			        |number		|O			|
 &emsp;isNeedToken			        |boolean		|O			|
+caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
+caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
+&emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 
 请求示例：
 
@@ -702,6 +708,9 @@ data						|object		|R			|
 &emsp;path			|string		|R			|接口路径
 &emsp;endpointId			|number		|R			|endpointId
 &emsp;isNeedToken			        |boolean		|O			|
+&emsp;caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
+&emsp;caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
+&emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 
 请求示例：
 
@@ -4056,10 +4065,98 @@ data						|any		|R			|&nbsp;返回历史记录值
 ```
 
 
+### 7.1  添加场景接口
+- **接口说明：** 添加场景接口
+- **请求方式：** POST
+- **接口地址：** /api/scene
 
+#### 7.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;name			        |string		|R		    |场景名称
+&emsp;desc			        |string		|O		    |场景描述
+&emsp;catalogId             |number		|R		    |场景关联的目录ID
+&emsp;caseList              |json		|R		    |场景关联的接口
 
+请求示例
 
+```
+{
+	"name": "获取首页课程信息",
+	"desc": "",
+     "catalogId":1,
+     "caseList":"[{"caseId":1,"index",1,"isDependenceParam":false},
+                    {"caseId":2,"index",2,"isDependenceParam":true},
+                   {"caseId":3,"index",3,"isDependenceParam":true}]"
+}
+```
+### 7.2  更改场景接口
+- **接口说明：** 更改场景接口
+- **请求方式：** PUT
+- **接口地址：** /api/scene
 
+#### 7.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;id			        |number		|R		    |场景id
+&emsp;name			        |string		|O		    |场景名称
+&emsp;desc			        |string		|O		    |场景描述
+&emsp;catalogId             |number		|O		    |场景关联的目录ID
+&emsp;caseList              |json		|O		    |场景关联的接口
+
+请求示例
+
+```
+{
+    "id":1,
+	"name": "获取首页课程信息",
+	"desc": "",
+     "catalogId":1,
+     "caseList":"[{"caseId":1,"index",1,"isDependenceParam":false},
+                    {"caseId":2,"index",2,"isDependenceParam":true},
+                   {"caseId":3,"index",3,"isDependenceParam":true}]"
+}
+```
+### 7.3  删除场景接口
+- **接口说明：** 更改场景接口
+- **请求方式：** DELETE
+- **接口地址：** /api/scene
+
+#### 7.3.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;sceneIds			        |number[]		|R		    |场景id
+
+请求示例
+
+```
+{
+    "sceneIds": [1,3],
+}
+```
+
+### 2.5  查询场景用例
+- **接口说明：** 查询场景用例
+- **请求方式：** GET
+- **接口地址：** /api/scene
+
+#### 2.5.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+catalogId				    |number		|O			|目录id(默认查询所有用例)
+sceneGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
+page	                    |number		|O			|页数(默认1)
+limit	                    |number		|O			|每页展示个数(默认10)
+
+请求示例
+
+```
+/api/scene?catalogId=1&caseGrade=1,2
+```
 
 
 

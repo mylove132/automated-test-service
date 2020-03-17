@@ -22,9 +22,26 @@ export class CaseController {
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
-  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('caseType') caseType: number = 0, @Query('sceneGrade') sceneGrade?: string,  @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
-   return this.caseService.findCase(catalogId, envId, {page, limit});
+    let caseGradeList = [];
+    if (sceneGrade){
+      if (sceneGrade.indexOf(',')){
+          sceneGrade.split(',').forEach(
+            value => {
+              if (!value){
+                return;
+              }
+              caseGradeList.push(Number(value));
+            }
+        )
+      }else {
+        caseGradeList.push(Number(sceneGrade));
+      }
+    }else {
+      caseGradeList.push(0,1,2);
+    }
+   return this.caseService.findCase(catalogId, envId, Number(caseType), caseGradeList, {page, limit});
   }
 
   @ApiOperation({ title: 'delete case' })

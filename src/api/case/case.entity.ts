@@ -13,10 +13,12 @@ import {
 import {ParamType, RequestType} from './dto/http.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
-import {CaselistEntity} from '../caselist/caselist.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {SceneEntity} from "../scene/scene.entity";
+import {SchedulerEntity} from "../task/scheduler.entity";
+import {CaseGrade, CaseType} from "./dto/case.dto";
+import {CaselistEntity} from "../caselist/caselist.entity";
 
 @Entity('case')
 export class CaseEntity {
@@ -35,6 +37,12 @@ export class CaseEntity {
 
     @Column('enum',{default: ParamType.TEXT, nullable: false, enum: ParamType, comment: '参数类型'})
     paramType: ParamType;
+
+    @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '用例等级'})
+    caseGrade: CaseGrade;
+
+    @Column('enum',{default: CaseType.SINGLE, nullable: false, enum: CaseType, comment: '用例类别'})
+    caseType: CaseType;
 
     @Column({comment: '请求接口的路径'})
     path: string;
@@ -86,6 +94,11 @@ export class CaseEntity {
 
     @Column({default: false})
     isDependenceParam: boolean;
+
+    @ManyToOne(type => SchedulerEntity, secheduler => secheduler.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    secheduler: SchedulerEntity;
+
+
 }
 
 
