@@ -1,7 +1,7 @@
-import {Controller, Post, Body, Query, Get} from '@nestjs/common';
+import {Controller, Post, Body, Query, Get, Delete, Put} from '@nestjs/common';
 import {ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
 import {SceneService} from "./scene.service";
-import {CreateSceneDto} from "./dto/scene.dto";
+import {CreateSceneDto, DeleteSceneByIdDto, UpdateSceneDto} from "./dto/scene.dto";
 import {Pagination} from "nestjs-typeorm-paginate";
 import {SceneEntity} from "./scene.entity";
 
@@ -18,6 +18,21 @@ export class SceneController {
     @Post('')
     async addSceneCrontroller(@Body() createSceneDto: CreateSceneDto): Promise<any> {
         return await this.sceneService.addSceneService(createSceneDto);
+    }
+
+
+    @ApiOperation({title: 'update scene', description: '更新场景用例'})
+    @ApiResponse({status: 200, description: 'update scene success.'})
+    @Put('')
+    async updateSceneCrontroller(@Body() updateSceneDto: UpdateSceneDto): Promise<any> {
+        return await this.sceneService.updateSceneService(updateSceneDto);
+    }
+
+    @ApiOperation({title: 'delete scene', description: '删除场景用例'})
+    @ApiResponse({status: 200, description: 'delete scene success.'})
+    @Delete('')
+    async deleteSceneCrontroller(@Body() deleteSceneByIdDto: DeleteSceneByIdDto): Promise<any> {
+        return await this.sceneService.deleteSceneById(deleteSceneByIdDto);
     }
 
     @ApiOperation({title: 'get scene', description: '获取场景'})

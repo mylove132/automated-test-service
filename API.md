@@ -267,7 +267,7 @@ data						|object		|R			|&nbsp;true表示删除成功
 :----						|:---		|:------	|:---
 catalogId				    |number		|O			|目录id(默认查询所有用例)
 caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
-caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
+caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认所有等级,多个等级查询用英文逗号隔开）
 envId				    |number		|R			|运行环境ID
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
@@ -4120,7 +4120,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 }
 ```
 ### 7.3  删除场景接口
-- **接口说明：** 更改场景接口
+- **接口说明：** 删除场景接口
 - **请求方式：** DELETE
 - **接口地址：** /api/scene
 
@@ -4148,7 +4148,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 catalogId				    |number		|O			|目录id(默认查询所有用例)
-sceneGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
+sceneGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认所有登记,多个等级查询用英文逗号隔开）
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
 

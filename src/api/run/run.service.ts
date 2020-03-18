@@ -335,6 +335,9 @@ export class RunService {
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
             }
         );
+        if (!scene){
+            throw new ApiException(`场景ID ${runSceneDto.sceneId}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
         let caseObjList = [];
         const caseJson = JSON.parse(scene.dependenceCaseJson);
 
