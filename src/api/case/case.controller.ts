@@ -26,7 +26,7 @@ export class CaseController {
     limit = limit > 100 ? 100 : limit;
     let caseGradeList = [];
     if (sceneGrade){
-      if (sceneGrade.indexOf(',')){
+      if (sceneGrade.indexOf(',') != -1){
           sceneGrade.split(',').forEach(
             value => {
               if (!value){

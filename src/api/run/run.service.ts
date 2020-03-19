@@ -46,6 +46,8 @@ export class RunService {
         resultObj['startTime'] = startTime;
         // 生成请求数据
         const requestData = this.generateRequestData(runCaseDto);
+        console.log('---------------')
+        console.log(requestData)
         let token;
         if (runCaseDto.token != null && runCaseDto.token != "") {
             token = runCaseDto.token;
@@ -98,14 +100,12 @@ export class RunService {
                 });
                 resultObj['caseId'] = caseId;
                 resultObj['caseName'] = caseObj.name;
-                console.log("requestBaseData", requestBaseData)
                 const requestData = this.generateRequestData(requestBaseData);
                 let token;
                 if (runCaseById.token != null && runCaseById.token != '') {
                     token = runCaseById.token;
                     requestData.headers['token'] = token
                 }
-                console.log(requestData)
                 const result = await this.curlService.makeRequest(requestData).toPromise();
 
                 const endTime = new Date();
@@ -145,6 +145,7 @@ export class RunService {
             }
             resultList.push(resultObj);
         }
+        console.log('接口执行返回结果：'+ JSON.stringify(resultList))
         return resultList;
     }
 
@@ -183,7 +184,6 @@ export class RunService {
             if (token != null && token != '') {
                 requestData.headers['token'] = token
             }
-            console.log(requestData)
             const result = await this.curlService.makeRequest(requestData).toPromise();
             const endTime = new Date();
             resultObj['endTime'] = endTime;
@@ -287,7 +287,12 @@ export class RunService {
 
     // 生成请求参数
     private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
-        let headers = runCaseDto.header ? JSON.parse(runCaseDto.header) : {};
+        let headers: {};
+        if (runCaseDto.header) {
+            headers = JSON.parse(runCaseDto.header);
+        } else {
+            headers = {};
+        }
         let contentTypeFlag = false
         for (const key in headers) {
             if (headers.hasOwnProperty(key) && key.toLocaleLowerCase() === 'content-type') {
@@ -316,12 +321,47 @@ export class RunService {
         } else {
             // 如果为get方法，则参数为params，否则为data
             if (runCaseDto.type === '0') {
-                requestData.params = JSON.parse(runCaseDto.param)
+                const vParams = JSON.parse(runCaseDto.param)
+                requestData.params = this.analysisParam(vParams);
             } else {
-                requestData.data = JSON.parse(runCaseDto.param)
+                const tmpParam = JSON.parse(runCaseDto.param)
+                requestData.data = this.analysisParam(tmpParam);
             }
         }
         return requestData
+    }
+
+    private analysisParam(param){
+        const paramReg = /\{\{(.+?)\}\}/g;
+        var regex2 = /\[(.+?)\]/g;
+        for (let paramsKey in param) {
+            if (paramReg.test(param[paramsKey])){
+                const regData = param[paramsKey].replace(paramReg, "$1");
+                if (regData.indexOf("$randomint") != -1){
+                    if (regData.indexOf('-') != -1){
+                        const limit = regData.split('-')[1];
+                        if (regex2.test(limit)){
+                            const qj =limit.replace(regex2, "$1");
+                            const min = Number(qj.split(',')[0]);
+                            const max = Number(qj.split(',')[1]);
+                            param[paramsKey] = CommonUtil.randomNum(min, max);
+                        }else {
+                            throw new ApiException(`参数${param[paramsKey]}不符合格式要求`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                        }
+                    }else {
+                        param[paramsKey] = Math.random();
+                    }
+                }else if (regData.indexOf("$randomstring") != -1){
+                    if (regData.indexOf('-') != -1){
+                        const length = regData.split('-')[1];
+                        param[paramsKey] = CommonUtil.randomChar(Number(length));
+                    }else {
+                        param[paramsKey] = CommonUtil.randomChar(6);
+                    }
+                }
+            }
+        }
+        return param;
     }
 
     /**
@@ -396,29 +436,6 @@ export class RunService {
         return resultList;
     }
 
-    /**
-     * 解析参数
-     * @param param
-     */
-    analyticParameter(sceneId: number, param: string) {
-        if (param == null || param == "") {
-            return "";
-        }
-        let jsonPaaram = {};
-        try {
-            jsonPaaram = JSON.parse(param);
-        } catch (e) {
-            throw new ApiException("接口参数不符合json格式", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        const paramReg = /\{\{(.+?)\}\}/g;
-        for (let key in jsonPaaram) {
-            const value = jsonPaaram[key];
-            if (paramReg.test(value)) {
-
-            }
-        }
-
-    }
 
     // 生成文件流
     private generateFileStream(paramName: string, address: string) {

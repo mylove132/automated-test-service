@@ -41,7 +41,7 @@ export class SceneController {
     async findHistoryList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('catalogId') catalogId?: number,  @Query('caseGrade') caseGrade?: string): Promise<Pagination<SceneEntity>> {
         let caseGradeList = [];
         if (caseGrade){
-            if (caseGrade.indexOf(',')){
+            if (caseGrade.indexOf(',') != -1){
                 caseGrade.split(',').forEach(
                     value => {
                         if (!value){

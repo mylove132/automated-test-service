@@ -1,4 +1,5 @@
 import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber} from 'class-validator';
+import {CaseGrade} from "../../case/dto/case.dto";
 
 export class AddCaselistTaskDto {
 
@@ -21,14 +22,33 @@ export class Md5ListDto {
 
 export class DeleteRunningTaskDto {
 
-    @ArrayMinSize(1,{message: "删除的md5不能为空"})
+    @ArrayMinSize(1,{message: "删除的id不能为空"})
     @IsArray()
-    md5List: string[];
+    ids: number[];
 }
 
 export class CheckCronDto {
 
     @IsNotEmpty()
     cron: string;
+
+}
+
+export class SIngleTaskDto{
+
+    @IsNumber({allowNaN:true})
+    readonly caseGrade: CaseGrade;
+
+    @IsNumber({allowNaN:true})
+    readonly envId: number;
+
+    @IsNotEmpty()
+    token: string;
+
+    @IsNotEmpty()
+    cron: string;
+
+    @IsNotEmpty()
+    name: string;
 
 }

@@ -1,7 +1,8 @@
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
-import {AddCaselistTaskDto, CheckCronDto, DeleteRunningTaskDto} from './dto/scheduler.dto';
+import {AddCaselistTaskDto, CheckCronDto, DeleteRunningTaskDto, SIngleTaskDto} from './dto/scheduler.dto';
 import {SchedulerService} from './scheduler.service';
+import {RunStatus} from "./dto/run.status";
 
 ApiBearerAuth()
 @ApiUseTags('定时任务')
@@ -11,16 +12,16 @@ export class SchedulerController {
     constructor(private readonly schedulerService: SchedulerService) {}
 
     @Post('')
-    async startTask(@Body() addCaselistTaskDto: AddCaselistTaskDto){
-        return await this.schedulerService.startTask(addCaselistTaskDto);
+    async startTask(@Body() singleTaskDto: SIngleTaskDto){
+        return await this.schedulerService.addRunSingleTask(singleTaskDto);
     }
 
-    @Get('running')
-    async getAllJobs(){
-        return this.schedulerService.getAllJobs();
+    @Get('')
+    async getAllJobs(@Query('status')status?:number){
+        return this.schedulerService.getAllJobs(status);
     }
 
-    @Delete('running')
+    @Delete('')
     async deleRunnigJobs(@Body() deleteRunningTaskDto: DeleteRunningTaskDto){
         return this.schedulerService.deleteJob(deleteRunningTaskDto);
     }

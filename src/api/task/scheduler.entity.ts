@@ -16,12 +16,15 @@ import {RunStatus} from './dto/run.status';
 import {CaseEntity} from "../case/case.entity";
 import {IsString} from "class-validator";
 
-@Unique(['md5'])
+@Unique(['md5','name'])
 @Entity('secheduler')
 export class SchedulerEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Column()
+    name: string;
 
     @Column()
     md5: string;

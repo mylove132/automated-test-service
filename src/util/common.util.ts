@@ -10,14 +10,18 @@ export class CommonUtil {
         }
     }
 
-    static randomChar(l) {
-        var x = "0123456789qwertyuioplkjhgfdsazxcvbnm";
-        var tmp = "";
-        var timestamp = new Date().getTime();
-        for (var i = 0; i < l; i++) {
-            tmp += x.charAt(Math.ceil(Math.random() * 100000000) % x.length);
+    //生成从minNum到maxNum的随机数
+    static randomNum(minNum,maxNum){
+       return  Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+    }
+
+    static randomChar(len) {
+        var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+        var tempLen = chars.length, tempStr='';
+        for(var i=0; i<len; ++i){
+            tempStr += chars.charAt(Math.floor(Math.random() * tempLen ));
         }
-        return timestamp + tmp;
+        return tempStr;
     }
 
     static compare(property){
