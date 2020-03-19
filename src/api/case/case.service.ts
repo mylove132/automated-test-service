@@ -181,11 +181,11 @@ export class CaseService {
                 throw new ApiException(`查询关联的catalogId:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.OK);
             }
             const queryBuilder = this.caseRepository.createQueryBuilder('case').
-            where('case.catalog = :catalog', {catalog: catalogId}).
             leftJoinAndSelect('case.endpointObject', 'endpoint')
                 .leftJoinAndSelect('case.assertType', 'assertType').
                 leftJoinAndSelect('case.assertJudge', 'assertJudge').
-                where('case.caseType = :caseType',{caseType : caseTypeVal}).
+                where('case.catalog = :catalog', {catalog: catalogId}).
+                andWhere('case.caseType = :caseType',{caseType : caseTypeVal}).
                 andWhere('case.caseGrade  IN (:...caseGradeList)', {caseGradeList: caseGradeList}).
                 orderBy('case.updateDate', 'DESC');
             const result = await paginate<CaseEntity>(queryBuilder, options);
