@@ -46,8 +46,8 @@ export class CaseService {
         if (createCaseDto.isNeedToken != null) {
             caseObj.isNeedToken = createCaseDto.isNeedToken;
         }
-        if (createCaseDto.grade){
-            caseObj.caseGrade = this.getCaseGrade(createCaseDto.grade)
+        if (createCaseDto.caseGrade){
+            caseObj.caseGrade = this.getCaseGrade(createCaseDto.caseGrade)
         }
         if (createCaseDto.caseType){
             caseObj.caseType = this.getCaseType(createCaseDto.caseType)
@@ -280,8 +280,8 @@ export class CaseService {
         if (updateCaseDto.alias){
             cases.alias = updateCaseDto.alias;
         }
-        if (updateCaseDto.grade){
-            cases.caseGrade = this.getCaseGrade(updateCaseDto.grade)
+        if (updateCaseDto.caseGrade){
+            cases.caseGrade = this.getCaseGrade(updateCaseDto.caseGrade)
         }
         if (updateCaseDto.caseType){
             cases.caseType = this.getCaseType(updateCaseDto.caseType)

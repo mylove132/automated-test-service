@@ -40,7 +40,7 @@ export class CreateCaseDto {
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly grade: number;
+    readonly caseGrade: number;
 
     //用例类别
     @IsNumber()
@@ -103,7 +103,7 @@ export class UpdateCaseDto {
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly grade: number;
+    readonly caseGrade: number;
 
     //用例类别
     @IsNumber()
