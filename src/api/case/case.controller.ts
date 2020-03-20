@@ -1,8 +1,8 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
-import { CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 
 
 @ApiBearerAuth()
@@ -22,7 +22,7 @@ export class CaseController {
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
-  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('caseType') caseType: number = 0, @Query('sceneGrade') sceneGrade?: string,  @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('caseType') caseType: CaseType = CaseType.SINGLE, @Query('sceneGrade') sceneGrade?: string,  @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
     let caseGradeList = [];
     if (sceneGrade){

@@ -40,12 +40,12 @@ export class CreateCaseDto {
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly caseGrade: number;
+    readonly caseGrade: CaseGrade;
 
     //用例类别
     @IsNumber()
     @IsOptional()
-    readonly caseType: number;
+    readonly caseType: CaseType;
 
     @IsNotEmpty()
     catalogId: number;
@@ -103,12 +103,12 @@ export class UpdateCaseDto {
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly caseGrade: number;
+    readonly caseGrade: CaseGrade;
 
     //用例类别
     @IsNumber()
     @IsOptional()
-    readonly caseType: number;
+    readonly caseType: CaseType;
 
     @IsNumber()
     @IsOptional()

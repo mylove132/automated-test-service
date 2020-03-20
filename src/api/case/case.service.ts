@@ -46,11 +46,11 @@ export class CaseService {
         if (createCaseDto.isNeedToken != null) {
             caseObj.isNeedToken = createCaseDto.isNeedToken;
         }
-        if (createCaseDto.caseGrade){
-            caseObj.caseGrade = this.getCaseGrade(createCaseDto.caseGrade)
+        if (createCaseDto.caseGrade != null){
+            caseObj.caseGrade = createCaseDto.caseGrade
         }
-        if (createCaseDto.caseType){
-            caseObj.caseType = this.getCaseType(createCaseDto.caseType)
+        if (createCaseDto.caseType != null){
+            caseObj.caseType = createCaseDto.caseType
         }
         const catalogId = createCaseDto.catalogId;
         const catalog = await this.catalogRepository.createQueryBuilder().select().where('id = :id', {id: catalogId}).getOne().catch(
@@ -150,11 +150,11 @@ export class CaseService {
      * @param envId 环境ID
      * @param options 分页信息
      */
-    async findCase(catalogId: number, envId: number, caseType: number, caseGradeList: number[], options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
+    async findCase(catalogId: number, envId: number, caseType: CaseType, caseGradeList: number[], options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
         if (envId == 0 || envId == null) {
             throw new ApiException(`envId不能为空或者0`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
-        const caseTypeVal = this.getCaseType(caseType);
+        const caseTypeVal = caseType;
         if (typeof catalogId == 'undefined') {
             const queryBuilder = this.caseRepository.createQueryBuilder('case').
             leftJoinAndSelect('case.endpointObject', 'endpoint').
@@ -280,14 +280,15 @@ export class CaseService {
         if (updateCaseDto.alias){
             cases.alias = updateCaseDto.alias;
         }
-        if (updateCaseDto.caseGrade){
-            cases.caseGrade = this.getCaseGrade(updateCaseDto.caseGrade)
+        if (updateCaseDto.caseGrade != null){
+            cases.caseGrade = updateCaseDto.caseGrade
         }
-        if (updateCaseDto.caseType){
-            cases.caseType = this.getCaseType(updateCaseDto.caseType)
+        if (updateCaseDto.caseType != null){
+            cases.caseType = updateCaseDto.caseType
         }
         const id = updateCaseDto.id;
-        const caseObj = await this.caseRepository.createQueryBuilder().select().where('id = :id', {id: id}).getOne().catch(
+        const caseObj = await this.caseRepository.createQueryBuilder().select().
+        where('id = :id', {id: id}).getOne().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -376,7 +377,8 @@ export class CaseService {
         if (updateCaseDto.assertKey){
             cases.assertKey = updateCaseDto.assertKey;
         }
-        await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).where('id = :id', {id: id}).execute().catch(
+        await this.caseRepository.createQueryBuilder().update(CaseEntity).set(cases).
+        where('id = :id', {id: id}).execute().catch(
             err => {
                 console.log(err);
                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -435,47 +437,4 @@ export class CaseService {
                 throw new ApiException(`param type值在[0,1]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
     }
-
-    /**
-     * 转换用例等级
-     * @param grade
-     */
-    private getCaseGrade(grade: number): CaseGrade {
-        switch (grade) {
-            case 0:
-                return CaseGrade.HIGH;
-                break;
-            case 1:
-                return CaseGrade.IN;
-                break;
-            case 2:
-                return CaseGrade.LOW;
-                break;
-            default:
-                throw new ApiException(`grade 值在[0,1,2]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * 转换用例类别
-     * @param grade
-     */
-    private getCaseType(type: number): CaseType {
-        switch (type) {
-            case 0:
-                return CaseType.SINGLE;
-                break;
-            case 1:
-                return CaseType.SCENE;
-                break;
-            case 2:
-                return CaseType.BLEND;
-                break;
-            default:
-                throw new ApiException(`caseType 值在[0,1,2]中`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-
 }
