@@ -8,7 +8,7 @@ import * as crypto from 'crypto';
 import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
-import {AddCaselistTaskDto, DeleteRunningTaskDto, SIngleTaskDto} from './dto/scheduler.dto';
+import {TaskIdsDto, SIngleTaskDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
 import {CommonUtil} from '../../util/common.util';
 import {RunService} from '../run/run.service';
@@ -59,9 +59,9 @@ export class SchedulerService {
      * 删除定时任务
      * @param deleteRunningTaskDto
      */
-    async deleteJob(deleteRunningTaskDto: DeleteRunningTaskDto) {
+    async deleteJob(taskIdsDto: TaskIdsDto) {
         try {
-            for (const id of deleteRunningTaskDto.ids) {
+            for (const id of taskIdsDto.ids) {
                 const schObj = await this.scheRepository.findOne(id).catch(
                     err => {
                         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -95,10 +95,10 @@ export class SchedulerService {
      * 停止运行中的定时任务
      * @param deleteRunningTaskDto
      */
-    async stopJob(deleteRunningTaskDto: DeleteRunningTaskDto) {
+    async stopJob(taskIdsDto: TaskIdsDto) {
         let stopSuccess = [];
         let stopFail = [];
-        for (const id of deleteRunningTaskDto.ids) {
+        for (const id of taskIdsDto.ids) {
             const task = await this.scheRepository.findOne(id).catch(
                 err => {
                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -132,12 +132,62 @@ export class SchedulerService {
      */
     async delCheckJobTask(){
         try {
-            this.schedulerRegistry.getCronJob('checkStatus').stop();
+            await this.schedulerRegistry.getCronJob('checkStatus').stop();
         }catch (e) {
             return {status: false};
         }
 
         return {status: true};
+    }
+
+    /**
+     * 删除系统定时任务
+     */
+    async restartSystemCheckJobTask(){
+        try {
+            await this.schedulerRegistry.getCronJob('checkStatus').start();
+        }catch (e) {
+            return {status: false};
+        }
+
+        return {status: true};
+    }
+
+    /**
+     * 重启定时任务
+     */
+    async restartCheckJobTask(taskIdsDto: TaskIdsDto){
+        console.log(taskIdsDto.ids)
+        const schObjList: SchedulerEntity[] = await this.scheRepository.createQueryBuilder('sch').
+        where('sch.id IN (:...ids)',{ids:taskIdsDto.ids}).getMany().catch(
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+        console.log(JSON.stringify(schObjList))
+        let resultList = [];
+        for (let schedulerEntity of schObjList) {
+            if (schedulerEntity.status != RunStatus.RUNNING){
+                try {
+                    await this.schedulerRegistry.getCronJob(schedulerEntity.md5).start();
+                    await this.scheRepository.createQueryBuilder().update(SchedulerEntity).
+                    set({status: RunStatus.RUNNING}).where('id = :id', {id: schedulerEntity.id}).execute().catch(
+                        err => {
+                            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                        }
+                    )
+                    resultList.push({id: schedulerEntity.id,result:true})
+                }catch (e) {
+                    console.log('--------------------')
+                    console.log(e)
+                    resultList.push({id: schedulerEntity.id,result:false, msg: e})
+
+                }
+
+            }
+        }
+
+        return resultList;
     }
 
     /**
@@ -223,23 +273,28 @@ export class SchedulerService {
         }
     }
 
-
+    /**
+     * 排查定时任务库，确认定时任务是否存活
+     *
+     */
     @Cron('* * * * * *',{name:'checkStatus'})
     async checkJobRunStatus() {
         console.log('------------------------排查定时任务--------------------')
         const runningSchObj: SchedulerEntity[] = await this.scheRepository.createQueryBuilder('sch').
         where('sch.status = :status',{status: RunStatus.RUNNING}).getMany().catch(
-
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
         )
-        const jobs = await this.getAllJobs(RunStatus.RUNNING);
-        let jbIds = [];
+        const jobs = this.schedulerRegistry.getCronJobs();
+        let md5List = [];
         jobs.forEach(
-            jb => {
-                jbIds.push(jb.id)
+            (k,v) =>{
+                md5List.push(k);
             }
         );
         for (let runningSch of runningSchObj){
-            if (jbIds.indexOf(runningSch.id) == -1){
+            if (md5List.indexOf(runningSch.md5) == -1){
                 await this.scheRepository.createQueryBuilder().update(SchedulerEntity).
                 set({status: RunStatus.STOP}).where('id = :id', {id: runningSch.id}).execute().catch(
                     err => {
@@ -248,27 +303,6 @@ export class SchedulerService {
                 );
             }
         }
-    }
-
-    /**
-     * 重启定时任务
-     * @param deleteTaskIdDto
-     */
-    async restartTask(deleteTaskIdDto: DeleteRunningTaskDto){
-        const ids = deleteTaskIdDto.ids;
-        const schObjList: SchedulerEntity[] = await this.scheRepository.createQueryBuilder('sch').where('sch.id IN (:...ids)',{ids: ids}).getMany().catch(
-            err => {
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        )
-        const jobs = await this.getAllJobs(RunStatus.RUNNING);
-        let jbIds = [];
-        jobs.forEach(
-            jb => {
-                jbIds.push(jb.id)
-            }
-        );
-
     }
 }
 

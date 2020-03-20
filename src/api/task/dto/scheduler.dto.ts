@@ -20,9 +20,9 @@ export class Md5ListDto {
     md5s: Set<string>;
 }
 
-export class DeleteRunningTaskDto {
+export class TaskIdsDto {
 
-    @ArrayMinSize(1,{message: "删除的id不能为空"})
+    @ArrayMinSize(1,{message: "id集合不能为空"})
     @IsArray()
     ids: number[];
 }
