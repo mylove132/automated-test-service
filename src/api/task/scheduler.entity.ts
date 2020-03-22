@@ -23,7 +23,7 @@ export class SchedulerEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: false})
     name: string;
 
     @Column()
@@ -45,6 +45,6 @@ export class SchedulerEntity {
     @Column('enum', {default: RunStatus.STOP, nullable:false, comment: '定时任务状态', enum: RunStatus})
     status: RunStatus;
 
-    @Column({nullable:true})
+    @Column({nullable:false})
     cron: string;
 }

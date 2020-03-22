@@ -18,6 +18,7 @@ import {IRunCaseById, IRunCaseList} from './run.interface';
 import {map} from 'rxjs/operators';
 import {SceneEntity} from "../scene/scene.entity";
 import {CommonUtil} from "../../util/common.util";
+import {TokenEntity} from "../token/token.entity";
 
 
 @Injectable()
@@ -27,6 +28,8 @@ export class RunService {
         private readonly caseRepository: Repository<CaseEntity>,
         @InjectRepository(SceneEntity)
         private readonly sceneRepository: Repository<SceneEntity>,
+        @InjectRepository(TokenEntity)
+        private readonly tokenRepository: Repository<TokenEntity>,
         @InjectRepository(CaselistEntity)
         private readonly caseListRepository: Repository<CaselistEntity>,
         private readonly curlService: CurlService,
@@ -46,11 +49,15 @@ export class RunService {
         resultObj['startTime'] = startTime;
         // 生成请求数据
         const requestData = this.generateRequestData(runCaseDto);
-        console.log('---------------')
-        console.log(requestData)
         let token;
-        if (runCaseDto.token != null && runCaseDto.token != "") {
-            token = runCaseDto.token;
+        if (runCaseDto.tokenId != null) {
+           const tokenObj =  await this.tokenRepository.findOne(runCaseDto.tokenId).catch(
+               err => {
+                   console.log(err);
+                   throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+               }
+            )
+            token = tokenObj.token;
             requestData.headers['token'] = token
         }
         // 响应结果
@@ -84,6 +91,7 @@ export class RunService {
                 .createQueryBuilder('case')
                 .select()
                 .leftJoinAndSelect("case.endpointObject", 'endpointObj')
+                .leftJoinAndSelect('case.token','token')
                 .where('case.id = :id', {id: caseId})
                 .getOne()
                 .catch(
@@ -101,9 +109,10 @@ export class RunService {
                 resultObj['caseId'] = caseId;
                 resultObj['caseName'] = caseObj.name;
                 const requestData = this.generateRequestData(requestBaseData);
+
                 let token;
-                if (runCaseById.token != null && runCaseById.token != '') {
-                    token = runCaseById.token;
+                if (caseObj.token != null) {
+                    token = caseObj.token.token;
                     requestData.headers['token'] = token
                 }
                 const result = await this.curlService.makeRequest(requestData).toPromise();
@@ -119,10 +128,20 @@ export class RunService {
                     resultObj['status'] = assert['result'];
                     resultObj['assert'] = assert;
                     resultObj['errMsg'] = null;
+                    if (runCaseById.isNotice){
+                       if (!assert['result']) {
+                           this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertKey} 
+                           期望条件 ${assert['relation']} 
+                           实际结果${assert['actual']} 不符合`)
+                       }
+                    }
                 } else {
                     resultObj['status'] = false;
                     resultObj['result'] = null;
                     resultObj['errMsg'] = result;
+                    if (runCaseById.isNotice){
+                            //this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
+                    }
                 }
                 console.log(res)
                 // 保存历史记录

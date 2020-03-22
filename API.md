@@ -3980,7 +3980,7 @@ status				    |number		|O			|定时任务的状态（默认查询所有：0：�
 请求示例
 
 ```
-/api/scheduler/running?status=0
+/api/scheduler?status=0
 ```
 
 ##### 返回结果

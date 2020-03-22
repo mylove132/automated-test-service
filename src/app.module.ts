@@ -18,6 +18,7 @@ import {AuthGuard} from './shared/guard/auth.guard';
 import {HistoryModule} from './api/history/history.module';
 import {JmeterModule} from "./api/jmeter/jmeter.module";
 import {SceneModule} from "./api/scene/scene.module";
+import {TokenModule} from "./api/token/token.module";
 
 const Orm = (): DynamicModule => {
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
@@ -39,7 +40,8 @@ const Orm = (): DynamicModule => {
         HistoryModule,
         SchedulerModule,
         JmeterModule,
-        SceneModule
+        SceneModule,
+        TokenModule
     ],
     controllers: [
         AppController

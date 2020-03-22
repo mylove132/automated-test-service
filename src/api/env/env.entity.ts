@@ -2,6 +2,7 @@ import {Column, Entity, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn}
 import {EndpointEntity} from './endpoint.entity';
 import {CaselistEntity} from '../caselist/caselist.entity';
 import {SchedulerEntity} from '../task/scheduler.entity';
+import {TokenEntity} from "../token/token.entity";
 
 @Entity('env')
 export class EnvEntity {
@@ -21,4 +22,8 @@ export class EnvEntity {
 
     @OneToOne(type => SchedulerEntity, secheduler => secheduler.env)
     sechedulers: SchedulerEntity[];
+
+    @OneToMany(type => TokenEntity,tokens => tokens.env)
+    tokens: TokenEntity[]
+
 }

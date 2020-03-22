@@ -8,7 +8,7 @@ import * as crypto from 'crypto';
 import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
-import {TaskIdsDto, SIngleTaskDto} from './dto/scheduler.dto';
+import {SIngleTaskDto, TaskIdsDto} from './dto/scheduler.dto';
 import {RunStatus} from './dto/run.status';
 import {CommonUtil} from '../../util/common.util';
 import {RunService} from '../run/run.service';
@@ -207,14 +207,27 @@ export class SchedulerService {
         }else {
             envId = singleTaskDto.envId;
         }
-        const caseList:CaseEntity[] = await this.caseRepository.createQueryBuilder('cas').
-        where('cas.caseGrade = :caseGrade',{caseGrade: caseGrade}).andWhere(
-            'cas.caseType = :caseType',{caseType:CaseType.SINGLE}
-        ).getMany().catch(
-            err => {
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        )
+        let caseList: CaseEntity[];
+        if (singleTaskDto.caseType == CaseType.SINGLE){
+            caseList = await this.caseRepository.createQueryBuilder('cas').
+            where('cas.caseGrade = :caseGrade',{caseGrade: caseGrade}).andWhere(
+                'cas.caseType IN (:...caseType)',{caseType:[CaseType.SINGLE, CaseType.BLEND]}
+            ).getMany().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+        }else if (singleTaskDto.caseType == CaseType.SCENE) {
+            caseList = await this.caseRepository.createQueryBuilder('cas').
+            where('cas.caseGrade = :caseGrade',{caseGrade: caseGrade}).andWhere(
+                'cas.caseType IN (:...caseType)',{caseType:[CaseType.SCENE, CaseType.BLEND]}
+            ).getMany().catch(
+                err => {
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            )
+        }
+
         if(caseList.length == 0 || caseList == null){
             throw new ApiException("需要执行的接口列表为空",ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
@@ -225,7 +238,7 @@ export class SchedulerService {
             }
         );
         console.log('运行的定时任务接口：'+caseIds)
-        const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER, singleTaskDto.token);
+        const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
         const secheduler = new SchedulerEntity();
         const createDate = new Date();
         const md5 = crypto.createHmac('sha256', createDate + CommonUtil.randomChar(10)).digest('hex');
@@ -277,7 +290,7 @@ export class SchedulerService {
      * 排查定时任务库，确认定时任务是否存活
      *
      */
-    @Cron('* * * * * *',{name:'checkStatus'})
+    //@Cron('* * * * * *',{name:'checkStatus'})
     async checkJobRunStatus() {
         console.log('------------------------排查定时任务--------------------')
         const runningSchObj: SchedulerEntity[] = await this.scheRepository.createQueryBuilder('sch').
@@ -311,13 +324,11 @@ class RunCaseListDto implements IRunCaseById{
     readonly caseIds: number[];
     readonly envId: number;
     readonly executor: Executor;
-    readonly token: string;
 
-    constructor(private readonly cIds: number[], private readonly eId: number, private readonly exec: Executor, private readonly tk: string) {
+    constructor(private readonly cIds: number[], private readonly eId: number, private readonly exec: Executor) {
         this.caseIds = cIds;
         this.envId = eId;
         this.executor = exec;
-        this.token = tk;
     }
 
 

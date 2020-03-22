@@ -1,5 +1,5 @@
 import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber} from 'class-validator';
-import {CaseGrade} from "../../case/dto/case.dto";
+import {CaseGrade, CaseType} from "../../case/dto/case.dto";
 
 export class AddCaselistTaskDto {
 
@@ -39,11 +39,12 @@ export class SIngleTaskDto{
     @IsNumber({allowNaN:true})
     readonly caseGrade: CaseGrade;
 
+    @IsNumber()
+    @IsNotEmpty()
+    readonly caseType: CaseType;
+
     @IsNumber({allowNaN:true})
     readonly envId: number;
-
-    @IsNotEmpty()
-    token: string;
 
     @IsNotEmpty()
     cron: string;

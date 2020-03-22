@@ -15,10 +15,10 @@ export class CurlService {
 	 * 向钉钉群发送消息
 	 *@param {message} : text钉钉消息
 	 */
-	sendDingTalkMessage(message: string) {
-		const token = this.configService.dingtalkAccessToken
-		const env = this.configService.env === 'production' ? '生产' : '测试'
-		return this.httpService.post(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
+	 sendDingTalkMessage(message: string) {
+		const token = this.configService.dingtalkAccessToken;
+		const env = this.configService.env === 'production' ? '生产' : '测试';
+		const result = this.httpService.post(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
 			msgtype: 'text',
 			text: {
 				content: `
@@ -28,7 +28,13 @@ export class CurlService {
 			}
 		}).pipe(
 			catchError(error => of(`钉钉消息发送失败: ${error}`)),
-		);
+		).subscribe(
+		    res => {
+		        console.log('----------------------------------------')
+		        console.log(res)
+            }
+        )
+		return result;
 	}
 
 	/**
