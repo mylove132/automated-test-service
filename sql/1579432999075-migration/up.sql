@@ -1,0 +1,9 @@
+CREATE TABLE "assert_type" ("id" SERIAL NOT NULL, "type" character varying NOT NULL, CONSTRAINT "PK_69a2dc3382dcc580f201b0302cc" PRIMARY KEY ("id"));
+CREATE TABLE "assert_judge" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_a63c45ab5051e49ffb16c87baef" PRIMARY KEY ("id"));
+ALTER TABLE "case" ADD "assertTypeId" integer;
+ALTER TABLE "case" ADD "assertJudgeId" integer;
+ALTER TABLE "catalog" ALTER COLUMN "parentId" SET DEFAULT null;
+ALTER TABLE "history" ALTER COLUMN "startTime" SET DEFAULT '"2020-01-19T11:23:20.549Z"';
+ALTER TABLE "history" ALTER COLUMN "endTime" SET DEFAULT '"2020-01-19T11:23:20.549Z"';
+ALTER TABLE "case" ADD CONSTRAINT "FK_ace50cf5ad4f83ebf45e718182d" FOREIGN KEY ("assertTypeId") REFERENCES "assert_type"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "case" ADD CONSTRAINT "FK_da485311d910dcd2ff151d8a0a6" FOREIGN KEY ("assertJudgeId") REFERENCES "assert_judge"("id") ON DELETE CASCADE ON UPDATE CASCADE;
