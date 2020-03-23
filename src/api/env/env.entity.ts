@@ -16,7 +16,6 @@ export class EnvEntity {
     @ManyToMany(type => EndpointEntity, endpoint => endpoint.envs)
     endpoints: EndpointEntity[];
 
-
     @OneToMany(type => CaselistEntity, caseList => caseList.env)
     caseLists: CaselistEntity[]
 

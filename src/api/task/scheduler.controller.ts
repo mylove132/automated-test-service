@@ -1,8 +1,7 @@
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
-import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
-import {AddCaselistTaskDto, CheckCronDto, TaskIdsDto, SIngleTaskDto} from './dto/scheduler.dto';
+import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
+import { TaskIdsDto, SIngleTaskDto, UpdateTaskDto} from './dto/scheduler.dto';
 import {SchedulerService} from './scheduler.service';
-import {RunStatus} from "./dto/run.status";
 
 ApiBearerAuth()
 @ApiUseTags('定时任务')
@@ -12,13 +11,19 @@ export class SchedulerController {
     constructor(private readonly schedulerService: SchedulerService) {}
 
     @Post('')
-    async startTask(@Body() singleTaskDto: SIngleTaskDto){
+    async addTask(@Body() singleTaskDto: SIngleTaskDto){
         return await this.schedulerService.addRunSingleTask(singleTaskDto);
     }
 
+    @Put('')
+    async updateTask(@Body() updateTaskDto: UpdateTaskDto){
+        return await this.schedulerService.updateRunSingleTask(updateTaskDto);
+    }
+
     @Get('')
-    async getAllJobs(@Query('status')status?:number){
-        return this.schedulerService.getAllJobs(status);
+    async getAllJobs(@Query('status')status?:number,  @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+        limit = limit > 100 ? 100 : limit;
+        return this.schedulerService.getAllJobs(status, {page, limit});
     }
 
     @Delete('')

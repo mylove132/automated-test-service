@@ -9,8 +9,7 @@ import {
 } from "typeorm";
 import {CaseEntity} from "../case/case.entity";
 import {EnvEntity} from "../env/env.entity";
-import {TokenPlatform} from "./dto/token.dto";
-import {ParamType} from "../case/dto/http.enum";
+import {PlatformCodeEntity} from "../catalog/platformCode.entity";
 
 
 @Entity('token')
@@ -22,8 +21,8 @@ export class TokenEntity {
     @Column({comment: "用户名称",nullable: true})
     username: string;
 
-    @Column('enum',{default: TokenPlatform.CRM, nullable: false, enum: TokenPlatform, comment: 'token平台'})
-    tokenPlatform: TokenPlatform;
+    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.tokens,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+   platformCode: PlatformCodeEntity;
 
     @Column({comment:"登录数据", nullable: true})
     body: string;

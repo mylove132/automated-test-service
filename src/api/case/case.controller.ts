@@ -45,7 +45,7 @@ export class CaseController {
   }
 
   @ApiOperation({ title: 'delete case' })
-  @ApiResponse({ status: 200, description: 'query case success.'})
+  @ApiResponse({ status: 200, description: 'delete case success.'})
   @Delete('')
   async deleteCase(@Body() deleteCaseDto: DeleteCaseDto) {
     return this.caseService.deleteById(deleteCaseDto);

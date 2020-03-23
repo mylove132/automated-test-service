@@ -4,6 +4,7 @@ import {
     Column, OneToMany
 } from 'typeorm';
 import {CatalogEntity} from "./catalog.entity";
+import {TokenEntity} from "../token/token.entity";
 
 @Entity('platform_code')
 export class PlatformCodeEntity {
@@ -17,4 +18,6 @@ export class PlatformCodeEntity {
     @OneToMany(type => CatalogEntity, catalog => catalog.platformCode)
     catalog: CatalogEntity[];
 
+    @OneToMany(type => TokenEntity, tokens => tokens.platformCode)
+    tokens: TokenEntity[];
 }

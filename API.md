@@ -868,7 +868,7 @@ data						|object		|R			|&nbsp;
 &emsp;paramType			    |number		|O			|参数类型（0：text,1:file）
 &emsp;type			    |number		|O			|请求方式(0:get,1:post)
 &emsp;assertText			    |string		|O			|断言内容
-&emsp;token			    |string		|O			|接口cookie值
+&emsp;tokenId			    |number		|O			|tokenId值
 
 
 请求示例：
@@ -990,7 +990,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 :----						|:---		|:------	|:---
 &emsp;caseIds			    |number[]		|R			|需要运行的接口ID集合
 &emsp;envId			    |number		|R			|环境ID
-&emsp;token			    |string		|O			|登录的token值
 
 
 请求示例：
@@ -998,8 +997,7 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ```
 {
 	"caseIds": [1,2],
-	"envId": 1,
-    "token":""
+	"envId": 1
 }
 
 
@@ -3901,7 +3899,7 @@ limit	                    |number		|O			|每页展示个数(默认10)
 /api/scene?catalogId=1&caseGrade=1,2
 ```
 
-### 8.0  添加单接口定时任务
+### 8.0  添加接口定时任务
 - **接口说明：** 添加定时任务
 - **请求方式：** POST
 - **接口地址：** /api/scheduler
@@ -3911,8 +3909,9 @@ limit	                    |number		|O			|每页展示个数(默认10)
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 caseGrade				    |number		|O			|接口的等级（默认0：高级）
+caseType				    |number		|R			|接口类型（默认0：单接口,1:场景接口,2:混合接口）
+taskType				    |number		|O			|任务类型(默认1:单接口任务，2：场景任务)
 envId				        |number		|R			|环境ID
-token	                    |String		|O			|接口token
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
 
@@ -3921,11 +3920,12 @@ cron	                    |string		|R			|定时任务cron表达式
 
 ```
 {
-	"caseGrade": 0,
+	"caseGrade": 1,
+	"caseType":0,
+	"taskType":1,
 	"envId": 1,
-	"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcklkIjoyMCwidXNlcm5hbWUiOiJjcm1hZG1pbiIsImlhdCI6MTU4NDU5NjcwNCwiZXhwIjoxNTg1MjAxNTA0fQ.1mTa7j5kXwF9PrwQoBgO0z5xjF6CTNktQf9YgJwnY_w",
-	"name":"测试定时任务",
-	"cron":"* * * * * *"
+	"name":"测试定时任务test",
+	"cron":"1 * * * * *"
 }
 ```
 
@@ -3936,37 +3936,22 @@ cron	                    |string		|R			|定时任务cron表达式
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|any		|R			|&nbsp;返回历史记录值
-&nbsp;&nbsp;&nbsp;&nbsp;env|any		|R			|&nbsp;环境信息
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;环境ID
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;createDate|date		|R			|&nbsp;环境名称
-&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;定时任务名称
-&nbsp;&nbsp;&nbsp;&nbsp;id|string		|R			|&nbsp;定时任务ID
-&nbsp;&nbsp;&nbsp;&nbsp;status|number		|R			|&nbsp;定时任务运行状态(0:运行中,1:停止，2：已删除)
-&nbsp;&nbsp;&nbsp;&nbsp;md5|string		|R			|&nbsp;定时任务唯一标示
+&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;生成的任务ID
+
 
 返回示例
 ```
 {
     "data": {
-        "name": "测试定时任务",
-        "md5": "6f8a65cd721b802d43fd5f5a0ed40730f3fb8675f4fe585dde673dc6aac9f56d",
-        "createDate": "2020-03-19T07:33:57.383Z",
-        "env": {
-            "id": 1,
-            "name": "smix1"
-        },
-        "cron": "* * * * * *",
-        "status": "0",
-        "id": 18,
-        "updateDate": "2020-03-19T07:33:57.675Z"
+        "id": 31
     },
     "code": 0,
     "message": "success"
 }
 ```
 
-### 8.1  获取所有运行中的定时任务
-- **接口说明：** 添加定时任务
+### 8.1  获取所有定时任务
+- **接口说明：** 获取所有定时任务
 - **请求方式：** GET
 - **接口地址：** /api/scheduler
 
@@ -3991,207 +3976,66 @@ code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明�
 message						|string		|R			|&nbsp;
 data						|any		|R			|&nbsp;返回历史记录值
 &nbsp;&nbsp;&nbsp;&nbsp;item|any		|R			|&nbsp;环境信息
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;环境ID
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;createDate|date		|R			|&nbsp;环境名称
-&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;定时任务名称
-&nbsp;&nbsp;&nbsp;&nbsp;id|string		|R			|&nbsp;定时任务ID
-&nbsp;&nbsp;&nbsp;&nbsp;status|number		|R			|&nbsp;定时任务运行状态(0:运行中,1:停止，2：已删除)
-&nbsp;&nbsp;&nbsp;&nbsp;md5|string		|R			|&nbsp;定时任务唯一标示
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;任务ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;任务名称
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;md5|string		|R			|&nbsp;任务md5值（定时任务的k值）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cron|string		|R			|&nbsp;任务的cron表达式
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;taskType|number		|R			|&nbsp;任务类型(1:单接口任务，2：场景任务)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status|number		|R			|&nbsp;任务状态(1:运行中，2：停止,3:已删除)
+
 
 返回示例
 ```
 {
-    "data": [
-        {
-            "id": 15,
-            "name": "测试定时任务",
-            "md5": "7bdc79590a95a85512e5baf20f2347428c3b060bf9c87c3bc67a9038f325fc80",
-            "createDate": "2020-03-19T07:27:20.171Z",
-            "updateDate": "2020-03-19T08:33:37.422Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 20,
-            "name": "测试定时任务",
-            "md5": "9b4b167d224fd791f8584986750816af09a30386513aec8bfbd7e3894b28e799",
-            "createDate": "2020-03-19T08:03:04.158Z",
-            "updateDate": "2020-03-19T08:05:53.972Z",
-            "status": 2,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 21,
-            "name": "测试定时任务",
-            "md5": "de2b99f2d2d8f19ab667da2341205426681e1f228547ced919af2d6a541b2e63",
-            "createDate": "2020-03-19T08:05:15.361Z",
-            "updateDate": "2020-03-19T08:05:54.200Z",
-            "status": 2,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 1,
-            "name": null,
-            "md5": "16dd14c01e7e7f26fcb5ce92f1744b6072dd78a5b2c658039ef71ab5329f6e3f",
-            "createDate": "2020-01-15T10:22:30.344Z",
-            "updateDate": "2020-03-19T08:33:36.217Z",
-            "status": 1,
-            "cron": ""
-        },
-        {
-            "id": 2,
-            "name": null,
-            "md5": "bc5e7f4cf024dd58415de9f337bee1de85e880e6455c1b230672c579193b70c2",
-            "createDate": "2020-01-15T10:31:52.205Z",
-            "updateDate": "2020-03-19T08:33:36.357Z",
-            "status": 1,
-            "cron": ""
-        },
-        {
-            "id": 3,
-            "name": null,
-            "md5": "d026fa283fb2a64847ec4c6af0662f9bd47459de0ed02af73535f0230d5ce9e2",
-            "createDate": "2020-01-15T10:42:25.621Z",
-            "updateDate": "2020-03-19T08:33:36.474Z",
-            "status": 1,
-            "cron": ""
-        },
-        {
-            "id": 4,
-            "name": null,
-            "md5": "c09fafd09d02f6842ea535fdb136b48b536813520e61938fc8ce104068050aeb",
-            "createDate": "2020-01-15T10:54:52.759Z",
-            "updateDate": "2020-03-19T08:33:36.595Z",
-            "status": 1,
-            "cron": ""
-        },
-        {
-            "id": 5,
-            "name": null,
-            "md5": "39204a7df12b1296e1f400af1ee6f7dab7be226f442c78a4b745362d17be7435",
-            "createDate": "2020-01-15T11:07:26.612Z",
-            "updateDate": "2020-03-19T08:33:36.713Z",
-            "status": 1,
-            "cron": ""
-        },
-        {
-            "id": 6,
-            "name": "测试定时任务",
-            "md5": "07f7a0e294c71684435854ba7c6e2fb9e5956e70a3b33fe8f264e5a9f8f3de1f",
-            "createDate": "2020-03-19T05:51:51.665Z",
-            "updateDate": "2020-03-19T08:33:36.831Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 7,
-            "name": "测试定时任务",
-            "md5": "aed1d200d4e8fb1b755e15043f9e2e26d818b8e55304d7f8157195a852f7a627",
-            "createDate": "2020-03-19T05:55:46.795Z",
-            "updateDate": "2020-03-19T08:33:36.948Z",
-            "status": 1,
-            "cron": "* 1 * * * *"
-        },
-        {
-            "id": 8,
-            "name": "测试定时任务",
-            "md5": "6c553dc82141941f85b20a0b810242e39b8d3b58827aae7c158967c45b2e6b15",
-            "createDate": "2020-03-19T06:00:26.099Z",
-            "updateDate": "2020-03-19T08:33:37.033Z",
-            "status": 1,
-            "cron": "* 1 * * * *"
-        },
-        {
-            "id": 16,
-            "name": "测试定时任务",
-            "md5": "895a675cb28c0ccaf435d537b0db30f0a331b8d1b80f28e12c20d16c0134e62b",
-            "createDate": "2020-03-19T07:29:31.288Z",
-            "updateDate": "2020-03-19T08:33:37.468Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 9,
-            "name": "测试定时任务",
-            "md5": "6b9b04b7ee4a81ab74fe8d727c1772569dc5b9194893690cf849738602ad7cdd",
-            "createDate": "2020-03-19T06:10:49.354Z",
-            "updateDate": "2020-03-19T08:33:37.171Z",
-            "status": 1,
-            "cron": "* 1 * * * *"
-        },
-        {
-            "id": 17,
-            "name": "测试定时任务",
-            "md5": "fe30e92d62385cde92217a062455fb5f8172cb847f31d084796e2516fc53b3f6",
-            "createDate": "2020-03-19T07:31:58.078Z",
-            "updateDate": "2020-03-19T08:33:37.509Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 10,
-            "name": "测试定时任务",
-            "md5": "bfd94643ea9cd3ecd75eb1c0fbc2180c311dbabb77a37d3b3048f8ddf54f8046",
-            "createDate": "2020-03-19T06:18:53.011Z",
-            "updateDate": "2020-03-19T08:33:37.213Z",
-            "status": 1,
-            "cron": "* 1 * * * *"
-        },
-        {
-            "id": 11,
-            "name": "测试定时任务",
-            "md5": "19d3efa22e440637820c3a1ddca23a4f3b55d62d200a02f55d6cfc14f4a4085c",
-            "createDate": "2020-03-19T06:20:14.849Z",
-            "updateDate": "2020-03-19T08:33:37.256Z",
-            "status": 1,
-            "cron": "0 0/1 * * * ? *"
-        },
-        {
-            "id": 18,
-            "name": "测试定时任务",
-            "md5": "6f8a65cd721b802d43fd5f5a0ed40730f3fb8675f4fe585dde673dc6aac9f56d",
-            "createDate": "2020-03-19T07:33:57.383Z",
-            "updateDate": "2020-03-19T08:33:37.550Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 12,
-            "name": "测试定时任务",
-            "md5": "e4e5403c06b7e0db09fa3f4695bd7e3e80fb4a2e4df6633b4cdef7b06e8e312a",
-            "createDate": "2020-03-19T06:24:21.996Z",
-            "updateDate": "2020-03-19T08:33:37.299Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 19,
-            "name": "测试定时任务",
-            "md5": "48103856aec8fa5bb6c90428cc2813e7138868f744e2703fa0ce73c993a35bb7",
-            "createDate": "2020-03-19T07:45:10.199Z",
-            "updateDate": "2020-03-19T08:33:37.678Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 13,
-            "name": "测试定时任务",
-            "md5": "9b8e4c3087d5f49b158cc27e5bcd10dd327f322423c25bc9df1279ee57d85ef4",
-            "createDate": "2020-03-19T06:27:09.964Z",
-            "updateDate": "2020-03-19T08:33:37.340Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        },
-        {
-            "id": 14,
-            "name": "测试定时任务",
-            "md5": "7ada8bfb8bb45efbfdf591cb5eeff23ff28bc9da827e4810987d82e079f429b2",
-            "createDate": "2020-03-19T07:20:36.065Z",
-            "updateDate": "2020-03-19T08:33:37.380Z",
-            "status": 1,
-            "cron": "* * * * * *"
-        }
-    ],
+    "data": {
+        "items": [
+            {
+                "id": 26,
+                "name": "测试定时任务",
+                "md5": "322a9d79d4a5ba59561af021813fa4f869983cb2ab3e64e617ec4f6b4c8c4070",
+                "taskType": 1,
+                "createDate": "2020-03-23T07:48:58.173Z",
+                "updateDate": "2020-03-23T08:35:42.221Z",
+                "status": 2,
+                "cron": "* * * * * *"
+            },
+            {
+                "id": 28,
+                "name": "测试定时任务test",
+                "md5": "c93ebd140345b18fcb65853001e8b73bd931ef2f1cb666c08e1a84a72095a8e2",
+                "taskType": 1,
+                "createDate": "2020-03-23T08:17:04.844Z",
+                "updateDate": "2020-03-23T08:35:42.337Z",
+                "status": 2,
+                "cron": "1 * * * * *"
+            },
+            {
+                "id": 27,
+                "name": "测试定时任务test",
+                "md5": "82e67a4b8c4655673738f2d2e65d756079ab7675512c6d1e007699ef2745469c",
+                "taskType": 1,
+                "createDate": "2020-03-23T08:05:05.114Z",
+                "updateDate": "2020-03-23T08:35:42.106Z",
+                "status": 2,
+                "cron": "1 * * * * *"
+            },
+            {
+                "id": 29,
+                "name": "测试定时任务test",
+                "md5": "902896c214d4459d88ae715fc174c47b23c4c33c1e463ce9fc772ac700eac341",
+                "taskType": 1,
+                "createDate": "2020-03-23T08:24:00.153Z",
+                "updateDate": "2020-03-23T09:05:05.252Z",
+                "status": 2,
+                "cron": "1 * * * * *"
+            }
+        ],
+        "itemCount": 4,
+        "totalItems": 4,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    },
     "code": 0,
     "message": "success"
 }
@@ -4279,12 +4123,12 @@ data						|any		|R			|&nbsp;返回历史记录值
 }
 ```
 
-### 8.3  重启定时任务
+### 8.4  重启定时任务
 - **接口说明：** 重启定时任务
 - **请求方式：** DELETE
 - **接口地址：** /api/scheduler/restart
 
-#### 8.3.1 请求参数
+#### 8.4.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
@@ -4324,7 +4168,263 @@ data						|any		|R			|&nbsp;返回历史记录值
 }
 ```
 
+### 8.0  更改接口定时任务
+- **接口说明：** 更改定时任务
+- **请求方式：** PUT
+- **接口地址：** /api/scheduler
 
+#### 8.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+id				    |number		|R			|任务的ID
+caseGrade				    |number		|O			|接口的等级（默认0：高级）
+caseType				    |number		|R			|接口类型（默认0：单接口,1:场景接口,2:混合接口）
+taskType				    |number		|O			|任务类型(默认1:单接口任务，2：场景任务)
+envId				        |number		|R			|环境ID
+name	                    |string		|R			|定时任务名称
+cron	                    |string		|R			|定时任务cron表达式
+isRestart	                    |bool		|O			|定时任务是否重启
+
+
+请求示例
+
+```
+{
+	"id":30,
+	"caseGrade": 0,
+	"envId": 5,
+	"name":"测试定时任务修改1",
+	"cron":"* * * * * *",
+	"isRestart":true
+}
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;status|bool		|R			|&nbsp;重启结果（true:成功，false：失败）
+
+
+返回示例
+```
+{
+    "data": {
+        "status": true
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 9.0  添加token
+- **接口说明：** 添加token
+- **请求方式：** POST
+- **接口地址：** /api/token
+
+#### 9.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+username				    |string		|R			|登录用户的用户名
+body				        |string（json）		|R			|登录接口的data数据
+platformCode	                    |String		|R			|关联的平台code码
+url	                    |string		|R			|登录接口的URL
+envId	                    |number		|R			|关联的环境ID
+
+
+请求示例
+
+```
+{
+    "username":"13986798661",
+    "body":"{"userName":"13986798666","password":"cyt007"}",
+    "platformCode":"0003",
+    "url":"https://oapi-smix5.t.blingabc.com/sale/open-api/sale/v1/login",
+    "envId":19
+}
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;生成的tokenID
+
+返回示例
+```
+{
+    "data": {
+        "id": 12
+    },
+    "code": 0,
+    "message": "success"
+}}
+```
+
+### 9.1  查询token
+- **接口说明：** 查询token
+- **请求方式：** GET
+- **接口地址：** /api/token
+
+#### 9.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+envId	                    |number		|O			|关联的环境ID
+platformCode	                    |string		|O			|平台code值
+
+请求示例
+
+```
+/api/token?platformCode=0004&envId=5
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;items|any		|R			|&nbsp;token分页数据
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;token id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;username|string		|R			|&nbsp;token用户名
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;body|string		|R			|&nbsp;token登录data
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;token|string		|R			|&nbsp;token值
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url|string		|R			|&nbsp;登录url
+返回示例
+```
+{
+    "data": {
+        "items": [
+            {
+                "id": 10,
+                "username": "autotest",
+                "body": "{\"userName\":\"autotest\",\"password\":\"bling123\"}",
+                "token": "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJjb20ueGRmLmJsaW5nIiwiYXVkIjoiY2xpZW50IiwidXNlcmNvZGUiOiJhdXRvdGVzdCIsImV4cCI6MTU4NTQ4OTk2NCwiaWF0IjoxNTg0ODg1MTY0fQ.g1UwebSmR6nU2Gk_VgInJd3BxJTAEKpUwIb-LBxMkq-X_6j5nO1w80a9oNwNA85UAgc2AvBL4QmrImMe0NZwfw",
+                "url": "https://oapi.t.blingabc.com//auth/open-api/autotest/useradmin/v1/login",
+                "createDate": "2020-03-22T13:52:44.246Z",
+                "updateDate": "2020-03-22T13:52:44.246Z"
+            },
+            {
+                "id": 8,
+                "username": "crmadmin",
+                "body": "{\"userName\":\"crmadmin\",\"password\":\"bling123!@#\"}",
+                "token": "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJjb20ueGRmLmJsaW5nIiwiYXVkIjoiY2xpZW50IiwidXNlcmNvZGUiOiJjcm1hZG1pbiIsImV4cCI6MTU4NTQ4ODgxMywiaWF0IjoxNTg0ODg0MDEzfQ.W7NXicA5YGt4poU3MIHnplDNwJ0fTdR1X0LF9nIZTuz0t3SHBwbI0PQkrlm3-k45_EtwMUuVQPtO9vLoApxgiQ",
+                "url": "https://oapi.t.blingabc.com//auth/open-api/autotest/useradmin/v1/login",
+                "createDate": "2020-03-22T13:33:33.808Z",
+                "updateDate": "2020-03-22T13:33:33.808Z"
+            }
+        ],
+        "itemCount": 2,
+        "totalItems": 2,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    },
+    "code": 0,
+    "message": "success"
+}}}
+```
+
+### 9.2  更新token
+- **接口说明：** 添加token
+- **请求方式：** PUT
+- **接口地址：** /api/token
+
+#### 9.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+username				    |string		|O			|登录用户的用户名
+body				        |string（json）		|O			|登录接口的data数据
+platformCode	                    |String		|O			|关联的平台code码
+url	                    |string		|O			|登录接口的URL
+envId	                    |number		|O			|关联的环境ID
+id                          |number		|R			|tokenID
+token                          |token		|O			|token值
+
+请求示例
+
+```
+{
+    "username":"13986798663",
+    "body":"{"userName":"13986798666","password":"cyt007"}",
+    "platformCode":"0003",
+    "url":"https://oapi-smix5.t.blingabc.com/sale/open-api/sale/v1/login",
+    "envId":19,
+    "id":11
+}
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;status|bool		|R			|&nbsp;更新结果，true成功，false失败
+
+返回示例
+```
+{
+    "data": {
+        "status": true
+    },
+    "code": 0,
+    "message": "success"
+}
+```
+
+### 9.3  删除token
+- **接口说明：** 删除token
+- **请求方式：** DELETE
+- **接口地址：** /api/token
+
+#### 9.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+ids				    |number[]		|R			|token ID集合
+
+
+请求示例
+
+```
+{
+    "ids":{11,10}
+}
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;affected|bool		|R			|&nbsp;删除的结果条数
+
+返回示例
+```
+{
+    "data": {
+        "raw": [],
+        "affected": 2
+    },
+    "code": 0,
+    "message": "success"
+}
+```
 
 
 响应码	|说明  

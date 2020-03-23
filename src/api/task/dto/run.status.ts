@@ -1,3 +1,7 @@
 export enum RunStatus {
-    RUNNING, STOP,DELETE
+    STATELESS,RUNNING, STOP,DELETE
+}
+
+export enum TaskType {
+    STATELESS,SINGLE,SCENE
 }

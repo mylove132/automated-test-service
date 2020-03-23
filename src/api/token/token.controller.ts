@@ -1,9 +1,7 @@
 import {ApiBearerAuth, ApiUseTags, ApiOperation, ApiResponse} from '@nestjs/swagger';
-import {Body, Controller, Get, Post, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
 import {TokenService} from "./token.service";
-import {CreateTokenDto, TokenPlatform} from "./dto/token.dto";
-import {CaseType} from "../case/dto/case.dto";
-import {options} from "tsconfig-paths/lib/options";
+import {CreateTokenDto, DeleteTokenDto, UpdateTokenDto} from "./dto/token.dto";
 
 
 ApiBearerAuth()
@@ -14,17 +12,34 @@ export class TokenController {
     constructor(private readonly tokenService: TokenService) {
     }
 
+    @ApiOperation({title: 'create token'})
+    @ApiResponse({status: 200, description: 'create token success.'})
     @Post('')
-    async addToken(@Body() createTokenDto: CreateTokenDto) {
+    async addTokenCrontroller(@Body() createTokenDto: CreateTokenDto) {
         return await this.tokenService.addTokenService(createTokenDto);
+    }
+
+    @ApiOperation({title: 'update token'})
+    @ApiResponse({status: 200, description: 'update token success.'})
+    @Put('')
+    async updateTokenCrontroller(@Body() updateTokenDto: UpdateTokenDto) {
+        return await this.tokenService.updateTokenService(updateTokenDto);
     }
 
 
     @ApiOperation({title: 'query token'})
     @ApiResponse({status: 200, description: 'query token success.'})
     @Get('')
-    async findCaseById(@Query('envId') envId?: number, @Query('tokenPlatform') tokenPlatform?: TokenPlatform, @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+    async findCaseById(@Query('envId') envId?: number, @Query('platformCode') platformCode?: string,
+                       @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
         limit = limit > 100 ? 100 : limit;
-        return this.tokenService.findCase(envId, tokenPlatform, {page, limit});
+        return this.tokenService.findCase(envId, platformCode, {page, limit});
+    }
+
+    @ApiOperation({ title: 'delete token' })
+    @ApiResponse({ status: 200, description: 'delete token success.'})
+    @Delete('')
+    async deleteTokenCrontroller(@Body() deleteTokenDto: DeleteTokenDto) {
+        return this.tokenService.deleteById(deleteTokenDto);
     }
 }

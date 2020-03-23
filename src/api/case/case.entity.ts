@@ -96,8 +96,8 @@ export class CaseEntity {
     @Column({default: false})
     isDependenceParam: boolean;
 
-    @ManyToOne(type => SchedulerEntity, secheduler => secheduler.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
-    secheduler: SchedulerEntity;
+    @ManyToMany(type => SchedulerEntity, secheduler => secheduler.cases)
+    sechedulers: SchedulerEntity[];
 
 
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})

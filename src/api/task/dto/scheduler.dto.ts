@@ -1,24 +1,8 @@
-import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber} from 'class-validator';
+import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional} from 'class-validator';
 import {CaseGrade, CaseType} from "../../case/dto/case.dto";
+import {TaskType} from "./run.status";
+import {Optional} from "@nestjs/common";
 
-export class AddCaselistTaskDto {
-
-    @IsNotEmpty()
-    @IsArray()
-    readonly caseIds: number[];
-
-    @ArrayMinSize(1)
-    @IsArray()
-    envIds: number[]
-
-    @IsNotEmpty()
-    cron: string;
-}
-
-export class Md5ListDto {
-
-    md5s: Set<string>;
-}
 
 export class TaskIdsDto {
 
@@ -27,17 +11,10 @@ export class TaskIdsDto {
     ids: number[];
 }
 
-export class CheckCronDto {
 
-    @IsNotEmpty()
-    cron: string;
 
-}
 
 export class SIngleTaskDto{
-
-    @IsNumber({allowNaN:true})
-    readonly caseGrade: CaseGrade;
 
     @IsNumber()
     @IsNotEmpty()
@@ -51,5 +28,43 @@ export class SIngleTaskDto{
 
     @IsNotEmpty()
     name: string;
+
+    //任务类型
+    @Optional()
+    taskType: TaskType;
+
+    //任务类型
+    @Optional()
+    caseGrade: CaseGrade;
+
+}
+
+export class UpdateTaskDto{
+
+    //任务类型
+    @Optional()
+    taskType: TaskType;
+
+    @IsNotEmpty()
+    id: number;
+
+   @IsOptional()
+    readonly caseGrade: CaseGrade;
+
+    @IsNumber()
+    @IsOptional()
+    readonly caseType: CaseType;
+
+    @IsOptional()
+    readonly envId: number;
+
+    @IsOptional()
+    cron: string;
+
+    @IsOptional()
+    name: string;
+
+    @IsOptional()
+    isRestart: boolean = false;
 
 }
