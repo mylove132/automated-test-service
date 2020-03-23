@@ -1,0 +1,4 @@
+ALTER TABLE "case" ADD "assertKey" character varying;
+ALTER TABLE "catalog" ALTER COLUMN "parentId" SET DEFAULT null;
+ALTER TABLE "history" ALTER COLUMN "startTime" SET DEFAULT '"2020-01-20T02:08:58.779Z"';
+ALTER TABLE "history" ALTER COLUMN "endTime" SET DEFAULT '"2020-01-20T02:08:58.779Z"';
