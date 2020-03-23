@@ -1,0 +1,12 @@
+SET AUTOCOMMIT=0;
+START TRANSACTION;
+ALTER TABLE "catalog" DROP CONSTRAINT "FK_f18cd600ff3e37b382de2cf3a4e";
+ALTER TABLE "history" ALTER COLUMN "endTime" SET DEFAULT '2020-02-27 08:16:16.593';
+ALTER TABLE "history" ALTER COLUMN "startTime" SET DEFAULT '2020-02-27 08:16:16.593';
+ALTER TABLE "catalog" DROP CONSTRAINT "UQ_f18cd600ff3e37b382de2cf3a4e";
+ALTER TABLE "catalog" DROP COLUMN "platformCodeId";
+ALTER TABLE "catalog" ADD "platformCodeId" character varying NOT NULL DEFAULT '000';
+ALTER TABLE "catalog" ALTER COLUMN "parentId" DROP DEFAULT;
+DROP TABLE "platform_code";
+ALTER TABLE "catalog" RENAME COLUMN "platformCodeId" TO "platformCode";
+COMMIT;
