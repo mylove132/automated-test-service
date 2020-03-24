@@ -9,7 +9,7 @@ import {HttpStatus} from '@nestjs/common';
 import {ParamType, RequestType} from './dto/http.enum';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 import {EndpointEntity} from '../env/endpoint.entity';
-import {CommonUtil} from '../../util/common.util';
+import {CommonUtil} from '../../utils/common.util';
 import {EnvService} from "../env/env.service";
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 

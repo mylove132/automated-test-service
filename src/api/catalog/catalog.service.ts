@@ -6,7 +6,7 @@ import {CreateCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog
 import {HttpStatus} from '@nestjs/common';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
-import {CommonUtil} from '../../util/common.util';
+import {CommonUtil} from '../../utils/common.util';
 import {PlatformCodeEntity} from "./platformCode.entity";
 
 export class CatalogService {

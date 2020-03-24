@@ -10,7 +10,7 @@ import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
 import {SIngleTaskDto, TaskIdsDto, UpdateTaskDto} from './dto/scheduler.dto';
 import {RunStatus, TaskType} from './dto/run.status';
-import {CommonUtil} from '../../util/common.util';
+import {CommonUtil} from '../../utils/common.util';
 import {RunService} from '../run/run.service';
 import {IRunCaseById} from '../run/run.interface';
 import {Executor} from '../history/dto/history.enum';

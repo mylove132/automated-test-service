@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
-import { CatalogEntity} from "../catalog/catalog.entity";
+import {OperateEntity} from "../operate/operate.entity";
 
 @Entity('user')
 export class UserEntity {
@@ -13,4 +13,6 @@ export class UserEntity {
   @Column({unique: true})
   userId: number;
 
+  @OneToMany(type => OperateEntity, operates => operates.user)
+  operates: OperateEntity[];
 }

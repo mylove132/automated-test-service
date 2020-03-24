@@ -17,7 +17,7 @@ import * as request from 'request';
 import {IRunCaseById, IRunCaseList} from './run.interface';
 import {map} from 'rxjs/operators';
 import {SceneEntity} from "../scene/scene.entity";
-import {CommonUtil} from "../../util/common.util";
+import {CommonUtil} from "../../utils/common.util";
 import {TokenEntity} from "../token/token.entity";
 
 

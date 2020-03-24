@@ -6,7 +6,7 @@ import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
-import {CommonUtil} from '../../util/common.util';
+import {CommonUtil} from '../../utils/common.util';
 import { url } from 'inspector';
 
 export class EnvService {
