@@ -4,6 +4,7 @@ import {SceneService} from "./scene.service";
 import {CreateSceneDto, DeleteSceneByIdDto, UpdateSceneDto} from "./dto/scene.dto";
 import {Pagination} from "nestjs-typeorm-paginate";
 import {SceneEntity} from "./scene.entity";
+import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
 @ApiUseTags('scene')
 @Controller('scene')
@@ -13,6 +14,9 @@ export class SceneController {
     ) {
     }
 
+    @OperateModule('场景模块')
+    @OperateType('添加场景')
+    @OperateDesc('')
     @ApiOperation({title: 'add scene', description: '添加场景用例'})
     @ApiResponse({status: 200, description: 'add scene success.'})
     @Post('')
@@ -21,6 +25,9 @@ export class SceneController {
     }
 
 
+    @OperateModule('场景模块')
+    @OperateType('更新场景')
+    @OperateDesc('')
     @ApiOperation({title: 'update scene', description: '更新场景用例'})
     @ApiResponse({status: 200, description: 'update scene success.'})
     @Put('')
@@ -28,6 +35,9 @@ export class SceneController {
         return await this.sceneService.updateSceneService(updateSceneDto);
     }
 
+    @OperateModule('场景模块')
+    @OperateType('删除场景')
+    @OperateDesc('')
     @ApiOperation({title: 'delete scene', description: '删除场景用例'})
     @ApiResponse({status: 200, description: 'delete scene success.'})
     @Delete('')
@@ -35,6 +45,9 @@ export class SceneController {
         return await this.sceneService.deleteSceneById(deleteSceneByIdDto);
     }
 
+    @OperateModule('场景模块')
+    @OperateType('查询场景')
+    @OperateDesc('')
     @ApiOperation({title: 'get scene', description: '获取场景'})
     @ApiResponse({status: 200, description: 'get scene success.'})
     @Get('')

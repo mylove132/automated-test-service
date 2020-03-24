@@ -30,7 +30,7 @@ export class OperateEntity {
     operateType: string;
 
     //操作描述
-    @Column()
+    @Column({nullable: true})
     operateDesc: string;
 
     //请求参数
@@ -40,9 +40,6 @@ export class OperateEntity {
     //返回参数
     @Column('text',{})
     responseParam: string;
-
-    @Column()
-    operateName: string;
 
     @Column()
     operateUri: string;

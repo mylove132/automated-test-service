@@ -3,6 +3,7 @@ import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swag
 import {EnvService} from './env.service';
 import {EnvEntity} from './env.entity';
 import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
+import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
 @ApiBearerAuth()
 @ApiUseTags('env')
@@ -11,6 +12,9 @@ export class EnvController {
 
     constructor(private readonly envService: EnvService) {}
 
+    @OperateModule('环境模块')
+    @OperateType('查询环境')
+    @OperateDesc('')
     @ApiOperation({ title: 'query all env' })
     @ApiResponse({ status: 200, description: 'query all env success.'})
     @Get()
@@ -18,6 +22,9 @@ export class EnvController {
         return this.envService.allEnv();
     }
 
+    @OperateModule('环境模块')
+    @OperateType('创建环境')
+    @OperateDesc('')
     @ApiOperation({ title: 'create env' })
     @ApiResponse({ status: 200, description: 'create env success.'})
     @Post()
@@ -25,6 +32,9 @@ export class EnvController {
         return this.envService.addEnv(envEntity);
     }
 
+    @OperateModule('环境模块')
+    @OperateType('更新环境')
+    @OperateDesc('')
     @ApiOperation({ title: 'update env' })
     @ApiResponse({ status: 200, description: 'update env success.'})
     @Put()
@@ -32,6 +42,9 @@ export class EnvController {
         return this.envService.updateEnv(envEntity);
     }
 
+    @OperateModule('环境模块')
+    @OperateType('删除环境')
+    @OperateDesc('')
     @ApiOperation({ title: 'delete env' })
     @ApiResponse({ status: 200, description: 'delete env success.'})
     @Delete()
@@ -39,6 +52,9 @@ export class EnvController {
         return this.envService.deleteEnv(queryEnvDto);
     }
 
+    @OperateModule('endpoint模块')
+    @OperateType('创建endpoint')
+    @OperateDesc('')
     @ApiOperation({ title: 'create endpoint' })
     @ApiResponse({ status: 200, description: 'create endpoint success.'})
     @Post('endpoint')
@@ -46,6 +62,9 @@ export class EnvController {
         return this.envService.addEndpoint(addEndpointDto);
     }
 
+    @OperateModule('endpoint模块')
+    @OperateType('查询endpoint')
+    @OperateDesc('')
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')
@@ -54,6 +73,9 @@ export class EnvController {
         return this.envService.findEndpointByEnv(envIds);
     }
 
+    @OperateModule('endpoint模块')
+    @OperateType('删除endpoint')
+    @OperateDesc('')
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Delete('/endpoint')

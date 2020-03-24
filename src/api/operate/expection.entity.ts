@@ -18,6 +18,13 @@ export class ExceptionEntity {
     @ManyToOne(type => UserEntity, user => user.operates, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     user: UserEntity;
 
+    @Column()
+    uri: string;
+
+    //异常名称
+    @Column()
+    excName: string;
+
     //请求参数
     @Column('text',{})
     requestParam: string;

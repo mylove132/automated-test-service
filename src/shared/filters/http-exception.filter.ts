@@ -28,11 +28,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
             date: new Date().toLocaleDateString(),
             path: request.url,
           });
+    }else {
+        response.status(status).json({
+            statusCode: status,
+            error: exception.message,
+            msg: `${status >= 500 ? 'Service Error' : 'Client Error'}`,
+        });
     }
-    response.status(status).json({
-      statusCode: status,
-      error: exception.message,
-      msg: `${status >= 500 ? 'Service Error' : 'Client Error'}`,
-    });
+
   }
 }

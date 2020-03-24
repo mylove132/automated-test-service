@@ -1,5 +1,5 @@
 import {DynamicModule, Module} from '@nestjs/common';
-import {APP_GUARD} from '@nestjs/core';
+import {APP_GUARD, APP_INTERCEPTOR} from '@nestjs/core';
 import {AppController} from './app.controller';
 import {UserModule} from './api/user/user.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
@@ -19,6 +19,8 @@ import {HistoryModule} from './api/history/history.module';
 import {JmeterModule} from "./api/jmeter/jmeter.module";
 import {SceneModule} from "./api/scene/scene.module";
 import {TokenModule} from "./api/token/token.module";
+import {OperateModule} from "./api/operate/operate.module";
+import {TransformInterceptor} from "./shared/interceptor/transform.interceptor";
 
 const Orm = (): DynamicModule => {
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
@@ -41,7 +43,8 @@ const Orm = (): DynamicModule => {
         SchedulerModule,
         JmeterModule,
         SceneModule,
-        TokenModule
+        TokenModule,
+        OperateModule
     ],
     controllers: [
         AppController
@@ -51,6 +54,10 @@ const Orm = (): DynamicModule => {
         {
             provide: APP_GUARD,
             useClass: AuthGuard,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: TransformInterceptor,
         },
     ]
 })

@@ -87,7 +87,7 @@ export class UserService {
    * @param {number}: id
    * @return {Promise<UserRO>}: 用户信息
    */
-  async findById(id: number): Promise<any>{
+  async findById(id: number): Promise<UserEntity>{
     const user = await this.userRepository.findOne(id);
     if (!user) {
       throw new ApiException('用户未找到', ApiErrorCode.USER_ID_INVALID, HttpStatus.OK);

@@ -3,7 +3,7 @@ import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
 import {CaseService} from './case.service';
 import {CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
-import {operateRecord} from "../../utils/common.decorators";
+import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
 @ApiBearerAuth()
 @ApiUseTags('case')
@@ -12,13 +12,11 @@ export class CaseController {
 
   constructor(private readonly caseService: CaseService) {}
 
-  @operateRecord('接口模块','创建接口','测试创建接口')
-  @Get('hello')
-  async test(){
-    return "hello";
-  }
 
-  @operateRecord('接口模块','创建接口','测试创建接口')
+
+  @OperateModule('接口模块')
+  @OperateType('创建接口')
+  @OperateDesc('')
   @ApiOperation({ title: 'create case' })
   @ApiResponse({ status: 200, description: 'create case success.'})
   @Post()
@@ -26,6 +24,9 @@ export class CaseController {
     return this.caseService.addCase(createCaseDto);
   }
 
+  @OperateModule('接口模块')
+  @OperateType('查询接口')
+  @OperateDesc('')
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
@@ -51,6 +52,9 @@ export class CaseController {
    return this.caseService.findCase(catalogId, envId, Number(caseType), caseGradeList, {page, limit});
   }
 
+  @OperateModule('接口模块')
+  @OperateType('删除接口')
+  @OperateDesc('通过ID删除接口')
   @ApiOperation({ title: 'delete case' })
   @ApiResponse({ status: 200, description: 'delete case success.'})
   @Delete('')
@@ -59,6 +63,9 @@ export class CaseController {
   }
 
 
+  @OperateModule('接口模块')
+  @OperateType('更新接口')
+  @OperateDesc('通过ID删除接口')
   @ApiOperation({ title: 'update case' })
   @ApiResponse({ status: 200, description: 'update case success.'})
   @Put('')
@@ -72,6 +79,7 @@ export class CaseController {
   async unionFindEndpoint(){
     return this.caseService.unionFindAllEndpoint();
   }
+
 
   @ApiOperation({ title: 'get all assertType' })
   @ApiResponse({ status: 200, description: 'get all assertType success.'})

@@ -16,7 +16,7 @@ async function bootstrap() {
   app.use(logger);
   app.useGlobalPipes(new ValidationPipe());
   // 使用拦截器打印出参
-  app.useGlobalInterceptors(new TransformInterceptor());
+ // app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api');
   const options = new DocumentBuilder()
