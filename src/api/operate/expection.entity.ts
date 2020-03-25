@@ -33,5 +33,8 @@ export class ExceptionEntity {
     exceptionMsg: string;
 
     @Column()
+    errorCode: number;
+
+    @Column()
     requestIp: string;
 }

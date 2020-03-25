@@ -360,7 +360,7 @@ export class SchedulerService {
             }catch (e) {
                 throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             }
-           
+
         }
         if (result.affected == 1){
             return {status: true};
@@ -389,7 +389,7 @@ export class SchedulerService {
      * 排查定时任务库，确认定时任务是否存活
      *
      */
-    @Cron('* * * * * *',{name:'checkStatus'})
+    //@Cron('* * * * * *',{name:'checkStatus'})
     async checkJobRunStatus() {
         console.log('------------------------排查定时任务--------------------')
         const runningSchObj: SchedulerEntity[] = await this.scheRepository.createQueryBuilder('sch').

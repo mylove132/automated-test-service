@@ -3,13 +3,12 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Logger } from '../../utils/log4js';
 import {Reflector} from "@nestjs/core";
-import {UserService} from "../../api/user/user.service";
 import {OperateService} from "../../api/operate/operate.service";
 import {OperateEntity} from "../../api/operate/operate.entity";
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-    constructor(private readonly reflector: Reflector,private readonly userService: UserService, private readonly operateService: OperateService) {}
+    constructor(private readonly reflector: Reflector,private readonly operateService: OperateService) {}
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.getArgByIndex(1).req;
     return next.handle().pipe(
@@ -24,8 +23,6 @@ export class TransformInterceptor implements NestInterceptor {
         Logger.info(logFormat);
         Logger.access(logFormat);
 
-        console.log('()()()()()(())(()')
-        console.log(req)
           const operate_module = this.reflector.get<string>('operate_module', context.getHandler());
           const operate_type = this.reflector.get<string>('operate_type', context.getHandler());
           const operate_desc = this.reflector.get<string>('operate_desc', context.getHandler());
