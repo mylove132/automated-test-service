@@ -44,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             path: request.url,
           });
     }else {
-        exceptionObj.excName = typeof exception;
+        exceptionObj.excName = 'ApiException';
         exceptionObj.exceptionMsg = exception.name;
         exceptionObj.errorCode = status;
         exceptionObj.requestIp = request.ip;

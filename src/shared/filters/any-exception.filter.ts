@@ -11,7 +11,7 @@ import {ExceptionEntity} from "../../api/operate/expection.entity";
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
     constructor(private readonly operateService: OperateService) {}
-    catch(exception: unknown, host: ArgumentsHost) {
+    catch(exception, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
@@ -47,7 +47,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           });
     }else {
         exceptionObj.excName = typeof exception;
-        exceptionObj.exceptionMsg = exception.toString();
+        exceptionObj.exceptionMsg = exception.name;
         exceptionObj.errorCode = status;
         exceptionObj.requestIp = request.ip;
         exceptionObj.uri = request.originalUrl;
