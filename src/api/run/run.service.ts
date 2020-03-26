@@ -130,7 +130,7 @@ export class RunService {
                     resultObj['errMsg'] = null;
                     if (runCaseById.isNotice){
                        if (!assert['result']) {
-                           this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertKey} 
+                           this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText} 
                            期望条件 ${assert['relation']} 
                            实际结果${assert['actual']} 不符合`)
                        }
@@ -140,7 +140,7 @@ export class RunService {
                     resultObj['result'] = null;
                     resultObj['errMsg'] = result;
                     if (runCaseById.isNotice){
-                            //this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
+                            this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
                     }
                 }
                 console.log(res)
@@ -162,10 +162,9 @@ export class RunService {
                 )
 
             }
+            console.log('接口执行返回结果：'+ JSON.stringify(resultObj))
             resultList.push(resultObj);
-        }
-        console.log('接口执行返回结果：'+ JSON.stringify(resultList))
-        return resultList;
+        }return resultList;
     }
 
     /**
