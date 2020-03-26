@@ -7,7 +7,7 @@ import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
 import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
 import {CommonUtil} from '../../utils/common.util';
-import { url } from 'inspector';
+import {findEnvById} from "../../datasource/env/env.sql";
 
 export class EnvService {
 
@@ -218,8 +218,9 @@ export class EnvService {
 
     /**
      * 通过环境ID改变endpoint
-	 * @param {number, string}
-	 * @return {string}: 当前环境的endpoint
+     * @return {string}: 当前环境的endpoint
+     * @param envId
+     * @param endpoint
      */
     public async formatEndpoint(envId: number, endpoint: string):Promise<string> {
         const reg = new RegExp('^https:\/\/[^\S]+.[^\S\s]*blingabc.com$', 'g')
@@ -228,18 +229,8 @@ export class EnvService {
             return endpoint
         }
         let result = ''
-        const envData = await this.envRepository.createQueryBuilder()
-        .select()
-        .where('id = :id',{id: envId})
-        .getOne()
-        .catch(
-            err => {
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
-            }
-        );
-        
+        const envData = await findEnvById(this.envRepository, envId);
         let urlList: any = endpoint.split('.');
-
         // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
         if (urlList.length == 3) { // 生产环境
             urlList.splice(1, 0, '', 't');

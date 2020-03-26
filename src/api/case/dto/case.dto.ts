@@ -12,6 +12,7 @@ import {
     MinLength
 } from 'class-validator';
 import {Optional} from '@nestjs/common';
+import {ParamType, RequestType} from "./http.enum";
 
 export class CreateCaseDto {
 
@@ -35,7 +36,7 @@ export class CreateCaseDto {
 
     @IsNumber()
     @IsOptional()
-    readonly type: number;
+    readonly type: RequestType;
 
     //接口等级
     @IsNumber()
@@ -52,17 +53,13 @@ export class CreateCaseDto {
 
     @IsNumber()
     @IsOptional()
-    paramType: number;
+    paramType: ParamType;
 
     @IsNotEmpty()
     assertText: string;
 
     @IsNotEmpty()
     endpointId: number;
-
-    @IsBoolean()
-    @IsOptional()
-    isNeedToken: boolean;
 
     @IsString()
     assertKey: string;
@@ -75,6 +72,9 @@ export class CreateCaseDto {
 
     @Optional()
     alias: string;
+
+    @Optional()
+    tokenId: number;
 }
 
 export class UpdateCaseDto {
@@ -112,7 +112,7 @@ export class UpdateCaseDto {
 
     @IsNumber()
     @IsOptional()
-    readonly type: number;
+    readonly type: RequestType;
 
     @IsOptional()
     catalogId: string;
@@ -127,10 +127,6 @@ export class UpdateCaseDto {
     @Optional()
     endpointId: number;
 
-    @IsBoolean()
-    @IsOptional()
-    isNeedToken: boolean;
-
     @Optional()
     assertKey: string;
 
@@ -144,6 +140,9 @@ export class UpdateCaseDto {
 
     @Optional()
     alias: string;
+
+    @Optional()
+    tokenId: number;
 
 }
 

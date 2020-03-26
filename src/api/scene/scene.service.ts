@@ -1,6 +1,6 @@
 import {HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {InsertResult, Repository} from 'typeorm';
+import {DeleteResult, InsertResult, Repository, UpdateResult} from 'typeorm';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
@@ -32,12 +32,9 @@ export class SceneService {
               throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
           }
       );
-      if (!catalogObj) {
-          throw new ApiException(`目录ID：${createSceneDto.catalogId}不存在`,ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
-      }
-      if (createSceneDto.sceneGrade){
-          sceneObj.sceneGrade = createSceneDto.sceneGrade;
-      }
+      if (!catalogObj) throw new ApiException(`目录ID：${createSceneDto.catalogId}不存在`,ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
+      if (createSceneDto.sceneGrade) sceneObj.sceneGrade = createSceneDto.sceneGrade;
+
       sceneObj.catalog = catalogObj;
       sceneObj.name = createSceneDto.name;
       sceneObj.desc = createSceneDto.desc;
@@ -64,22 +61,12 @@ export class SceneService {
 
         const sceneObj = new SceneEntity();
         sceneObj.id = updateSceneDto.id;
-        if (updateSceneDto.name){
-            sceneObj.name = updateSceneDto.name;
-        }
-        if (updateSceneDto.catalogId){
-            sceneObj.catalog = await this.catalogRepository.findOne(updateSceneDto.catalogId);
-        }
-        if (updateSceneDto.desc){
-            sceneObj.desc = updateSceneDto.desc;
-        }
-        if (updateSceneDto.caseList){
-            sceneObj.dependenceCaseJson = updateSceneDto.caseList;
-        }
-        if (updateSceneDto.sceneGrade){
-            sceneObj.sceneGrade = updateSceneDto.sceneGrade;
-        }
-        const saveResult = await this.sceneRepository.createQueryBuilder().update(SceneEntity).
+        if (updateSceneDto.name) sceneObj.name = updateSceneDto.name;
+        if (updateSceneDto.catalogId) sceneObj.catalog = await this.catalogRepository.findOne(updateSceneDto.catalogId);
+        if (updateSceneDto.desc) sceneObj.desc = updateSceneDto.desc;
+        if (updateSceneDto.caseList) sceneObj.dependenceCaseJson = updateSceneDto.caseList;
+        if (updateSceneDto.sceneGrade) sceneObj.sceneGrade = updateSceneDto.sceneGrade;
+        const saveResult: UpdateResult = await this.sceneRepository.createQueryBuilder().update(SceneEntity).
         set(sceneObj).where("id = :id",{id: updateSceneDto.id}).execute().catch(
             err => {
                 console.log(err);
@@ -91,7 +78,7 @@ export class SceneService {
 
 
     async deleteSceneById(deleteByIdDto: DeleteSceneByIdDto){
-        const result = await this.sceneRepository.createQueryBuilder('scene').delete().
+        const result: DeleteResult = await this.sceneRepository.createQueryBuilder('scene').delete().
         where('scene.id IN (:...sceneIds)',{sceneIds: deleteByIdDto.sceneIds}).execute().catch(
             err => {
                 console.log(err);
@@ -104,10 +91,12 @@ export class SceneService {
 
   /**
    * 获取所有的场景信息
-   * @param {number, IPaginationOptions}: id, 页码信息
    * @return {Promise<Pagination<HistoryEntity>>}: 场景列表
+   * @param catalogId
+   * @param caseGradeList
+   * @param options
    */
-  async findSceneService(catalogId: number, caseGradeList:number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
+  async findSceneService(catalogId: number, caseGradeList: number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
     if (!catalogId) {
         const queryBuilder = await this.sceneRepository.createQueryBuilder("scene")
             .where('scene.catalogId = :catalogId',{catalogId: catalogId}).

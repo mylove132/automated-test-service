@@ -51,7 +51,7 @@ export class SceneController {
     @ApiOperation({title: 'get scene', description: '获取场景'})
     @ApiResponse({status: 200, description: 'get scene success.'})
     @Get('')
-    async findHistoryList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('catalogId') catalogId?: number,  @Query('caseGrade') caseGrade?: string): Promise<Pagination<SceneEntity>> {
+    async findSceneList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('catalogId') catalogId?: number,  @Query('caseGrade') caseGrade?: string): Promise<Pagination<SceneEntity>> {
         let caseGradeList = [];
         if (caseGrade){
             if (caseGrade.indexOf(',') != -1){

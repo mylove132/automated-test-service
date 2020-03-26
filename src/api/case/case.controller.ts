@@ -30,12 +30,12 @@ export class CaseController {
   @ApiOperation({ title: 'query case' })
   @ApiResponse({ status: 200, description: 'query case success.'})
   @Get()
-  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('caseType') caseType: CaseType = CaseType.SINGLE, @Query('sceneGrade') sceneGrade?: string,  @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+  async findCaseById(@Query('catalogId') catalogId: number ,@Query('envId') envId: number , @Query('caseType') caseType: CaseType = CaseType.SINGLE, @Query('caseGrade') caseGrade?: string,  @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
     let caseGradeList = [];
-    if (sceneGrade){
-      if (sceneGrade.indexOf(',') != -1){
-          sceneGrade.split(',').forEach(
+    if (caseGrade){
+      if (caseGrade.indexOf(',') != -1){
+        caseGrade.split(',').forEach(
             value => {
               if (!value){
                 return;
@@ -44,7 +44,7 @@ export class CaseController {
             }
         )
       }else {
-        caseGradeList.push(Number(sceneGrade));
+        caseGradeList.push(Number(caseGrade));
       }
     }else {
       caseGradeList.push(0,1,2);
