@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, HttpStatus, Post, Put, Query} from '@nest
 import {CatalogService} from './catalog.service';
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
-import {CreateCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, DeleteCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {CatalogEntity} from './catalog.entity';
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
@@ -45,8 +45,8 @@ export class CatalogController {
   @ApiOperation({ title: 'delete catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Delete('')
-  async deleteCatalog(@Body() queryCatalogDto: QueryCatalogDto) {
-    return this.catalogService.deleteById(queryCatalogDto);
+  async deleteCatalog(@Body() deleteCatalogDto: DeleteCatalogDto) {
+    return this.catalogService.deleteById(deleteCatalogDto);
   }
 
   @OperateModule('目录模块')

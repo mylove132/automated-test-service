@@ -7,7 +7,7 @@ export class CreateCatalogDto {
 
   readonly parentId: number;
 
-  readonly isPub?: string;
+  readonly isPub?: boolean;
 
   @IsNotEmpty()
   readonly platformCode: string;
@@ -19,13 +19,13 @@ export class UpdateCatalogDto{
 
   readonly name: string;
 
-  readonly isPub: string;
+  readonly isPub: boolean;
 
   readonly platformCode: string;
 
 }
 
-export class QueryCatalogDto {
+export class DeleteCatalogDto {
 
   @IsArray()
   ids: number[];

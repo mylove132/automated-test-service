@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Post, Put, Query, ValidationPipe} from '@
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
 import {EnvService} from './env.service';
 import {EnvEntity} from './env.entity';
-import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, QueryEnvDto} from './dto/env.dto';
+import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, DeleteEnvDto} from './dto/env.dto';
 import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
 @ApiBearerAuth()
@@ -48,8 +48,8 @@ export class EnvController {
     @ApiOperation({ title: 'delete env' })
     @ApiResponse({ status: 200, description: 'delete env success.'})
     @Delete()
-    async deleteEnv(@Body() queryEnvDto: QueryEnvDto) {
-        return this.envService.deleteEnv(queryEnvDto);
+    async deleteEnv(@Body() deleteEnvDto: DeleteEnvDto) {
+        return this.envService.deleteEnv(deleteEnvDto);
     }
 
     @OperateModule('endpoint模块')

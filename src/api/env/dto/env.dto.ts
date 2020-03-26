@@ -15,7 +15,7 @@ export class AddEndpointDto{
 
 }
 
-export class QueryEnvDto {
+export class DeleteEnvDto {
 
     @IsArray()
     ids: number[]
