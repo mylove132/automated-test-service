@@ -1,11 +1,9 @@
 export enum RequestStatusEnum {
-    STATELESS,
-    SUCCESS,
-    FAIL
+    SUCCESS = 0,
+    FAIL = 1
 }
 
 export enum Executor {
-    STATELESS,
-    MANUAL     //手动,
-    ,SCHEDULER//定时任务
+    MANUAL = 0     //手动,
+    ,SCHEDULER = 1//定时任务
 }

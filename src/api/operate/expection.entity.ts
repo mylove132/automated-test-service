@@ -32,7 +32,7 @@ export class ExceptionEntity {
     @Column('text',{})
     exceptionMsg: string;
 
-    @Column()
+    @Column({nullable: true})
     errorCode: number;
 
     @Column()

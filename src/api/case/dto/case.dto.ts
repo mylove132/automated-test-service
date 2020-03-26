@@ -157,9 +157,9 @@ export class DeleteCaseDto {
 
 
 export enum CaseGrade {
-    HIGH, IN, LOW
+    HIGH = 0, IN = 1, LOW = 2
 }
 
 export enum CaseType {
-    SINGLE, SCENE, BLEND
+    SINGLE = 0, SCENE = 1, BLEND = 2
 }

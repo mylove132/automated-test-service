@@ -1,7 +1,7 @@
 export enum RunStatus {
-    STATELESS,RUNNING, STOP,DELETE
+    RUNNING = 0, STOP = 1,DELETE = 2
 }
 
 export enum TaskType {
-    STATELESS,SINGLE,SCENE
+    SINGLE = 0,SCENE = 1
 }
