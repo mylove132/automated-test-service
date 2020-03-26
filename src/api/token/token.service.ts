@@ -10,6 +10,8 @@ import {CurlService} from "../curl/curl.service";
 import {EnvEntity} from "../env/env.entity";
 import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
 import {PlatformCodeEntity} from "../catalog/platformCode.entity";
+import {Logger} from "../../utils/log4js";
+import {Cron} from "@nestjs/schedule";
 
 
 @Injectable()
@@ -68,37 +70,7 @@ export class TokenService {
       tokenObj.platformCode = await this.platformRepository.createQueryBuilder('platform').where(
           'platform.platformCode = :platformCode',{platformCode: createTokenDto.platformCode}
       ).getOne();
-        const requestData = {
-            url: createTokenDto.url,
-            method: getRequestMethodTypeString(1),
-            data: JSON.parse(createTokenDto.body)
-        };
-        console.log(requestData)
-        const result = await this.curlService.makeRequest(requestData).toPromise();
-        if (!result){
-            throw new ApiException(`登录URL：${createTokenDto.url}，登录body：${createTokenDto.body},登录失败`,
-                ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
-        }
-        let token;
-        if (result.data.code === 10000){
-            switch (tokenObj.platformCode.id) {
-                case 1:
-                    token = result.data.data.userInfoVO.token;
-                    break;
-                case 2:
-                    token = result.data.data.userInfo.token;
-                    break;
-                case 3:
-                    token = result.data.data.userInfo.token;
-                    break;
-                case 4:
-                    token = result.data.data.userInfoVO.token;
-                    break;
-            }
-        } else {
-            throw new ApiException(`登录失败:code：${result.data.code}`,
-                ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
-        }
+        const token = await this.getNewToken(tokenObj.url, tokenObj.body, tokenObj.platformCode.id);
         tokenObj.token = token;
         const saveResult:InsertResult = await this.tokenRepository.createQueryBuilder().
         insert().into(TokenEntity).values(tokenObj).execute().catch(
@@ -220,4 +192,67 @@ export class TokenService {
       }
   }
 
+    /**
+     *  定时更新token
+     */
+    @Cron('0 0 0 * * *')
+    async updateTokenTask(){
+        Logger.info('-----------------执行token定时更新任务----------------------');
+        Logger.access('-----------------执行token定时更新任务----------------------');
+        const tokenList: TokenEntity[] = await this.tokenRepository.createQueryBuilder('token').
+        leftJoinAndSelect('token.platformCode','platformCode').getMany().catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        );
+        for (let tokenObj of tokenList){
+            const newToken = await this.getNewToken(tokenObj.url, tokenObj.body, tokenObj.platformCode.id);
+            await this.tokenRepository.createQueryBuilder().update(TokenEntity).set(
+                {token: newToken}
+            ).where('id = :id',{id: tokenObj.id}).execute().catch(
+                err => {
+                    console.log(err);
+                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+                }
+            );
+            Logger.info(`token Id ${tokenObj.id} token更新完成`);
+            Logger.access(`token Id ${tokenObj.id} token更新完成`);
+        }
+    }
+
+    private async getNewToken(url, body, platformCodeId){
+        const requestData = {
+            url: url,
+            method: getRequestMethodTypeString(1),
+            data: JSON.parse(body)
+        };
+        console.log(requestData)
+        const result = await this.curlService.makeRequest(requestData).toPromise();
+        if (!result){
+            throw new ApiException(`登录URL：${url}，登录body：${body},登录失败`,
+                ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+        }
+        let token;
+        if (result.data.code === 10000){
+            switch (platformCodeId) {
+                case 1:
+                    token = result.data.data.userInfoVO.token;
+                    break;
+                case 2:
+                    token = result.data.data.userInfo.token;
+                    break;
+                case 3:
+                    token = result.data.data.userInfo.token;
+                    break;
+                case 4:
+                    token = result.data.data.userInfoVO.token;
+                    break;
+            }
+        } else {
+            throw new ApiException(`登录失败:code：${result.data.code}`,
+                ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
+        }
+        return token;
+    }
 }
