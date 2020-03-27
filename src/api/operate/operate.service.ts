@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {OperateEntity} from "./operate.entity";
 import {ExceptionEntity} from "./expection.entity";
+import {saveException, saveOperate} from "../../datasource/operate/operate.sql";
 
 @Injectable()
 export class OperateService {
@@ -13,11 +14,21 @@ export class OperateService {
     private readonly exceptionRepository: Repository<ExceptionEntity>,
   ) {
   }
+
+    /**
+     * 创建操作记录
+     * @param operateEntity
+     */
   async createOperate(operateEntity: OperateEntity){
-    return await this.operateRepository.save(operateEntity);
+    return await saveOperate(this.operateRepository, operateEntity);
   }
 
+
+    /**
+     * 创建异常记录
+     * @param exceptionEntity
+     */
     async createException(exceptionEntity: ExceptionEntity){
-        return await this.exceptionRepository.save(exceptionEntity);
+        return await saveException(this.exceptionRepository, exceptionEntity);
     }
 }

@@ -45,13 +45,22 @@ export class CommonUtil {
     }
 
     /**
-     * 处理url
-     * @param url
+     * 处理path
+     * @param path
      */
    static handlePath(path){
        if (path.charAt(0) != '/') path = '/' + path;
        return path;
    }
+
+    /**
+     * 处理url
+     * @param url
+     */
+    static handleUrl(url){
+        url = url.lastIndexOf('/') ? url.substr(0,url.length - 1) : url;
+        return url;
+    }
 
     /**
      * 目录改为树结构输出

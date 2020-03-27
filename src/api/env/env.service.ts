@@ -11,8 +11,8 @@ import {
     addEnv,
     deleteEndpointByIds,
     deleteEnvByIds,
-    findAllEnv,
-    findEnvById,
+    findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
+    findEnvById, saveEndpoint,
     updateEnv
 } from "../../datasource/env/env.sql";
 
@@ -73,92 +73,36 @@ export class EnvService {
        return await deleteEndpointByIds(this.endpointgRepository, deleteEndpointDto.endpointIds);
     }
 
+    /**
+     * 添加endpoint实体
+     * @param addEndpointDto
+     */
     async addEndpoint(addEndpointDto: AddEndpointDto){
-        console.log(addEndpointDto);
         const addPoint = new EndpointEntity();
-        if (addEndpointDto.endpoint == null){
-            throw new ApiException('前缀url名称不能为空', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }else {
-            const endpointObj = await this.endpointgRepository.createQueryBuilder().select().where('endpoint = :endpoint',{endpoint: addEndpointDto.endpoint}).getOne().catch(
-                err => {
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION,HttpStatus.BAD_REQUEST);
-                }
-            );
-            if (endpointObj){
-                throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.ENDPOINT_NAME_REPEAT, HttpStatus.BAD_REQUEST);
-            }
-        }
-        if (addEndpointDto.name == null){
-            throw new ApiException('前缀名称不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
+        const endpointObj = await findEndpointInstanceByEndpoint(this.endpointgRepository, addEndpointDto.endpoint);
+        if (endpointObj) throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.ENDPOINT_NAME_REPEAT, HttpStatus.BAD_REQUEST);
         let envList = [];
-       for (const env of addEndpointDto.envs){
-         const envObj = await this.envRepository.findOne(env).catch(
-             err => {
-                 throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
-             }
-         );
-         if (!envObj){
-             throw new ApiException(`环境ID ${env}不存在`,ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
-         }
-         envList.push(envObj);
-       }
-       let endP;
-       if (addEndpointDto.endpoint.lastIndexOf('/')){
-           endP = addEndpointDto.endpoint.substr(0,addEndpointDto.endpoint.length-1);
-       }else {
-           endP = addEndpointDto.endpoint;
-       }
+        addEndpointDto.envs.map(async envId => {
+            return envList.push(await findEnvById(this.envRepository, envId));
+        });
        addPoint.name = addEndpointDto.name;
-       addPoint.endpoint = endP;
+       addPoint.endpoint = CommonUtil.handleUrl(addEndpointDto.endpoint);
        addPoint.envs = envList;
-
-      return await this.endpointgRepository.save(addPoint).catch(
-          err => {
-              throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
-          }
-       );
+      return await saveEndpoint(this.endpointgRepository, addPoint);
     }
 
-    async findEndpointByEnv(envIds){
-        const result = await this.envRepository.createQueryBuilder("env").leftJoinAndSelect('env.endpoints','envpoint')
-            .getMany().catch(
-                err => {
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
-                }
-            );
-        if (envIds == 'undefined'){
-            return result;
-        }
-        envIds = envIds.split(',');
-        envIds.forEach(
-            id => {
-                if (!CommonUtil.isNumber(id)){
-                    throw new ApiException(`数组值${id}必须为数字`, ApiErrorCode.PARAM_VALID_FAIL,HttpStatus.BAD_REQUEST);
-                }
-            }
-        );
-        for (const findId of envIds){
-            const envObj = await this.envRepository.createQueryBuilder().select().where('id =  :id',{id: findId}).getOne().catch(
-                err => {
-                    console.log(err);
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-            if (!envObj){
-                throw new ApiException(`查询env ID:${findId}不存在`, ApiErrorCode.ENV_ID_INVALID, HttpStatus.OK);
-            }
-        }
 
-        let rs = [];
-        for (const res of result){
-            for (const findId of envIds){
-                if (Number(res.id) == findId){
-                    rs.push(res);
-                }
-            }
-        }
-        return rs;
+    /**
+     * 通过环境ID查询endpoint
+     * @param envIds
+     */
+    async findEndpointByEnv(envIds){
+
+        if (!envIds) return await findEndpoints(this.envRepository);
+        let envList = [];
+        envIds.index(',') ? envList = envIds.split(',').map(envId => {return Number(envId)}) : envList.push(Number(envIds));
+
+        return await findEndpointByEnvIds(this.envRepository, envList);
     }
 
     /**
@@ -173,33 +117,33 @@ export class EnvService {
         if (!reg.test(endpoint)) {
             return endpoint
         }
-        let result = ''
+        let result = '';
         const envData = await findEnvById(this.envRepository, envId);
         let urlList: any = endpoint.split('.');
         // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
         if (urlList.length == 3) { // 生产环境
             urlList.splice(1, 0, '', 't');
         } else { // 长度为4则为测试环境
-            const tempList = urlList[0].split('-')
+            const tempList = urlList[0].split('-');
             if (tempList.length == 1) {
                 urlList.splice(1, 0, '');
             } else {
-                urlList[0] = urlList[0].split('-')
+                urlList[0] = urlList[0].split('-');
                 // urlList = urlList.flat();
                 urlList.splice(0, 1, ...urlList[0])
             }
         }
         switch(envData.name) {
             case 'test':
-                urlList.splice(1, 1)
-                result = urlList.join('.')
+                urlList.splice(1, 1);
+                result = urlList.join('.');
                 break;
             case 'prod':
-                urlList.splice(1, 2)
-                result = urlList.join('.')
+                urlList.splice(1, 2);
+                result = urlList.join('.');
                 break;
             default:
-                result = `${urlList[0]}-${envData.name}.` + urlList.splice(2).join('.')
+                result = `${urlList[0]}-${envData.name}.` + urlList.splice(2).join('.');
                 break;
         }
         return result

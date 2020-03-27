@@ -8,13 +8,13 @@ import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {CommonUtil} from '../../utils/common.util';
 import {PlatformCodeEntity} from "./platformCode.entity";
-import {findPlatformCodeByCode, findPlatformCodeByCodeList} from 'src/datasource/platformCode/platform.sql';
 import {
     deleteCatalogByIds,
     findCatalogById,
     findCatalogByPlatformCodes,
     saveCatalog, updateCatalog
-} from 'src/datasource/catalog/catalog.sql';
+} from '../../datasource/catalog/catalog.sql';
+import {findPlatformCodeByCode, findPlatformCodeByCodeList} from "../../datasource/platformCode/platform.sql";
 
 export class CatalogService {
     constructor(
@@ -46,14 +46,9 @@ export class CatalogService {
      * @param isPub
      */
     async findCatalog(platformCode: string, isPub?: boolean): Promise<CatalogEntity[]> {
-
         let platformCodes = [];
         platformCode.indexOf(',') != -1 ? platformCodes = platformCode.split(',').map(pc => {return pc;}) : platformCodes.push(platformCode);
-        const platformIdList = (await findPlatformCodeByCodeList(this.platformRepository, platformCodes)).map(
-            pc => {
-                return pc.id;
-            }
-        );
+        const platformIdList = (await findPlatformCodeByCodeList(this.platformRepository, platformCodes)).map(pc => {return pc.id;});
         const result = await findCatalogByPlatformCodes(this.catalogRepository, platformIdList);
         return CommonUtil.getTree(result, isPub);
     }

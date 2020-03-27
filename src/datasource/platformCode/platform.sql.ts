@@ -1,13 +1,13 @@
 import { PlatformCodeEntity } from "src/api/catalog/platformCode.entity";
 import { Repository } from "typeorm";
-import { ApiException } from "src/shared/exceptions/api.exception";
-import { ApiErrorCode } from "src/shared/enums/api.error.code";
+import { ApiException } from "../../shared/exceptions/api.exception";
+import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 
 /**
  * 通过code查询platform实体
- * @param entityRepository
- * @param id
+ * @param PlatformCodeEntity
+ * @param platformCode
  */
 export const findPlatformCodeByCode = async (PlatformCodeEntity: Repository<PlatformCodeEntity>, platformCode) => {
     return await PlatformCodeEntity.createQueryBuilder('platform').
@@ -22,7 +22,7 @@ export const findPlatformCodeByCode = async (PlatformCodeEntity: Repository<Plat
 
 /**
  * 通过code集合查询platform实体
- * @param entityRepository
+ * @param PlatformCodeEntity
  * @param platformCodeList
  */
 export const findPlatformCodeByCodeList = async (PlatformCodeEntity: Repository<PlatformCodeEntity>, platformCodeList) => {

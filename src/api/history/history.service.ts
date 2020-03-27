@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { HistoryEntity } from './history.entity';
 import { CreateHistoryDto } from './dto/history.dto';
 import { CaseEntity } from '../case/case.entity';
-import { ApiException } from '../../shared/exceptions/api.exception';
-import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import {findCaseById} from "../../datasource/case/case.sql";
+import {findHistoryByPath, saveHistory} from "../../datasource/history/history.sql";
 
 @Injectable()
 export class HistoryService {
@@ -25,19 +25,14 @@ export class HistoryService {
    */
   async createHistory(createHistoryDto: CreateHistoryDto): Promise<HistoryEntity> {
     const historyObj = new HistoryEntity();
-    const caseObj = await this.caseRepository.findOne(createHistoryDto.caseId).catch(err => {
-      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-    })
+    const caseObj = await findCaseById(this.caseRepository, createHistoryDto.caseId);
     historyObj.case = caseObj;
     historyObj.status = createHistoryDto.status;
     historyObj.executor = createHistoryDto.executor;
     historyObj.result = createHistoryDto.re;
     historyObj.startTime = createHistoryDto.startTime;
     historyObj.endTime = createHistoryDto.endTime;
-    const result = await this.historyRepository.save(historyObj).catch(err => {
-      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-    })
-    return result
+    return await saveHistory(this.historyRepository, historyObj);
   }
   /**
    * 获取所有的历史记录列表
@@ -45,20 +40,7 @@ export class HistoryService {
    * @return {Promise<Pagination<HistoryEntity>>}: 历史记录列表
    */
   async findHistoryList(historyPath: string, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
-    if (!historyPath) {
-        const queryBuilder = this.historyRepository.createQueryBuilder('history')
-        .leftJoinAndSelect('history.case','case')
-        .orderBy('history.createDate', 'DESC');
+      const queryBuilder = await findHistoryByPath(this.historyRepository, historyPath);
         return await paginate<HistoryEntity>(queryBuilder, options);
-    } else {
-        const queryBuilder = this.historyRepository.createQueryBuilder('history')
-        .leftJoinAndSelect('history.case','case')
-        .where("case.path LIKE :param")
-        .setParameters({
-            param: '%'+historyPath+'%'
-        })
-        .orderBy('history.createDate', 'DESC');
-        return await paginate<HistoryEntity>(queryBuilder, options);
-    }
   }
 }

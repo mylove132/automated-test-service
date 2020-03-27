@@ -19,6 +19,7 @@ import {map} from 'rxjs/operators';
 import {SceneEntity} from "../scene/scene.entity";
 import {CommonUtil} from "../../utils/common.util";
 import {TokenEntity} from "../token/token.entity";
+import {findTokenById} from "../../datasource/token/token.sql";
 
 
 @Injectable()
@@ -45,33 +46,19 @@ export class RunService {
      */
     async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
         let resultObj = {};
-        const startTime = new Date();
-        resultObj['startTime'] = startTime;
+        resultObj['startTime'] = new Date();
         // 生成请求数据
         const requestData = this.generateRequestData(runCaseDto);
-        let token;
-        if (runCaseDto.tokenId != null) {
-           const tokenObj =  await this.tokenRepository.findOne(runCaseDto.tokenId).catch(
-               err => {
-                   console.log(err);
-                   throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-               }
-            )
-            token = tokenObj.token;
-            requestData.headers['token'] = token
+        if (runCaseDto.tokenId) {
+            const tokenObj = await findTokenById(this.tokenRepository, runCaseDto.tokenId);
+            requestData.headers['token'] = tokenObj.token;
         }
         // 响应结果
         const result = await this.curlService.makeRequest(requestData).toPromise();
         const endTime = new Date();
         resultObj['endTime'] = endTime;
-        console.log(result)
-        if (result.result) {
-            resultObj['result'] = result.data;
-            resultObj['errMsg'] = null;
-        } else {
-            resultObj['result'] = null;
-            resultObj['errMsg'] = result;
-        }
+        result.result == null ? resultObj['result'] = null : resultObj['result'] = result.data;
+        result.result == null ? resultObj['errMsg'] = null : resultObj['errMsg'] = result;
         return resultObj;
     }
 

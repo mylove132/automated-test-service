@@ -48,6 +48,75 @@ export const findAllEnv = async (entityRepository: Repository<EnvEntity>) => {
     )
 };
 
+
+/**
+ * 根据endpoint值查询endpoint实体
+ * @param endpointEntity
+ * @param endpoint
+ */
+export const findEndpointInstanceByEndpoint = async (endpointEntity: Repository<EndpointEntity>, endpoint) => {
+    return await endpointEntity.createQueryBuilder('endpoint').
+    where('endpoint.endpoint = :enp', {enp: endpoint}).
+    getOne().catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
+
+/**
+ * 保存endpoint实体
+ * @param endpointEntity
+ * @param endpointObj
+ */
+export const saveEndpoint = async (endpointEntity: Repository<EndpointEntity>, endpointObj) => {
+    return await endpointEntity.save(endpointObj)
+    .catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
+/**
+ * 通过环境ID查询endpoint值
+ * @param envRepositoryEntity
+ * @param envIds
+ */
+export const findEndpointByEnvIds = async (envRepositoryEntity: Repository<EnvEntity>, envIds) => {
+    return await envRepositoryEntity.createQueryBuilder("env").
+    leftJoinAndSelect('env.endpoints','envpoint').
+    where('env.id IN (:...envIds)',{envIds: envIds}).
+    getMany().
+    catch(
+            err => {
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
+            }
+        );
+};
+
+
+
+/**
+ * 通过环境ID查询endpoint值
+ * @param envRepositoryEntity
+ */
+export const findEndpoints = async (envRepositoryEntity: Repository<EnvEntity>) => {
+    return await envRepositoryEntity.createQueryBuilder("env").
+    leftJoinAndSelect('env.endpoints','envpoint').
+    getMany().
+    catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.BAD_REQUEST);
+        }
+    );
+};
+
+
+
 /**
  * 更新环境
  * @param entityRepository
