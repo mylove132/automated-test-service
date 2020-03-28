@@ -20,6 +20,7 @@ import {JmeterModule} from "./api/jmeter/jmeter.module";
 import {SceneModule} from "./api/scene/scene.module";
 
 const Orm = (): DynamicModule => {
+    console.log('连接数据库中....')
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
     return TypeOrmModule.forRoot(config.getTypeOrmConfig());
 };

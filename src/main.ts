@@ -12,11 +12,14 @@ async function bootstrap() {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
   log4js.configure(join(__dirname,'../log4js.json'));
   const app = await NestFactory.create(ApplicationModule, {cors: true});
+  console.log('加载数据库及module成功...')
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');
   app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
+  console.log('加载中间件成功...')
+
   const options = new DocumentBuilder()
     .setTitle('automated test service App')
     .setDescription('The automated API description')
@@ -30,5 +33,6 @@ async function bootstrap() {
   var logger = require('log4js').getLogger("main");
   logger.info(`automated-test-server start ..... port: ${config.port}`);
   await app.listen(config.port);
+  console.log('监听端口成功...')
 }
 bootstrap();
