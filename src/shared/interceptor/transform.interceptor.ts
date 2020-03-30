@@ -26,6 +26,13 @@ export class TransformInterceptor implements NestInterceptor {
           const operate_module = this.reflector.get<string>('operate_module', context.getHandler());
           const operate_type = this.reflector.get<string>('operate_type', context.getHandler());
           const operate_desc = this.reflector.get<string>('operate_desc', context.getHandler());
+          if (!operate_module || !operate_type){
+              return {
+                  data,
+                  code: 0,
+                  message: 'success',
+              };
+          }
           const operate = new OperateEntity();
           operate.operateModule = operate_module;
           operate.operateType = operate_type;

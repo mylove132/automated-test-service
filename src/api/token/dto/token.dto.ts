@@ -16,8 +16,8 @@ export class CreateTokenDto {
     @IsNotEmpty()
     username: string;
 
-    @IsNumberString()
-    platformCode: string;
+    @Optional()
+    platformCodeId: number;
 
     @IsJSON()
     @IsNotEmpty()
@@ -29,7 +29,7 @@ export class CreateTokenDto {
 
     @IsNumber()
     envId: number;
-    
+
 }
 
 export class UpdateTokenDto {
@@ -42,8 +42,7 @@ export class UpdateTokenDto {
     username: string;
 
     @IsOptional()
-    @IsNumberString()
-    platformCode: string;
+    platformCodeId: number;
 
     @IsJSON()
     @IsOptional()

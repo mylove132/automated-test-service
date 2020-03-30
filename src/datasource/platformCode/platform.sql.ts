@@ -21,6 +21,22 @@ export const findPlatformCodeByCode = async (PlatformCodeEntity: Repository<Plat
 };
 
 /**
+ * 通过id查询platform实体
+ * @param PlatformCodeEntity
+ * @param id
+ */
+export const findPlatformCodeById = async (PlatformCodeEntity: Repository<PlatformCodeEntity>, id) => {
+    return await PlatformCodeEntity.createQueryBuilder('platform').
+    where('platform.id = :id',{id: id}).
+    getOne().catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
+/**
  * 通过code集合查询platform实体
  * @param PlatformCodeEntity
  * @param platformCodeList

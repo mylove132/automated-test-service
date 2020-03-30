@@ -29,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     Logger.error(logFormat);
 
     if (exception instanceof ApiException) {
-        exceptionObj.excName = typeof exception;
+        exceptionObj.excName = 'ApiException';
         exceptionObj.exceptionMsg = exception.getErrorMessage();
         exceptionObj.errorCode = exception.getErrorCode();
         exceptionObj.requestIp = request.ip;
@@ -46,8 +46,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
             path: request.url,
           });
     }else {
-        exceptionObj.excName = typeof exception;
-        exceptionObj.exceptionMsg = exception.name;
+        exceptionObj.excName = exception.name;
+        exceptionObj.exceptionMsg = exception.toLocaleString();
         exceptionObj.errorCode = status;
         exceptionObj.requestIp = request.ip;
         exceptionObj.uri = request.originalUrl;

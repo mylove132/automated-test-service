@@ -23,7 +23,7 @@ export class UserService {
     private curlService: CurlService,
     private configService: ConfigService,
   ) {}
-  
+
   /**
    * 登录接口
    * @param {LoginUserDto}: 用户名及密码
@@ -62,7 +62,7 @@ export class UserService {
       throw new ApiException('请求失败', ApiErrorCode.TIMEOUT, HttpStatus.OK);
     }
   }
-  
+
   // 保存/更新 用户
   private async saveUser(userData: UserData): Promise<UserEntity> {
     let user = await this.userRepository.findOne({userId: userData.userId});
@@ -71,7 +71,7 @@ export class UserService {
       if (user.username !== userData.username) {
         await this.userRepository.update(user.id, userData).catch(err => {
           throw new ApiException('更新用户失败', ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
-        })
+        });
         user = Object.assign(user, userData);
       }
     } else {

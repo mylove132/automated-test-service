@@ -4,8 +4,6 @@ import {TokenService} from "./token.service";
 import {CreateTokenDto, DeleteTokenDto, UpdateTokenDto} from "./dto/token.dto";
 import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
-
-ApiBearerAuth()
 @ApiUseTags('token')
 @Controller('token')
 export class TokenController {
@@ -40,10 +38,16 @@ export class TokenController {
     @ApiOperation({title: 'query token'})
     @ApiResponse({status: 200, description: 'query token success.'})
     @Get('')
-    async findCaseById(@Query('envId') envId?: number, @Query('platformCode') platformCode?: string,
+    async findCaseById(@Query('envId') envId?: number, @Query('platformCodeId') platformCodeId?: number,
                        @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
         limit = limit > 100 ? 100 : limit;
-        return this.tokenService.findCase(envId, platformCode, {page, limit});
+        return this.tokenService.findToken(envId, platformCodeId, {page, limit});
+    }
+
+
+    @Get('cascade')
+    async findCascadeToken(){
+        return await this.tokenService.cascadeToken();
     }
 
     @OperateModule('token模块')
