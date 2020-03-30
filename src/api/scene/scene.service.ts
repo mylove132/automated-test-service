@@ -7,6 +7,8 @@ import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate'
 import {CatalogEntity} from "../catalog/catalog.entity";
 import {SceneEntity} from "./scene.entity";
 import {CreateSceneDto, DeleteSceneByIdDto, UpdateSceneDto} from "./dto/scene.dto";
+import {findCatalogById} from "../../datasource/catalog/catalog.sql";
+import {deleteScene, findScene, saveScene, updateScene} from "../../datasource/scene/scene.sql";
 
 @Injectable()
 export class SceneService {
@@ -26,12 +28,7 @@ export class SceneService {
 
       const sceneObj = new SceneEntity();
       const catalogId = createSceneDto.catalogId;
-      const catalogObj = await this.catalogRepository.findOne(catalogId).catch(
-          err => {
-              console.log(err);
-              throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-      );
+      const catalogObj = await findCatalogById(this.catalogRepository, createSceneDto.catalogId);
       if (!catalogObj) throw new ApiException(`目录ID：${createSceneDto.catalogId}不存在`,ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
       if (createSceneDto.sceneGrade) sceneObj.sceneGrade = createSceneDto.sceneGrade;
 
@@ -39,17 +36,7 @@ export class SceneService {
       sceneObj.name = createSceneDto.name;
       sceneObj.desc = createSceneDto.desc;
       sceneObj.dependenceCaseJson = createSceneDto.caseList;
-      const result: InsertResult = await this.sceneRepository.createQueryBuilder()
-            .insert()
-            .into(SceneEntity)
-            .values(sceneObj)
-            .execute().catch(
-                err => {
-                    console.log(err);
-                    throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                }
-            );
-
+      const result: InsertResult = await saveScene(this.sceneRepository, sceneObj);
       return {id: result.identifiers[0].id};
   }
 
@@ -66,25 +53,13 @@ export class SceneService {
         if (updateSceneDto.desc) sceneObj.desc = updateSceneDto.desc;
         if (updateSceneDto.caseList) sceneObj.dependenceCaseJson = updateSceneDto.caseList;
         if (updateSceneDto.sceneGrade) sceneObj.sceneGrade = updateSceneDto.sceneGrade;
-        const saveResult: UpdateResult = await this.sceneRepository.createQueryBuilder().update(SceneEntity).
-        set(sceneObj).where("id = :id",{id: updateSceneDto.id}).execute().catch(
-            err => {
-                console.log(err);
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        );
+        const saveResult: UpdateResult = await updateScene(this.sceneRepository, updateSceneDto.id, sceneObj);
         return saveResult;
     }
 
 
     async deleteSceneById(deleteByIdDto: DeleteSceneByIdDto){
-        const result: DeleteResult = await this.sceneRepository.createQueryBuilder('scene').delete().
-        where('scene.id IN (:...sceneIds)',{sceneIds: deleteByIdDto.sceneIds}).execute().catch(
-            err => {
-                console.log(err);
-                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-        );
+        const result: DeleteResult = await deleteScene(this.sceneRepository, deleteByIdDto.sceneIds);
         return result;
     }
 
@@ -96,18 +71,8 @@ export class SceneService {
    * @param caseGradeList
    * @param options
    */
-  async findSceneService(catalogId: number, caseGradeList: number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
-    if (!catalogId) {
-        const queryBuilder = await this.sceneRepository.createQueryBuilder("scene")
-            .where('scene.catalogId = :catalogId',{catalogId: catalogId}).
-            andWhere('scene.sceneGrade IN (:...sceneGrade)',{sceneGrade: caseGradeList}).orderBy('scene.createDate','DESC');
-        return paginate<SceneEntity>(queryBuilder, options);
-    } else {
-        const queryBuilder = await this.sceneRepository.createQueryBuilder("scene").
-        where('scene.sceneGrade IN (:...sceneGrade)',{sceneGrade: caseGradeList}).
-        orderBy('scene.createDate','DESC');
-        return paginate<SceneEntity>(queryBuilder, options);
-        return await paginate<SceneEntity>(queryBuilder, options);
-    }
+  async findSceneService(catalogId: number, sceneGradeList: number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {
+      const queryBuilder = await findScene(this.sceneRepository, catalogId, sceneGradeList);
+      return await paginate<SceneEntity>(queryBuilder, options);
   }
 }

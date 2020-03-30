@@ -3896,7 +3896,7 @@ limit	                    |number		|O			|每页展示个数(默认10)
 请求示例
 
 ```
-/api/scene?catalogId=1&caseGrade=1,2
+/api/scene?catalogId=1&sceneGrade=1,2
 ```
 
 ### 8.0  添加接口定时任务

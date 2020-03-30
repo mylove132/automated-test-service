@@ -51,25 +51,12 @@ export class SceneController {
     @ApiOperation({title: 'get scene', description: '获取场景'})
     @ApiResponse({status: 200, description: 'get scene success.'})
     @Get('')
-    async findSceneList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('catalogId') catalogId?: number,  @Query('caseGrade') caseGrade?: string): Promise<Pagination<SceneEntity>> {
-        let caseGradeList = [];
-        if (caseGrade){
-            if (caseGrade.indexOf(',') != -1){
-                caseGrade.split(',').forEach(
-                    value => {
-                        if (!value){
-                            return;
-                        }
-                        caseGradeList.push(Number(value));
-                    }
-                )
-            }else {
-                caseGradeList.push(Number(caseGrade));
-            }
-        }else {
-            caseGradeList.push(0,1,2);
-        }
-        return this.sceneService.findSceneService(catalogId,caseGradeList, {page, limit});
+    async findSceneList(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('catalogId') catalogId?: number,  @Query('sceneGrade') sceneGrade?: string): Promise<Pagination<SceneEntity>> {
+        let sceneGradeList = [];
+        sceneGrade == null ? sceneGradeList.push(0, 1, 2) : sceneGrade.indexOf(',') ? sceneGrade.split(',').map(grade => {
+            sceneGradeList.push(Number(grade))
+        }) : sceneGradeList.push(Number(sceneGrade));
+        return this.sceneService.findSceneService(catalogId, sceneGradeList, {page, limit});
     }
 
 }
