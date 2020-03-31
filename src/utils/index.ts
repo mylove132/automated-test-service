@@ -1,7 +1,5 @@
-import { Method } from 'axios';
-
 // type转换成method文字
-export function getRequestMethodTypeString(type: number): Method {
+export function getRequestMethodTypeString(type: number): string {
 	switch (type) {
 		case 0:
 			return 'GET';
