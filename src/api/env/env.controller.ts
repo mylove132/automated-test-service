@@ -12,9 +12,6 @@ export class EnvController {
 
     constructor(private readonly envService: EnvService) {}
 
-    @OperateModule('环境模块')
-    @OperateType('查询环境')
-    @OperateDesc('')
     @ApiOperation({ title: 'query all env' })
     @ApiResponse({ status: 200, description: 'query all env success.'})
     @Get()

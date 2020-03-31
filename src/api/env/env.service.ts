@@ -100,7 +100,7 @@ export class EnvService {
 
         if (!envIds) return await findEndpoints(this.envRepository);
         let envList = [];
-        envIds.index(',') ? envList = envIds.split(',').map(envId => {return Number(envId)}) : envList.push(Number(envIds));
+        envIds.indexOf(',') ? envList = envIds.split(',').map(envId => {return Number(envId)}) : envList.push(Number(envIds));
 
         return await findEndpointByEnvIds(this.envRepository, envList);
     }
