@@ -16,6 +16,4 @@ export interface IRunCaseById {
     readonly envId: number;
 
     readonly executor: Executor;
-
-    readonly isNotice?: boolean;
 }

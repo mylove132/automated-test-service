@@ -64,8 +64,8 @@ export class RunService {
 
     /**
      * 执行某个具体测试样例接口
-     * @param {RunCaseByIdDto}: 接口Id及环境Id
      * @return {Promise<any>}: 发起请求后的响应结果
+     * @param runCaseById
      */
     async runCaseById(runCaseById: IRunCaseById): Promise<any> {
 
@@ -115,9 +115,9 @@ export class RunService {
                     resultObj['status'] = assert['result'];
                     resultObj['assert'] = assert;
                     resultObj['errMsg'] = null;
-                    if (runCaseById.isNotice){
+                    if (caseObj.isFailNotice){
                        if (!assert['result']) {
-                           this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText} 
+                           await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText} 
                            期望条件 ${assert['relation']} 
                            实际结果${assert['actual']} 不符合`)
                        }
@@ -126,11 +126,10 @@ export class RunService {
                     resultObj['status'] = false;
                     resultObj['result'] = null;
                     resultObj['errMsg'] = result;
-                    if (runCaseById.isNotice){
-                            this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
+                    if (caseObj.isFailNotice){
+                            await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
                     }
                 }
-                console.log(res)
                 // 保存历史记录
                 const historyData = {
                     caseId: caseId,
@@ -140,7 +139,6 @@ export class RunService {
                     startTime: startTime,
                     endTime: endTime
                 };
-                console.log(historyData);
                 await this.historyService.createHistory(historyData).catch(
                     err => {
                         console.log(err);

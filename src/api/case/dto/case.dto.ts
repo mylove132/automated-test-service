@@ -75,6 +75,9 @@ export class CreateCaseDto {
 
     @Optional()
     tokenId: number;
+
+    @Optional()
+    isFailNotice?: boolean;
 }
 
 export class UpdateCaseDto {
@@ -143,6 +146,9 @@ export class UpdateCaseDto {
 
     @Optional()
     tokenId: number;
+
+    @Optional()
+    isFailNotice?: boolean;
 
 }
 

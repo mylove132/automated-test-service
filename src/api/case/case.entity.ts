@@ -7,7 +7,6 @@ import {
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
-    Unique,
     UpdateDateColumn
 } from 'typeorm';
 import {ParamType, RequestType} from './dto/http.enum';
@@ -15,7 +14,6 @@ import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
-import {SceneEntity} from "../scene/scene.entity";
 import {SchedulerEntity} from "../task/scheduler.entity";
 import {CaseGrade, CaseType} from "./dto/case.dto";
 import {CaselistEntity} from "../caselist/caselist.entity";
@@ -87,6 +85,9 @@ export class CaseEntity {
 
     @Column({default: false})
     isNeedToken: boolean;
+
+    @Column({default: false})
+    isFailNotice: boolean;
 
     //返回值别名
     @Column({nullable: true})
