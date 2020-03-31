@@ -38,6 +38,9 @@ export class SceneEntity {
 
     @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '场景等级'})
     sceneGrade: CaseGrade;
+    //
+    // @ManyToMany(type => CaseEntity, cases => cases.scenes)
+    // cases: CaseEntity[];
 
 }
 

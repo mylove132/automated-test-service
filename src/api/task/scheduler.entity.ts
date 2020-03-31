@@ -2,19 +2,16 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
+    JoinColumn, JoinTable, ManyToMany,
     ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn
 } from 'typeorm';
-import {CaselistEntity} from '../caselist/caselist.entity';
 import {EnvEntity} from '../env/env.entity';
-import {RunStatus} from './dto/run.status';
+import {RunStatus, TaskType} from './dto/run.status';
 import {CaseEntity} from "../case/case.entity";
-import {IsString} from "class-validator";
 
 @Unique(['md5','name'])
 @Entity('secheduler')
@@ -23,11 +20,14 @@ export class SchedulerEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: false})
     name: string;
 
     @Column()
     md5: string;
+
+    @Column('enum',{default: TaskType.SINGLE, nullable: false, enum: TaskType, comment: '任务类别'})
+    taskType: TaskType;
 
     @CreateDateColumn()
     createDate: Date;
@@ -35,7 +35,8 @@ export class SchedulerEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @OneToMany(type => CaseEntity, cases => cases.secheduler)
+    @ManyToMany(type => CaseEntity, cases => cases.sechedulers, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @JoinTable()
     cases: CaseEntity[];
 
     @ManyToOne(type => EnvEntity,env => env.sechedulers,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
@@ -45,6 +46,6 @@ export class SchedulerEntity {
     @Column('enum', {default: RunStatus.STOP, nullable:false, comment: '定时任务状态', enum: RunStatus})
     status: RunStatus;
 
-    @Column({nullable:true})
+    @Column({nullable:false})
     cron: string;
 }

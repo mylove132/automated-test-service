@@ -1,6 +1,7 @@
 import {Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, Unique} from 'typeorm';
 import {EnvEntity} from './env.entity';
 import {CaseEntity} from '../case/case.entity';
+import {TokenEntity} from "../token/token.entity";
 @Unique(['endpoint'])
 @Entity('endpoint')
 export class EndpointEntity {
@@ -20,4 +21,6 @@ export class EndpointEntity {
 
     @OneToMany(type => CaseEntity, cas => cas.endpointObject)
     cases: CaseEntity[];
+
+
 }

@@ -1,5 +1,5 @@
 import {DynamicModule, Module} from '@nestjs/common';
-import {APP_GUARD} from '@nestjs/core';
+import {APP_FILTER, APP_GUARD, APP_INTERCEPTOR} from '@nestjs/core';
 import {AppController} from './app.controller';
 import {UserModule} from './api/user/user.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
@@ -18,6 +18,11 @@ import {AuthGuard} from './shared/guard/auth.guard';
 import {HistoryModule} from './api/history/history.module';
 import {JmeterModule} from "./api/jmeter/jmeter.module";
 import {SceneModule} from "./api/scene/scene.module";
+import {TokenModule} from "./api/token/token.module";
+import {OperateModule} from "./api/operate/operate.module";
+import {TransformInterceptor} from "./shared/interceptor/transform.interceptor";
+import {HttpExceptionFilter} from "./shared/filters/http-exception.filter";
+import {AllExceptionsFilter} from "./shared/filters/any-exception.filter";
 
 const Orm = (): DynamicModule => {
     console.log('连接数据库中....')
@@ -40,7 +45,9 @@ const Orm = (): DynamicModule => {
         HistoryModule,
         SchedulerModule,
         JmeterModule,
-        SceneModule
+        SceneModule,
+        TokenModule,
+        OperateModule
     ],
     controllers: [
         AppController
@@ -50,6 +57,18 @@ const Orm = (): DynamicModule => {
         {
             provide: APP_GUARD,
             useClass: AuthGuard,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: TransformInterceptor,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: AllExceptionsFilter,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
         },
     ]
 })

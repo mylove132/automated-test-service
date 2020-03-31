@@ -4,7 +4,6 @@ export enum RequestStatusEnum {
 }
 
 export enum Executor {
-    MANUAL     //手动
-
-     , SCHEDULER//定时任务
+    MANUAL = 0     //手动,
+    ,SCHEDULER = 1//定时任务
 }

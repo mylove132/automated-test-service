@@ -19,6 +19,7 @@ import {SceneEntity} from "../scene/scene.entity";
 import {SchedulerEntity} from "../task/scheduler.entity";
 import {CaseGrade, CaseType} from "./dto/case.dto";
 import {CaselistEntity} from "../caselist/caselist.entity";
+import {TokenEntity} from "../token/token.entity";
 
 @Entity('case')
 export class CaseEntity {
@@ -95,9 +96,16 @@ export class CaseEntity {
     @Column({default: false})
     isDependenceParam: boolean;
 
-    @ManyToOne(type => SchedulerEntity, secheduler => secheduler.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
-    secheduler: SchedulerEntity;
+    @ManyToMany(type => SchedulerEntity, secheduler => secheduler.cases)
+    sechedulers: SchedulerEntity[];
 
+
+    @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    token: TokenEntity;
+
+    // @ManyToMany(type => SceneEntity, scenes => scenes.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    // @JoinTable()
+    // scenes: SceneEntity[];
 
 }
 

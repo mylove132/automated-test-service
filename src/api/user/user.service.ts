@@ -23,11 +23,11 @@ export class UserService {
     private curlService: CurlService,
     private configService: ConfigService,
   ) {}
-  
+
   /**
    * 登录接口
-   * @param {LoginUserDto}: 用户名及密码
    * @return {Promise<any>}: 返回的用户信息及菜单列表
+   * @param loginUserDto
    */
   async login(loginUserDto: LoginUserDto): Promise<any> {
     const url = this.configService.javaOapi + '/auth/open-api/autotest/useradmin/v1/login'
@@ -62,7 +62,7 @@ export class UserService {
       throw new ApiException('请求失败', ApiErrorCode.TIMEOUT, HttpStatus.OK);
     }
   }
-  
+
   // 保存/更新 用户
   private async saveUser(userData: UserData): Promise<UserEntity> {
     let user = await this.userRepository.findOne({userId: userData.userId});
@@ -71,7 +71,7 @@ export class UserService {
       if (user.username !== userData.username) {
         await this.userRepository.update(user.id, userData).catch(err => {
           throw new ApiException('更新用户失败', ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
-        })
+        });
         user = Object.assign(user, userData);
       }
     } else {
@@ -87,7 +87,7 @@ export class UserService {
    * @param {number}: id
    * @return {Promise<UserRO>}: 用户信息
    */
-  async findById(id: number): Promise<any>{
+  async findById(id: number): Promise<UserEntity>{
     const user = await this.userRepository.findOne(id);
     if (!user) {
       throw new ApiException('用户未找到', ApiErrorCode.USER_ID_INVALID, HttpStatus.OK);

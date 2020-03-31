@@ -2,38 +2,32 @@ import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import {ConfigService} from "./config/config.service";
-import {join} from "path";
-import {HttpExceptionFilter} from "./shared/filters/http.exception.filter";
-import {TransformInterceptor} from "./shared/filters/http.response.filter";
+import * as express from 'express';
+import { logger } from './shared/middleware/logger.middleware';
 import {ValidationPipe} from './shared/pipes/validation.pipe';
-var log4js = require('log4js');
+import {Logger} from "./utils/log4js";
+
 
 async function bootstrap() {
   const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-  log4js.configure(join(__dirname,'../log4js.json'));
   const app = await NestFactory.create(ApplicationModule, {cors: true});
-  console.log('加载数据库及module成功...')
+  app.use(express.json()); // For parsing application/json
+  // 监听所有的请求路由，并打印日志
+  app.use(logger);
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new TransformInterceptor());
+  // 使用拦截器打印出参
+  // app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');
-  app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
-  console.log('加载中间件成功...')
-  log4js.getLogger('main').info('加载中间件成功...');
   const options = new DocumentBuilder()
-    .setTitle('automated test service App')
-    .setDescription('The automated API description')
-    .setVersion('1.0')
-    .setBasePath('api')
-    .addBearerAuth()
-    .build();
+      .setTitle('automated test service App')
+      .setDescription('The automated API description')
+      .setVersion('1.0')
+      .setBasePath('api')
+      .addBearerAuth()
+      .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('/docs', app, document);
-
-  var logger = require('log4js').getLogger("main");
-  logger.info(`automated-test-server start ..... port: ${config.port}`);
   await app.listen(config.port);
-  console.log('监听端口成功...')
-  log4js.getLogger('main').info(`服务启动成功,端口${config.port}...`);
+  Logger.info(`服务启动成功,端口：${config.port}..................`)
 }
 bootstrap();

@@ -3,5 +3,5 @@ export enum RequestType {
 }
 
 export enum ParamType {
-    TEXT = 0,FILE = 1
+   TEXT = 0,FILE = 1
 }

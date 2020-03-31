@@ -5,7 +5,7 @@ import {CaselistEntity} from './caselist.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import {CommonUtil} from '../../util/common.util';
+import {CommonUtil} from '../../utils/common.util';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 import {AddCaseListDto, CaseListIdsDto, UpdateCaseListDto} from './dto/caselist.dto';
 import {EnvEntity} from '../env/env.entity';

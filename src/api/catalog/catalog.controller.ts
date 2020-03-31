@@ -2,10 +2,12 @@ import {Body, Controller, Delete, Get, HttpStatus, Post, Put, Query} from '@nest
 import {CatalogService} from './catalog.service';
 
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
-import {CreateCatalogDto, QueryCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
+import {CreateCatalogDto, DeleteCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
 import {CatalogEntity} from './catalog.entity';
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
+import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
+import {PlatformCodeEntity} from "./platformCode.entity";
 
 
 @ApiBearerAuth()
@@ -15,6 +17,9 @@ export class CatalogController {
 
   constructor(private readonly catalogService: CatalogService) {}
 
+  @OperateModule('目录模块')
+  @OperateType('创建目录')
+  @OperateDesc('')
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
   @Post()
@@ -22,6 +27,9 @@ export class CatalogController {
     return await this.catalogService.addCatalog(createCatalogDto);
   }
 
+  @OperateModule('目录模块')
+  @OperateType('查询目录')
+  @OperateDesc('')
   @ApiOperation({ title: 'query catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Get()
@@ -32,13 +40,26 @@ export class CatalogController {
     return this.catalogService.findCatalog(platformCode);
   }
 
+  @ApiOperation({ title: 'query platformCode list' })
+  @ApiResponse({ status: 200, description: 'query platformCode list success.'})
+  @Get('platformCodeList')
+  async findPlatformCode(): Promise<PlatformCodeEntity[]> {
+    return this.catalogService.findPlatformCode();
+  }
+
+  @OperateModule('目录模块')
+  @OperateType('删除目录')
+  @OperateDesc('')
   @ApiOperation({ title: 'delete catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Delete('')
-  async deleteCatalog(@Body() queryCatalogDto: QueryCatalogDto) {
-    return this.catalogService.deleteById(queryCatalogDto);
+  async deleteCatalog(@Body() deleteCatalogDto: DeleteCatalogDto) {
+    return this.catalogService.deleteById(deleteCatalogDto);
   }
 
+  @OperateModule('目录模块')
+  @OperateType('更新目录')
+  @OperateDesc('')
   @ApiOperation({ title: 'update catalog' })
   @ApiResponse({ status: 200, description: 'update catalog success.'})
   @Put('')
