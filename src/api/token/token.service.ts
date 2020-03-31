@@ -13,7 +13,10 @@ import {PlatformCodeEntity} from "../catalog/platformCode.entity";
 import {Logger} from "../../utils/log4js";
 import {Cron} from "@nestjs/schedule";
 import {
-    deleteTokenByIds, findAllToken,
+    deleteTokenByIds,
+    findAllTokenByPlatformCodeIdAndEnvId,
+    findAllTokenEnvByPlatformCodeId,
+    findAllTokenPlatform,
     findTokenByEnvIdAndPlatformCode,
     findTokenById,
     findTokenByUrlAndUsername,
@@ -24,6 +27,8 @@ import {
 } from "../../datasource/token/token.sql";
 import {findEnvById} from "../../datasource/env/env.sql";
 import {findPlatformCodeById} from "../../datasource/platformCode/platform.sql";
+import {from} from "rxjs";
+import {distinct} from "rxjs/operators";
 
 
 @Injectable()
@@ -73,34 +78,49 @@ export class TokenService {
     /**
      * 查询token
      * @param envId 环境ID
-     * @param platformCode 平台code码
+     * @param platformCodeId 平台code码
      * @param options
      */
     async findToken(envId: number, platformCodeId: number, options: IPaginationOptions): Promise<Pagination<TokenEntity>> {
         let queryBuilder = await findTokenByEnvIdAndPlatformCode(this.tokenRepository, envId, platformCodeId);
-        const result = await paginate<TokenEntity>(queryBuilder, options);
-        return result;
+        return await paginate<TokenEntity>(queryBuilder, options);
 
     }
 
     /**
-     * 获取级联token数据
+     * 获取所有token表中的platform（去重）
      */
-    async cascadeToken(){
-        const tokens: TokenEntity[] = await findAllToken(this.tokenRepository);
-        let resultList = [];
-        for (let token of tokens){
-            console.log(token)
-            let result = {};
-            let envJson = {};
-            let userJson = {};
-            userJson[token.username] = token;
-            envJson[token.env.name] = userJson;
-            result[token.platformCode.name] = envJson;
-            resultList.push(result);
-        }
-        return resultList;
+    async getAllTokenOfPlatform(){
+        const result = (await findAllTokenPlatform(this.tokenRepository)).map(res => {return res.platformCode});
+        let rs = [];
+        from(result).pipe(
+            distinct((item) => item.id),
+        ).subscribe(item => {
+            rs.push(item);
+        });
+        return rs;
+    }
 
+    /**
+     * 获取token中环境通过platformCodeID（去重）
+     */
+    async getAllTokenOfEnv(platformCodeId){
+      const result = (await findAllTokenEnvByPlatformCodeId(this.tokenRepository, platformCodeId)).map(res => {return res.env});
+        let rs = [];
+        from(result).pipe(
+            distinct((item) => item.id),
+        ).subscribe(item => {
+            rs.push(item);
+        });
+        return rs;
+    }
+
+    /**
+     * 获取token中环境通过platformCodeID（去重）
+     */
+    async getAllTokenByEnvIdAndPlatformId(platformCodeId, envId) {
+        const result = (await findAllTokenByPlatformCodeIdAndEnvId(this.tokenRepository, platformCodeId, envId)).map(res => {return {username: res.username,tokenId: res.id}});
+        return result;
     }
 
     /**

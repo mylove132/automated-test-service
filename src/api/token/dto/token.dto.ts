@@ -5,7 +5,7 @@ import {
     IsJSON,
     IsNotEmpty,
     IsNumber,
-    IsNumberString, IsOptional,
+     IsOptional,
     IsUrl
 } from "class-validator";
 import {Optional} from "@nestjs/common";

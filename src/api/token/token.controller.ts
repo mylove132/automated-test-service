@@ -17,7 +17,7 @@ export class TokenController {
     @ApiOperation({title: 'create token'})
     @ApiResponse({status: 200, description: 'create token success.'})
     @Post('')
-    async addTokenCrontroller(@Body() createTokenDto: CreateTokenDto) {
+    async addTokenController(@Body() createTokenDto: CreateTokenDto) {
         return await this.tokenService.addTokenService(createTokenDto);
     }
 
@@ -27,10 +27,9 @@ export class TokenController {
     @ApiOperation({title: 'update token'})
     @ApiResponse({status: 200, description: 'update token success.'})
     @Put('')
-    async updateTokenCrontroller(@Body() updateTokenDto: UpdateTokenDto) {
+    async updateTokenController(@Body() updateTokenDto: UpdateTokenDto) {
         return await this.tokenService.updateTokenService(updateTokenDto);
     }
-
 
     @OperateModule('token模块')
     @OperateType('查询token')
@@ -38,16 +37,25 @@ export class TokenController {
     @ApiOperation({title: 'query token'})
     @ApiResponse({status: 200, description: 'query token success.'})
     @Get('')
-    async findCaseById(@Query('envId') envId?: number, @Query('platformCodeId') platformCodeId?: number,
-                       @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+    async findCaseByIdController(@Query('envId') envId?: number, @Query('platformCodeId') platformCodeId?: number,
+                                 @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
         limit = limit > 100 ? 100 : limit;
         return this.tokenService.findToken(envId, platformCodeId, {page, limit});
     }
 
+    @Get('platform')
+    async findTokenOfPlatformController(){
+        return await this.tokenService.getAllTokenOfPlatform();
+    }
 
-    @Get('cascade')
-    async findCascadeToken(){
-        return await this.tokenService.cascadeToken();
+    @Get('env')
+    async findTokenOfEnvController(@Query('platformCodeId') platformCodeId: number,){
+        return await this.tokenService.getAllTokenOfEnv(platformCodeId);
+    }
+
+    @Get('userAndToken')
+    async findTokenOfEnvAndPlatformController(@Query('platformCodeId') platformCodeId: number,@Query('envId') envId: number,){
+        return await this.tokenService.getAllTokenByEnvIdAndPlatformId(platformCodeId, envId);
     }
 
     @OperateModule('token模块')
@@ -56,7 +64,7 @@ export class TokenController {
     @ApiOperation({ title: 'delete token' })
     @ApiResponse({ status: 200, description: 'delete token success.'})
     @Delete('')
-    async deleteTokenCrontroller(@Body() deleteTokenDto: DeleteTokenDto) {
+    async deleteTokenController(@Body() deleteTokenDto: DeleteTokenDto) {
         return this.tokenService.deleteById(deleteTokenDto);
     }
 }

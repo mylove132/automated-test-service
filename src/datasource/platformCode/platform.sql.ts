@@ -51,3 +51,18 @@ export const findPlatformCodeByCodeList = async (PlatformCodeEntity: Repository<
         }
     )
 };
+
+
+/**
+ * 通过code集合查询platform实体
+ * @param PlatformCodeEntity
+ */
+export const findAllPlatformCode= async (PlatformCodeEntity: Repository<PlatformCodeEntity>) => {
+    return await PlatformCodeEntity.createQueryBuilder('platform').
+    getMany().catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};

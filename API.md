@@ -4232,7 +4232,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 :----						|:---		|:------	|:---
 username				    |string		|R			|登录用户的用户名
 body				        |string（json）		|R			|登录接口的data数据
-platformCode	                    |String		|R			|关联的平台code码
+platformCodeId	                    |number		|R			|关联的平台id
 url	                    |string		|R			|登录接口的URL
 envId	                    |number		|R			|关联的环境ID
 
@@ -4243,7 +4243,7 @@ envId	                    |number		|R			|关联的环境ID
 {
     "username":"13986798661",
     "body":"{"userName":"13986798666","password":"cyt007"}",
-    "platformCode":"0003",
+    "platformCodeId":1,
     "url":"https://oapi-smix5.t.blingabc.com/sale/open-api/sale/v1/login",
     "envId":19
 }
@@ -4279,12 +4279,12 @@ data						|any		|R			|&nbsp;返回历史记录值
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 envId	                    |number		|O			|关联的环境ID
-platformCode	                    |string		|O			|平台code值
+platformCodeId	                    |number		|O			|平台ID
 
 请求示例
 
 ```
-/api/token?platformCode=0004&envId=5
+/api/token?platformCodeId=4&envId=5
 ```
 
 ##### 返回结果
@@ -4346,7 +4346,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 :----						|:---		|:------	|:---
 username				    |string		|O			|登录用户的用户名
 body				        |string（json）		|O			|登录接口的data数据
-platformCode	                    |String		|O			|关联的平台code码
+platformCodeId	                    |number		|O			|关联的平台id
 url	                    |string		|O			|登录接口的URL
 envId	                    |number		|O			|关联的环境ID
 id                          |number		|R			|tokenID
@@ -4358,7 +4358,7 @@ token                          |token		|O			|token值
 {
     "username":"13986798663",
     "body":"{"userName":"13986798666","password":"cyt007"}",
-    "platformCode":"0003",
+    "platformCodeId":1,
     "url":"https://oapi-smix5.t.blingabc.com/sale/open-api/sale/v1/login",
     "envId":19,
     "id":11
@@ -4390,7 +4390,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 - **请求方式：** DELETE
 - **接口地址：** /api/token
 
-#### 9.2.1 请求参数
+#### 9.3.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
@@ -4425,6 +4425,241 @@ data						|any		|R			|&nbsp;返回历史记录值
     "message": "success"
 }
 ```
+
+### 9.4  获取token中所有平台（去重）
+- **接口说明：** 获取token中所有平台（去重）
+- **请求方式：** GET
+- **接口地址：** /api/token/platform
+
+#### 9.4.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+
+请求示例
+
+```
+/api/token/platform
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;平台ID
+&nbsp;&nbsp;&nbsp;&nbsp;platformCode|string		|R			|&nbsp;平台code值
+&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;平台名称
+
+返回示例
+```
+{
+    "data": [
+        {
+            "id": 4,
+            "platformCode": "0004",
+            "name": "CRM平台"
+        },
+        {
+            "id": 3,
+            "platformCode": "0003",
+            "name": "课程顾问平台"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+
+### 9.5  通过平台ID获取token中所有环境（去重）
+- **接口说明：** 获取token中所有环境（去重）
+- **请求方式：** GET
+- **接口地址：** /api/token/env
+
+#### 9.5.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+platformCodeId				    |number		|R			|平台ID
+
+
+
+请求示例
+
+```
+/api/token/env?platformCodeId=3
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;环境ID
+&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;环境名称
+
+返回示例
+```
+{
+    "data": [
+        {
+            "id": 19,
+            "name": "smix5"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+
+### 9.6  通过平台ID和环境ID获取token中所有用户和tokenID
+- **接口说明：** 获取token中所有用户和tokenID
+- **请求方式：** GET
+- **接口地址：** /api/token/userAndToken
+
+#### 9.6.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+platformCodeId				    |number		|R			|平台ID
+envId				    |number		|R			|环境ID
+
+
+
+请求示例
+
+```
+/api/token/userAndToken?envId=19&platformCodeId=3
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;username|string		|R			|&nbsp;token用户名
+&nbsp;&nbsp;&nbsp;&nbsp;tokenId|number		|R			|&nbsp;tokenId
+
+返回示例
+```
+{
+    "data": [
+        {
+            "username": "13986798666",
+            "tokenId": 14
+        },
+        {
+            "username": "13986798661",
+            "tokenId": 13
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+
+### 10.0 获取平台集合
+- **接口说明：** 获取平台集合
+- **请求方式：** GET
+- **接口地址：** /api/catalog/platformCodeList
+
+#### 2.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+
+请求示例：
+
+```
+
+```
+返回结果
+
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "platformCode": "0001",
+            "name": "班主任平台"
+        },
+        {
+            "id": 2,
+            "platformCode": "0002",
+            "name": "外教平台"
+        },
+        {
+            "id": 3,
+            "platformCode": "0003",
+            "name": "课程顾问平台"
+        },
+        {
+            "id": 4,
+            "platformCode": "0004",
+            "name": "CRM平台"
+        },
+        {
+            "id": 5,
+            "platformCode": "0005",
+            "name": "技术支持平台"
+        },
+        {
+            "id": 6,
+            "platformCode": "0006",
+            "name": "通用平台"
+        },
+        {
+            "id": 7,
+            "platformCode": "0007",
+            "name": "学术研究中心"
+        },
+        {
+            "id": 8,
+            "platformCode": "0008",
+            "name": "客服平台"
+        },
+        {
+            "id": 9,
+            "platformCode": "0009",
+            "name": "运营平台"
+        },
+        {
+            "id": 11,
+            "platformCode": "0011",
+            "name": "钉钉移动端"
+        },
+        {
+            "id": 12,
+            "platformCode": "0012",
+            "name": "自动化测试平台"
+        }
+    ],
+    "code": 0,
+    "message": "success"
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;id						|number		|R			|&nbsp;平台ID
+&nbsp;&nbsp;&nbsp;platformCode						|string		|R			|&nbsp;平台code码
+&nbsp;&nbsp;&nbsp;name						|string		|R			|&nbsp;平台名称
+
+
 
 
 响应码	|说明  

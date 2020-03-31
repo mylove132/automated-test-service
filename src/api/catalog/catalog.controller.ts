@@ -7,6 +7,7 @@ import {CatalogEntity} from './catalog.entity';
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
+import {PlatformCodeEntity} from "./platformCode.entity";
 
 
 @ApiBearerAuth()
@@ -37,6 +38,13 @@ export class CatalogController {
           throw new ApiException("查询目录platformCode参数不能为空", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
       }
     return this.catalogService.findCatalog(platformCode);
+  }
+
+  @ApiOperation({ title: 'query platformCode list' })
+  @ApiResponse({ status: 200, description: 'query platformCode list success.'})
+  @Get('platformCodeList')
+  async findPlatformCode(): Promise<PlatformCodeEntity[]> {
+    return this.catalogService.findPlatformCode();
   }
 
   @OperateModule('目录模块')

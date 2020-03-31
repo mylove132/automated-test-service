@@ -8,7 +8,7 @@ import {Repository} from "typeorm";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {HttpStatus} from "@nestjs/common";
-import {findPlatformCodeByCode} from "../platformCode/platform.sql";
+
 
 /**
  * 通过token ID查找实体
@@ -46,13 +46,64 @@ export const findTokenByUrlAndUsername = async (tokenEntityRepository: Repositor
 /**
  * 查询所有的token数据
  * @param tokenEntityRepository
- * @param url
- * @param username
  */
 export const findAllToken = async (tokenEntityRepository: Repository<TokenEntity>) => {
     return await tokenEntityRepository.createQueryBuilder('token').
     leftJoinAndSelect('token.platformCode','platform').
     leftJoinAndSelect('token.env','env').
+    getMany().
+    catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
+        }
+    );
+};
+
+
+/**
+ * 查询所有的token platform
+ * @param tokenEntityRepository
+ */
+export const findAllTokenPlatform = async (tokenEntityRepository: Repository<TokenEntity>) => {
+    return  await tokenEntityRepository.createQueryBuilder('token').
+    leftJoinAndSelect('token.platformCode','platform').
+    getMany().
+    catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
+        }
+    );
+};
+
+
+/**
+ * 查询所有的token env
+ * @param tokenEntityRepository
+ * @param platformCodeId
+ */
+export const findAllTokenEnvByPlatformCodeId = async (tokenEntityRepository: Repository<TokenEntity>, platformCodeId) => {
+    return  await tokenEntityRepository.createQueryBuilder('token').
+    leftJoinAndSelect('token.env','env').
+    where('token.platformCode = :platformCode',{platformCode: platformCodeId}).
+    getMany().
+    catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.CREATE_USER_FAIL, HttpStatus.OK);
+        }
+    );
+};
+
+
+/**
+ * 查询所有的token 通过envId和platformCodeId
+ * @param tokenEntityRepository
+ * @param platformCodeId
+ * @param envId
+ */
+export const findAllTokenByPlatformCodeIdAndEnvId = async (tokenEntityRepository: Repository<TokenEntity>, platformCodeId, envId) => {
+    return  await tokenEntityRepository.createQueryBuilder('token').
+    where('token.platformCode = :platformCode',{platformCode: platformCodeId}).
+    andWhere('token.env = :env',{env: envId}).
     getMany().
     catch(
         err => {

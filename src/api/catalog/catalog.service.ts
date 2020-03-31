@@ -14,7 +14,11 @@ import {
     findCatalogByPlatformCodes,
     saveCatalog, updateCatalog
 } from '../../datasource/catalog/catalog.sql';
-import {findPlatformCodeByCode, findPlatformCodeByCodeList} from "../../datasource/platformCode/platform.sql";
+import {
+    findAllPlatformCode,
+    findPlatformCodeByCode,
+    findPlatformCodeByCodeList
+} from "../../datasource/platformCode/platform.sql";
 
 export class CatalogService {
     constructor(
@@ -52,6 +56,12 @@ export class CatalogService {
         const result = await findCatalogByPlatformCodes(this.catalogRepository, platformIdList);
         return CommonUtil.getTree(result, isPub);
     }
+
+
+    async findPlatformCode(): Promise<PlatformCodeEntity[]> {
+        return await findAllPlatformCode(this.platformRepository);
+    }
+
 
 
     /**
