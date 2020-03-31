@@ -1,12 +1,11 @@
 import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
 
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import {CaseService} from './case.service';
 import {CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
 
 @ApiBearerAuth()
-@ApiUseTags('case')
 @Controller('case')
 export class CaseController {
 

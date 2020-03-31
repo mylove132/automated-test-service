@@ -1,10 +1,9 @@
 /**
  * 捕获所有异常
  */
-import {ExceptionFilter, Catch, HttpException, HttpStatus, ExecutionContext, ArgumentsHost} from '@nestjs/common';
+import {ExceptionFilter, Catch, HttpException, HttpStatus, ArgumentsHost} from '@nestjs/common';
 import { Logger } from '../../utils/log4js';
 import {ApiException} from "../exceptions/api.exception";
-import {Reflector} from "@nestjs/core";
 import {OperateService} from "../../api/operate/operate.service";
 import {ExceptionEntity} from "../../api/operate/expection.entity";
 

@@ -1,4 +1,4 @@
-import {ExceptionFilter, Catch, ArgumentsHost, HttpException, ExecutionContext} from '@nestjs/common';
+import {ExceptionFilter, Catch, ArgumentsHost, HttpException,} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from '../../utils/log4js';
 import {ApiException} from "../exceptions/api.exception";
