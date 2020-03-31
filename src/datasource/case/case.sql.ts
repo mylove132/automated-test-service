@@ -70,7 +70,9 @@ export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepos
     leftJoinAndSelect('case.endpointObject', 'endpoint').
     leftJoinAndSelect('case.assertType', 'assertType').
     leftJoinAndSelect('case.assertJudge', 'assertJudge').
-    leftJoinAndSelect('case.token', 'token'). leftJoinAndSelect('case.token', 'token').
+    leftJoinAndSelect('case.token', 'token').
+    leftJoinAndSelect('token.platformCode', 'platformCode').
+    leftJoinAndSelect('token.env', 'env').
     where(qb => {
         if (catalogId) {
             qb.where('case.catalog = :catalog', {catalog: catalogId});

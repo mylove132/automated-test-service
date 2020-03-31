@@ -59,9 +59,6 @@ export class EnvController {
         return this.envService.addEndpoint(addEndpointDto);
     }
 
-    @OperateModule('endpoint模块')
-    @OperateType('查询endpoint')
-    @OperateDesc('')
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')

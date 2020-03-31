@@ -23,9 +23,6 @@ export class CaseController {
         return this.caseService.addCase(createCaseDto);
     }
 
-    @OperateModule('接口模块')
-    @OperateType('查询接口')
-    @OperateDesc('')
     @ApiOperation({title: 'query case'})
     @ApiResponse({status: 200, description: 'query case success.'})
     @Get()

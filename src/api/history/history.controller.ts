@@ -12,9 +12,7 @@ export class HistoryController {
     private historyService : HistoryService,
   ) {}
 
-  @OperateModule('历史模块')
-  @OperateType('查询历史记录')
-  @OperateDesc('')
+
   @ApiOperation({ title: 'history list', description: '查询历史记录列表' })
   @ApiResponse({ status: 200, description: 'query history list success.'})
   @Get('list')

@@ -31,9 +31,7 @@ export class TokenController {
         return await this.tokenService.updateTokenService(updateTokenDto);
     }
 
-    @OperateModule('token模块')
-    @OperateType('查询token')
-    @OperateDesc('')
+
     @ApiOperation({title: 'query token'})
     @ApiResponse({status: 200, description: 'query token success.'})
     @Get('')

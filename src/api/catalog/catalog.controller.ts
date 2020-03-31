@@ -27,9 +27,7 @@ export class CatalogController {
     return await this.catalogService.addCatalog(createCatalogDto);
   }
 
-  @OperateModule('目录模块')
-  @OperateType('查询目录')
-  @OperateDesc('')
+
   @ApiOperation({ title: 'query catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Get()
