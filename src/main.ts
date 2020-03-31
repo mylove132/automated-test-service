@@ -19,7 +19,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
   console.log('加载中间件成功...')
-
+  log4js.getLogger('main').info('加载中间件成功...');
   const options = new DocumentBuilder()
     .setTitle('automated test service App')
     .setDescription('The automated API description')
@@ -34,5 +34,6 @@ async function bootstrap() {
   logger.info(`automated-test-server start ..... port: ${config.port}`);
   await app.listen(config.port);
   console.log('监听端口成功...')
+  log4js.getLogger('main').info(`服务启动成功,端口${config.port}...`);
 }
 bootstrap();
