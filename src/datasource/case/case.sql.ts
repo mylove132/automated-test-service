@@ -4,6 +4,7 @@ import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {HttpStatus} from "@nestjs/common";
 import {CaseEntity} from "../../api/case/case.entity";
 import {AssertJudgeEntity, AssertTypeEntity} from "../../api/case/assert.entity";
+import {CatalogEntity} from "../../api/catalog/catalog.entity";
 
 
 /**
@@ -158,11 +159,11 @@ export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, c
  * @param caseId
  */
 export const updateCase = async (caseEntityRepository: Repository<CaseEntity>, caseObj, caseId) => {
-    return caseEntityRepository.createQueryBuilder('case').
-    update(CaseEntity).
-    set(caseObj).
-    where('case.id = :caseId', {id: caseId}).
-    execute().catch(
+    return await caseEntityRepository.createQueryBuilder().
+    update(CaseEntity).set(caseObj).
+    where('id = :id',{id: caseId}).
+    execute().
+    catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
