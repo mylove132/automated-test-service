@@ -598,6 +598,8 @@ data						|object		|R			|&nbsp;
 caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
 caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
+&emsp;tokenId			        |number		|O			|tokenId
+
 
 请求示例：
 
@@ -612,7 +614,8 @@ caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默
      "name":"zhangsan"
     },
    "type": 1,
-   "catalogId": 1
+   "catalogId": 1,
+   "tokenId": 4
 }
 
 ```
@@ -711,6 +714,7 @@ data						|object		|R			|
 &emsp;caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
 &emsp;caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
+&emsp;tokenId			|number		|O			|tokenId
 
 请求示例：
 
