@@ -163,10 +163,7 @@ export const addEnv = async (entityRepository: Repository<EnvEntity>, envObj) =>
  * @param envObj
  */
 export const deleteEnvByIds = async (entityRepository: Repository<EnvEntity>, envIds) => {
-    return await entityRepository.createQueryBuilder().
-    delete().
-    where('id IN (:...ids)',{ids: envIds}).
-    execute().
+    return await entityRepository.delete(envIds).
     catch(
         err => {
             console.log(err);

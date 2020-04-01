@@ -168,10 +168,7 @@ export const saveToken = async (tokenEntityRepository: Repository<TokenEntity>, 
  * @param ids
  */
 export const deleteTokenByIds = async (tokenEntityRepository: Repository<TokenEntity>, ids) => {
-    return await tokenEntityRepository.createQueryBuilder('token').
-    delete().
-    where('id IN (:...ids)',{ids: ids}).
-    execute().
+    return await tokenEntityRepository.delete(ids).
     catch(
         err => {
             console.log(err);

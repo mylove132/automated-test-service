@@ -409,7 +409,7 @@ export class SchedulerService {
             }
             md5List.push(key);
         });
-        console.log('定时任务中的md5列表'+JSON.stringify(runningSchObj))
+        // console.log('定时任务中的md5列表'+JSON.stringify(runningSchObj))
         for (let runningSch of runningSchObj){
             if (md5List.indexOf(runningSch.md5) == -1){
                 await this.scheRepository.createQueryBuilder().update(SchedulerEntity).

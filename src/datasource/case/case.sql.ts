@@ -21,6 +21,8 @@ export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>,
     )
 };
 
+
+
 /**
  * 通过接口名称和接口路径查找接口
  * @param caseEntityRepository
@@ -93,6 +95,27 @@ export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepos
 
 
 /**
+ * 通过id查询case
+ * @param caseEntityRepository
+ * @param caseId
+ */
+export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repository<CaseEntity>,caseId) => {
+  return await caseEntityRepository.createQueryBuilder('case')
+    .select()
+    .leftJoinAndSelect("case.endpointObject", 'endpointObj')
+    .leftJoinAndSelect('case.token','token')
+    .where('case.id = :id', {id: caseId})
+    .getOne()
+    .catch(
+      err => {
+        console.log(err);
+        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      }
+    );
+};
+
+
+/**
  * 通过断言类型ID查询
  * @param assertTypeEntityRepository
  * @param id
@@ -143,11 +166,10 @@ export const saveCase = async (caseEntityRepository: Repository<CaseEntity>, cas
  * @param caseIds
  */
 export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, caseIds) => {
-    return await caseEntityRepository.createQueryBuilder('case').delete().where(
-        'case.id IN (:...caseIds)', {caseIds: caseIds}
-    ).execute().catch(err => {
-        console.log(err);
-        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+  return await caseEntityRepository.delete(caseIds)
+    .catch(err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     });
 };
 

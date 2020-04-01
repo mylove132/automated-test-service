@@ -20,6 +20,9 @@ import {SceneEntity} from "../scene/scene.entity";
 import {CommonUtil} from "../../utils/common.util";
 import {TokenEntity} from "../token/token.entity";
 import {findTokenById} from "../../datasource/token/token.sql";
+import { findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from 'bull';
 
 
 @Injectable()
@@ -36,6 +39,7 @@ export class RunService {
         private readonly curlService: CurlService,
         private readonly historyService: HistoryService,
         private readonly envService: EnvService,
+        @InjectQueue('dingdingProcessor') private readonly sendMessageQueue: Queue
     ) {
     }
 
@@ -74,19 +78,7 @@ export class RunService {
             let resultObj = {};
             const startTime = new Date();
             resultObj['startTime'] = startTime;
-            const caseObj = await this.caseRepository
-                .createQueryBuilder('case')
-                .select()
-                .leftJoinAndSelect("case.endpointObject", 'endpointObj')
-                .leftJoinAndSelect('case.token','token')
-                .where('case.id = :id', {id: caseId})
-                .getOne()
-                .catch(
-                    err => {
-                        console.log(err);
-                        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-                    }
-                );
+            const caseObj = await findCaseOfEndpointAndTokenById(this.caseRepository, caseId);
             if (caseObj instanceof CaseEntity) {
                 const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
                 const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
@@ -117,9 +109,10 @@ export class RunService {
                     resultObj['errMsg'] = null;
                     if (caseObj.isFailNotice){
                        if (!assert['result']) {
-                           await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText} 
-                           期望条件 ${assert['relation']} 
-                           实际结果${assert['actual']} 不符合`)
+                            this.sendMessageQueue.add('sendMessage',{message: '1110110'});
+                           // await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
+                           // 期望条件 ${assert['relation']}
+                           // 实际结果${assert['actual']} 不符合`)
                        }
                     }
                 } else {

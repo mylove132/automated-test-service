@@ -79,9 +79,7 @@ export const updateCatalog = async (catalogEntityRepository: Repository<CatalogE
  * @param catalogIds
  */
 export const deleteCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, catalogIds) => {
-    return await catalogEntityRepository.createQueryBuilder('catalog').delete().
-    where('catalog.id IN (:...ids)', {ids: catalogIds}).
-    execute().catch(
+    return await catalogEntityRepository.delete(catalogIds).catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
