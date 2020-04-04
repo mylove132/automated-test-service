@@ -109,10 +109,9 @@ export class RunService {
                     resultObj['errMsg'] = null;
                     if (caseObj.isFailNotice){
                        if (!assert['result']) {
-                            this.sendMessageQueue.add('sendMessage',{message: '1110110'});
-                           // await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
-                           // 期望条件 ${assert['relation']}
-                           // 实际结果${assert['actual']} 不符合`)
+                            this.sendMessageQueue.add('sendMessage',{message: `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
+                           期望条件 ${assert['relation']}
+                           实际结果${assert['actual']} 不符合`});
                        }
                     }
                 } else {
@@ -120,7 +119,7 @@ export class RunService {
                     resultObj['result'] = null;
                     resultObj['errMsg'] = result;
                     if (caseObj.isFailNotice){
-                            await this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
+                      this.sendMessageQueue.add('sendMessage',`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
                     }
                 }
                 // 保存历史记录

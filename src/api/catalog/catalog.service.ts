@@ -38,6 +38,7 @@ export class CatalogService {
         const catalog = new CatalogEntity();
         const platformObj = await findPlatformCodeByCode(this.platformRepository, platformCode);
         catalog.platformCode = platformObj;
+        catalog.parentId = createCatalogDto.parentId;
         catalog.name = createCatalogDto.name;
         catalog.isPub = isPub;
         return await saveCatalog(this.catalogRepository, catalog);

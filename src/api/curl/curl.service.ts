@@ -28,8 +28,7 @@ export class CurlService {
 			}
 		}).pipe(
 			catchError(error => of(`钉钉消息发送失败: ${error}`)),
-		);
-		console.log(result)
+		).subscribe();
 		return result;
 	}
 
