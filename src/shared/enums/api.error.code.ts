@@ -2,6 +2,7 @@ export enum ApiErrorCode {
   //通用code
   TIMEOUT = -1, // 系统繁忙
   SUCCESS = 0, // 成功
+  REQUESTID_NULL = -100,
   PARAM_VALID_FAIL = 19999, //参数验证失败
   RUN_SQL_EXCEPTION = 20000, //数据库执行失败
 

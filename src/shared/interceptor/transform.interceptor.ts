@@ -1,11 +1,12 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Logger } from '../../utils/log4js';
-import {Reflector} from "@nestjs/core";
-import {OperateService} from "../../api/operate/operate.service";
-import {OperateEntity} from "../../api/operate/operate.entity";
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { Logger } from "../../utils/log4js";
+import { Reflector } from "@nestjs/core";
+import { OperateService } from "../../api/operate/operate.service";
+import { OperateEntity } from "../../api/operate/operate.entity";
 import { OperateModule, OperateType } from "../../api/operate/dto/operate.dto";
+import { ApiErrorCode } from "../enums/api.error.code";
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
@@ -14,25 +15,21 @@ export class TransformInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     return next.handle().pipe(
       map(data => {
-        const logFormat = ` <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    Request original url: ${req.originalUrl}
-    Method: ${req.method}
-    IP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}
-    User: ${JSON.stringify(req.user)}
-    Response data:\n ${JSON.stringify(data)}
-    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`;
-        Logger.info(logFormat);
-        Logger.access(logFormat);
+        if (!context.switchToHttp().getRequest().headers['requestId']){
+
+        }
+        const res = {
+          code: ApiErrorCode.SUCCESS,
+          msg: 'success',
+          data
+        };
+        this.doLog(context, res);
 
           const operate_module = this.reflector.get<OperateModule>('operate_module', context.getHandler());
           const operate_type = this.reflector.get<OperateType>('operate_type', context.getHandler());
           const operate_desc = this.reflector.get<string>('operate_desc', context.getHandler());
           if (!operate_module || !operate_type){
-              return {
-                  data,
-                  code: 0,
-                  message: 'success',
-              };
+              return res;
           }
           const operate = new OperateEntity();
           operate.operateModule = operate_module;
@@ -44,12 +41,18 @@ export class TransformInterceptor implements NestInterceptor {
           operate.responseParam = JSON.stringify(data);
           operate.user = req.user;
           this.operateService.createOperate(operate);
-          return {
-              data,
-              code: 0,
-              message: 'success',
-          };
+          return res;
       }),
     );
+  }
+  doLog(context: ExecutionContext, res): void {
+    const ctx = context.switchToHttp();
+    const request = ctx.getRequest();
+    const { url, headers, method, body } = request;
+    const ua = headers['user-agent'];
+
+    Logger.info(
+      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(res)}`
+    )
   }
 }
