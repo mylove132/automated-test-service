@@ -24,50 +24,58 @@ import {HttpExceptionFilter} from "./shared/filters/http-exception.filter";
 import {AllExceptionsFilter} from "./shared/filters/any-exception.filter";
 
 const Orm = (): DynamicModule => {
-    console.log('连接数据库中....')
+    console.log('连接数据库中....');
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
     return TypeOrmModule.forRoot(config.getTypeOrmConfig());
 };
 
+const modules = [
+  ScheduleModule.forRoot(), //开启定时任务服务
+  ConfigModule,
+  Orm(),
+  CaseModule,
+  CatalogModule,
+  UserModule,
+  EnvModule,
+  CaseListModule,
+  RunModule,
+  HistoryModule,
+  SchedulerModule,
+  JmeterModule,
+  SceneModule,
+  TokenModule,
+  OperateModule
+];
+
+const provides = [
+  {
+    provide: APP_GUARD,
+    useClass: AuthGuard,
+  },
+  {
+    provide: APP_INTERCEPTOR,
+    useClass: TransformInterceptor,
+  },
+  {
+    provide: APP_FILTER,
+    useClass: AllExceptionsFilter,
+  },
+  {
+    provide: APP_FILTER,
+    useClass: HttpExceptionFilter,
+  },
+];
+
 @Module({
     imports: [
-        ScheduleModule.forRoot(), //开启定时任务服务
-        ConfigModule,
-        Orm(),
-        CaseModule,
-        CatalogModule,
-        UserModule,
-        EnvModule,
-        CaseListModule,
-        RunModule,
-        HistoryModule,
-        SchedulerModule,
-        JmeterModule,
-        SceneModule,
-        TokenModule,
-        OperateModule
+      ...modules
     ],
     controllers: [
         AppController
     ],
     providers: [
         // 全局绑定守卫
-        {
-            provide: APP_GUARD,
-            useClass: AuthGuard,
-        },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: TransformInterceptor,
-        },
-        {
-            provide: APP_FILTER,
-            useClass: AllExceptionsFilter,
-        },
-        {
-            provide: APP_FILTER,
-            useClass: HttpExceptionFilter,
-        },
+      ...provides
     ]
 })
 export class ApplicationModule {

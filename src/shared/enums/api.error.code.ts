@@ -25,7 +25,6 @@ export enum ApiErrorCode {
   CASE_ID_INVALID = 40001, //接口id无效
   CASE_NAME_PATH_INVALID = 40002,
 
-  //caselist
 
   CASELIST_ID_INVALID = 50001,
 

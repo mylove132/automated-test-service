@@ -63,7 +63,6 @@ export class AuthGuard implements CanActivate {
    * @param req
    */
   async validateRequestId(req: Request): Promise<boolean> {
-    console.info(req.headers)
     const authRequestId = req.headers.requestid;
     if (authRequestId) {
       const requestId = authRequestId;
