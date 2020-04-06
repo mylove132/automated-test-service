@@ -7,8 +7,7 @@ import {
     OneToMany,
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
-import {CaseEntity} from '../case/case.entity';
-import {SceneEntity} from "../scene/scene.entity";
+import { OperateType,OperateModule } from "./dto/operate.dto";
 @Entity('operate')
 export class OperateEntity {
 
@@ -22,12 +21,12 @@ export class OperateEntity {
     user: UserEntity;
 
     //操作模块
-    @Column()
-    operateModule: string;
+  @Column('enum', {default: OperateModule.CASE, nullable:false, comment: '操作模块', enum: OperateModule})
+    operateModule: OperateModule;
 
     //操作类型
-    @Column()
-    operateType: string;
+    @Column('enum', {default: OperateType.CREAT, nullable:false, comment: '操作类型', enum: OperateType})
+    operateType: OperateType;
 
     //操作描述
     @Column({nullable: true})

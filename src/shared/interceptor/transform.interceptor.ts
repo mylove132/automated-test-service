@@ -5,6 +5,7 @@ import { Logger } from '../../utils/log4js';
 import {Reflector} from "@nestjs/core";
 import {OperateService} from "../../api/operate/operate.service";
 import {OperateEntity} from "../../api/operate/operate.entity";
+import { OperateModule, OperateType } from "../../api/operate/dto/operate.dto";
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
@@ -23,8 +24,8 @@ export class TransformInterceptor implements NestInterceptor {
         Logger.info(logFormat);
         Logger.access(logFormat);
 
-          const operate_module = this.reflector.get<string>('operate_module', context.getHandler());
-          const operate_type = this.reflector.get<string>('operate_type', context.getHandler());
+          const operate_module = this.reflector.get<OperateModule>('operate_module', context.getHandler());
+          const operate_type = this.reflector.get<OperateType>('operate_type', context.getHandler());
           const operate_desc = this.reflector.get<string>('operate_desc', context.getHandler());
           if (!operate_module || !operate_type){
               return {

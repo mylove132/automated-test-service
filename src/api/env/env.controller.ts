@@ -1,9 +1,10 @@
-import {Body, Controller, Delete, Get, Post, Put, Query, ValidationPipe} from '@nestjs/common';
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
-import {EnvService} from './env.service';
-import {EnvEntity} from './env.entity';
-import {AddEndpointDto, DeleteEndpointDto, QueryEndpointDto, DeleteEnvDto} from './dto/env.dto';
-import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
+import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
+import { EnvService } from "./env.service";
+import { EnvEntity } from "./env.entity";
+import { AddEndpointDto, DeleteEndpointDto, DeleteEnvDto } from "./dto/env.dto";
+import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
+import { OperateModule, OperateType } from "../operate/dto/operate.dto";
 
 @ApiBearerAuth()
 @ApiUseTags('env')
@@ -19,8 +20,8 @@ export class EnvController {
         return this.envService.allEnv();
     }
 
-    @OperateModule('环境模块')
-    @OperateType('创建环境')
+    @OpeModule(OperateModule.ENV)
+    @OpeType(OperateType.CREAT)
     @OperateDesc('')
     @ApiOperation({ title: 'create env' })
     @ApiResponse({ status: 200, description: 'create env success.'})
@@ -29,8 +30,8 @@ export class EnvController {
         return this.envService.addEnv(envEntity);
     }
 
-    @OperateModule('环境模块')
-    @OperateType('更新环境')
+    @OpeModule(OperateModule.ENV)
+    @OpeType(OperateType.UPDATE)
     @OperateDesc('')
     @ApiOperation({ title: 'update env' })
     @ApiResponse({ status: 200, description: 'update env success.'})
@@ -39,8 +40,8 @@ export class EnvController {
         return this.envService.updateEnv(envEntity);
     }
 
-    @OperateModule('环境模块')
-    @OperateType('删除环境')
+   @OpeModule(OperateModule.ENV)
+   @OpeType(OperateType.DELETE)
     @OperateDesc('')
     @ApiOperation({ title: 'delete env' })
     @ApiResponse({ status: 200, description: 'delete env success.'})
@@ -49,8 +50,8 @@ export class EnvController {
         return this.envService.deleteEnv(deleteEnvDto);
     }
 
-    @OperateModule('endpoint模块')
-    @OperateType('创建endpoint')
+    @OpeModule(OperateModule.ENDPOINT)
+    @OpeType(OperateType.CREAT)
     @OperateDesc('')
     @ApiOperation({ title: 'create endpoint' })
     @ApiResponse({ status: 200, description: 'create endpoint success.'})
@@ -66,8 +67,8 @@ export class EnvController {
         return this.envService.findEndpointByEnv(envIds);
     }
 
-    @OperateModule('endpoint模块')
-    @OperateType('删除endpoint')
+    @OpeModule(OperateModule.ENDPOINT)
+    @OpeType(OperateType.DELETE)
     @OperateDesc('')
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})

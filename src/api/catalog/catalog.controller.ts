@@ -1,13 +1,14 @@
-import {Body, Controller, Delete, Get, HttpStatus, Post, Put, Query} from '@nestjs/common';
-import {CatalogService} from './catalog.service';
+import { Body, Controller, Delete, Get, HttpStatus, Post, Put, Query } from "@nestjs/common";
+import { CatalogService } from "./catalog.service";
 
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags,} from '@nestjs/swagger';
-import {CreateCatalogDto, DeleteCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
-import {CatalogEntity} from './catalog.entity';
-import {ApiException} from "../../shared/exceptions/api.exception";
-import {ApiErrorCode} from "../../shared/enums/api.error.code";
-import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
-import {PlatformCodeEntity} from "./platformCode.entity";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
+import { CreateCatalogDto, DeleteCatalogDto, UpdateCatalogDto } from "./dto/catalog.dto";
+import { CatalogEntity } from "./catalog.entity";
+import { ApiException } from "../../shared/exceptions/api.exception";
+import { ApiErrorCode } from "../../shared/enums/api.error.code";
+import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
+import { PlatformCodeEntity } from "./platformCode.entity";
+import { OperateModule, OperateType } from "../operate/dto/operate.dto";
 
 
 @ApiBearerAuth()
@@ -17,8 +18,8 @@ export class CatalogController {
 
   constructor(private readonly catalogService: CatalogService) {}
 
-  @OperateModule('目录模块')
-  @OperateType('创建目录')
+  @OpeModule(OperateModule.CATALOG)
+  @OpeType(OperateType.CREAT)
   @OperateDesc('')
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
@@ -45,8 +46,8 @@ export class CatalogController {
     return this.catalogService.findPlatformCode();
   }
 
-  @OperateModule('目录模块')
-  @OperateType('删除目录')
+  @OpeModule(OperateModule.CATALOG)
+  @OpeType(OperateType.DELETE)
   @OperateDesc('')
   @ApiOperation({ title: 'delete catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
@@ -55,8 +56,8 @@ export class CatalogController {
     return this.catalogService.deleteById(deleteCatalogDto);
   }
 
-  @OperateModule('目录模块')
-  @OperateType('更新目录')
+  @OpeModule(OperateModule.CATALOG)
+  @OpeType(OperateType.UPDATE)
   @OperateDesc('')
   @ApiOperation({ title: 'update catalog' })
   @ApiResponse({ status: 200, description: 'update catalog success.'})

@@ -1,9 +1,10 @@
-import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
 
-import {ApiBearerAuth, ApiOperation, ApiResponse} from '@nestjs/swagger';
-import {CaseService} from './case.service';
-import {CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
-import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
+import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { CaseService } from "./case.service";
+import { CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto } from "./dto/case.dto";
+import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
+import { OperateModule, OperateType } from "../operate/dto/operate.dto";
 
 @ApiBearerAuth()
 @Controller('case')
@@ -13,8 +14,8 @@ export class CaseController {
     }
 
 
-    @OperateModule('接口模块')
-    @OperateType('创建接口')
+    @OpeModule(OperateModule.CASE)
+    @OpeType(OperateType.CREAT)
     @OperateDesc('')
     @ApiOperation({title: 'create case'})
     @ApiResponse({status: 200, description: 'create case success.'})
@@ -36,8 +37,8 @@ export class CaseController {
         return this.caseService.findCase(catalogId, envId, Number(caseType), caseGradeList, {page, limit});
     }
 
-    @OperateModule('接口模块')
-    @OperateType('删除接口')
+    @OpeModule(OperateModule.CASE)
+    @OpeType(OperateType.DELETE)
     @OperateDesc('通过ID删除接口')
     @ApiOperation({title: 'delete case'})
     @ApiResponse({status: 200, description: 'delete case success.'})
@@ -47,8 +48,8 @@ export class CaseController {
     }
 
 
-    @OperateModule('接口模块')
-    @OperateType('更新接口')
+    @OpeModule(OperateModule.CASE)
+    @OpeType(OperateType.UPDATE)
     @OperateDesc('通过ID删除接口')
     @ApiOperation({title: 'update case'})
     @ApiResponse({status: 200, description: 'update case success.'})

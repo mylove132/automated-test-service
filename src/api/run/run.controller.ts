@@ -1,8 +1,9 @@
-import {Controller, Post, Body, Query, Get} from '@nestjs/common';
-import {RunService} from './run.service';
-import {RunCaseDto, RunCaseByIdDto, RunCaseListByIdDto, CovertDto, RunSceneDto} from './dto/run.dto';
-import {ApiOperation, ApiResponse, ApiUseTags} from '@nestjs/swagger';
-import {OperateDesc, OperateModule, OperateType} from "../../utils/common.decorators";
+import { Body, Controller, Post } from "@nestjs/common";
+import { RunService } from "./run.service";
+import { CovertDto, RunCaseByIdDto, RunCaseDto, RunCaseListByIdDto, RunSceneDto } from "./dto/run.dto";
+import { ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
+import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
+import { OperateModule, OperateType } from "../operate/dto/operate.dto";
 
 @ApiUseTags('run')
 @Controller('run')
@@ -12,8 +13,8 @@ export class RunController {
     ) {
     }
 
-    @OperateModule('运行模块')
-    @OperateType('执行临时接口')
+    @OpeModule(OperateModule.RUN)
+    @OpeType(OperateType.RUNTMPCASE)
     @OperateDesc('')
     @ApiOperation({title: 'run temp case', description: '运行http请求'})
     @ApiResponse({status: 200, description: 'run temp case success.'})
@@ -22,8 +23,8 @@ export class RunController {
         return await this.runService.runTempCase(runCaseDto);
     }
 
-    @OperateModule('运行模块')
-    @OperateType('通过接口ID运行')
+  @OpeModule(OperateModule.RUN)
+  @OpeType(OperateType.RUNIDCASE)
     @OperateDesc('')
     @ApiOperation({title: 'run case by id', description: '运行某具体样例请求'})
     @ApiResponse({status: 200, description: 'run case success.'})
@@ -32,8 +33,8 @@ export class RunController {
         return await this.runService.runCaseById(runCaseByIdDto);
     }
 
-    @OperateModule('运行模块')
-    @OperateType('执行临时接口')
+  @OpeModule(OperateModule.RUN)
+  @OpeType(OperateType.RUNTMPCASE)
     @OperateDesc('')
     @ApiOperation({title: 'run caselist by id', description: '运行样例里的所有接口请求'})
     @ApiResponse({status: 200, description: 'run caselist success.'})
@@ -42,8 +43,8 @@ export class RunController {
         return await this.runService.runCaseListById(runCaseListByIdDto);
     }
 
-    @OperateModule('运行模块')
-    @OperateType('转换接口')
+  @OpeModule(OperateModule.RUN)
+  @OpeType(OperateType.COVERT)
     @OperateDesc('')
     @ApiOperation({title: 'covert curl url', description: '接口转换为curl'})
     @ApiResponse({status: 200, description: 'run caselist success.'})
@@ -52,8 +53,8 @@ export class RunController {
         return await this.runService.covertCurl(covertDto);
     }
 
-    @OperateModule('运行模块')
-    @OperateType('运行场景接口')
+  @OpeModule(OperateModule.RUN)
+  @OpeType(OperateType.RUNSCENE)
     @OperateDesc('')
     @ApiOperation({title: 'run scene by id', description: '运行场景'})
     @ApiResponse({status: 200, description: 'run scene success.'})
