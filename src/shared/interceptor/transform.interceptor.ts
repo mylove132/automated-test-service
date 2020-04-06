@@ -11,13 +11,13 @@ import { OperateModule, OperateType } from "../../api/operate/dto/operate.dto";
 export class TransformInterceptor implements NestInterceptor {
     constructor(private readonly reflector: Reflector,private readonly operateService: OperateService) {}
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const req = context.getArgByIndex(1).req;
+    const req = context.switchToHttp().getRequest();
     return next.handle().pipe(
       map(data => {
         const logFormat = ` <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     Request original url: ${req.originalUrl}
     Method: ${req.method}
-    IP: ${req.ip}
+    IP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}
     User: ${JSON.stringify(req.user)}
     Response data:\n ${JSON.stringify(data)}
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`;
@@ -38,7 +38,7 @@ export class TransformInterceptor implements NestInterceptor {
           operate.operateModule = operate_module;
           operate.operateType = operate_type;
           operate.operateDesc = operate_desc;
-          operate.operateIp = req.ip;
+          operate.operateIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
           operate.operateUri = req.originalUrl;
           operate.requestParam = JSON.stringify(req.body);
           operate.responseParam = JSON.stringify(data);

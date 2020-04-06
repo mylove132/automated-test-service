@@ -36,6 +36,13 @@ export const saveException = async (exceptionReposity: Repository<ExceptionEntit
   );
 };
 
+/**
+ * 查询操作记录
+ * @param operateEntityRepository
+ * @param userId
+ * @param operateModule
+ * @param operateType
+ */
 export const findOperateByUserAndOperate = async (operateEntityRepository: Repository<OperateEntity>,
                                                   userId, operateModule: OperateModule, operateType: OperateType) => {
   return await operateEntityRepository.createQueryBuilder("operate").where(qb => {
@@ -59,5 +66,6 @@ export const findOperateByUserAndOperate = async (operateEntityRepository: Repos
         }
       }
     }
-  }).orderBy('operate.createDate','DESC');
+  }).leftJoinAndSelect('operate.user','user').
+  orderBy('operate.createDate','DESC');
 };
