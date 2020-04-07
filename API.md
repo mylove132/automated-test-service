@@ -3520,6 +3520,83 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 }
 ```
 
+### 5.2  获取所有用户
+- **接口说明：** 获取所有用户
+- **请求方式：** GET
+- **接口地址：** /api/user
+
+#### 5.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+
+
+请求示例
+
+```
+```
+
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": [
+        {
+            "id": 1,
+            "username": "crmadmin",
+            "userId": 20
+        },
+        {
+            "id": 2,
+            "username": "13821774377",
+            "userId": 1439
+        },
+        {
+            "id": 3,
+            "username": "13016429490",
+            "userId": 1561
+        },
+        {
+            "id": 4,
+            "username": "hu",
+            "userId": 1560
+        },
+        {
+            "id": 5,
+            "username": "autotest",
+            "userId": 1572
+        },
+        {
+            "id": 6,
+            "username": "autotest",
+            "userId": 1639
+        },
+        {
+            "id": 7,
+            "username": "huadmin",
+            "userId": 1634
+        },
+        {
+            "id": 8,
+            "username": "13016429490",
+            "userId": 1640
+        },
+        {
+            "id": 9,
+            "username": "hu",
+            "userId": 1656
+        },
+        {
+            "id": 10,
+            "username": "changpin",
+            "userId": 215
+        }
+    ]
+}
+```
+
 
 ### 6.1 获取历史记录
 - **接口说明：** 获取历史记录

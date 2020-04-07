@@ -1,4 +1,4 @@
-import { Post, Body, Controller, SetMetadata } from '@nestjs/common';
+import {Post, Body, Controller, SetMetadata, Get} from '@nestjs/common';
 import { UserService } from './user.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiUseTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -16,5 +16,12 @@ export class UserController {
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto): Promise<any> {
     return await this.userService.login(loginUserDto);
+  }
+
+  @ApiOperation({ title: 'find user', description: '查询所有用户接口' })
+  @ApiResponse({ status: 200, description: 'find user success.'})
+  @Get('')
+  async userListController(){
+    return await this.userService.userListService();
   }
 }

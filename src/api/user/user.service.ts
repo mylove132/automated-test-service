@@ -12,6 +12,7 @@ import { getRequestMethodTypeString } from '../../utils'
 import { ApiException } from '../../shared/exceptions/api.exception';
 import { ApiErrorCode } from '../../shared/enums/api.error.code';
 import { UserData } from './user.interface';
+import {findUserList} from "../../datasource/user/user.sql";
 
 
 
@@ -83,9 +84,15 @@ export class UserService {
   }
 
   /**
+   * 查询库中所有用户
+   */
+  async userListService(){
+    return await findUserList(this.userRepository);
+  }
+  /**
    * 通过id查询用户
-   * @param {number}: id
    * @return {Promise<UserRO>}: 用户信息
+   * @param id
    */
   async findById(id: number): Promise<UserEntity>{
     const user = await this.userRepository.findOne(id);
