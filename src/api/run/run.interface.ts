@@ -1,4 +1,4 @@
-import {Executor} from '../history/dto/history.enum';
+import {Executor} from "../../config/base.enum";
 
 export interface IRunCaseList {
 

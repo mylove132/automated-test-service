@@ -1,7 +1,7 @@
 import {
     ArrayMaxSize,
     ArrayMinSize,
-    IsArray, IsBoolean,
+    IsArray,
     IsJSON,
     IsNotEmpty,
     IsNumber,
@@ -9,10 +9,9 @@ import {
     IsOptional,
     IsString,
     IsUrl,
-    MinLength
 } from 'class-validator';
 import {Optional} from '@nestjs/common';
-import {ParamType, RequestType} from "./http.enum";
+import {CaseGrade, CaseType, ParamType, RequestType} from "../../../config/base.enum";
 
 export class CreateCaseDto {
 
@@ -41,12 +40,12 @@ export class CreateCaseDto {
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly caseGrade: CaseGrade;
+    readonly caseGrade: number | CaseGrade;
 
     //用例类别
     @IsNumber()
     @IsOptional()
-    readonly caseType: CaseType;
+    readonly caseType:number | CaseType;
 
     @IsNotEmpty()
     catalogId: number;
@@ -161,11 +160,3 @@ export class DeleteCaseDto {
     ids: number[];
 }
 
-
-export enum CaseGrade {
-    HIGH = 0, IN = 1, LOW = 2
-}
-
-export enum CaseType {
-    SINGLE = 0, SCENE = 1, BLEND = 2
-}

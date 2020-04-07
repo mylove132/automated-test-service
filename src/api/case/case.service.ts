@@ -1,7 +1,7 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {InsertResult, Repository} from 'typeorm';
 import {CaseEntity} from './case.entity';
-import {CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
+import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from './dto/case.dto';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
@@ -23,6 +23,7 @@ import {
 } from "../../datasource/case/case.sql";
 import {findTokenById} from "../../datasource/token/token.sql";
 import {TokenEntity} from "../token/token.entity";
+import {CaseType} from "../../config/base.enum";
 
 export class CaseService {
     constructor(
@@ -143,7 +144,9 @@ export class CaseService {
         if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
         if (updateCaseDto.isFailNotice) caseObj.isFailNotice = updateCaseDto.isFailNotice;
         if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
-        if (updateCaseDto.caseGrade) caseObj.caseGrade = updateCaseDto.caseGrade
+        console.log(updateCaseDto.caseGrade)
+        if (updateCaseDto.caseGrade) caseObj.caseGrade = updateCaseDto.caseGrade;
+        console.log(caseObj.caseGrade)
         if (updateCaseDto.caseType) caseObj.caseType = updateCaseDto.caseType;
         if (! await findCaseById(this.caseRepository, updateCaseDto.id)){
             throw new ApiException(`更改case的id:${updateCaseDto.id}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);

@@ -1,7 +1,7 @@
 import { Controller, Get, Query, ParseIntPipe } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { OperateService } from "./operate.service";
-import { OperateModule, OperateType } from "./dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 import { Pagination } from "nestjs-typeorm-paginate";
 import { OperateEntity } from "./operate.entity";
 

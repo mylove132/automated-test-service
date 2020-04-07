@@ -1,5 +1,5 @@
 import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {RequestStatusEnum, Executor} from './dto/history.enum';
+import {RequestStatusEnum, Executor} from '../../config/base.enum';
 import {CaseEntity} from '../case/case.entity';
 
 

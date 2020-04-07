@@ -68,7 +68,7 @@ export class SceneService {
    * 获取所有的场景信息
    * @return {Promise<Pagination<HistoryEntity>>}: 场景列表
    * @param catalogId
-   * @param caseGradeList
+   * @param sceneGradeList
    * @param options
    */
   async findSceneService(catalogId: number, sceneGradeList: number[],options: IPaginationOptions): Promise<Pagination<SceneEntity>> {

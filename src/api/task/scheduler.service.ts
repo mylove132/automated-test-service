@@ -9,14 +9,12 @@ import {CronJob} from 'cron';
 import {SchedulerEntity} from './scheduler.entity';
 import {EnvEntity} from '../env/env.entity';
 import {SIngleTaskDto, TaskIdsDto, UpdateTaskDto} from './dto/scheduler.dto';
-import {RunStatus, TaskType} from './dto/run.status';
 import {CommonUtil} from '../../utils/common.util';
 import {RunService} from '../run/run.service';
 import {IRunCaseById} from '../run/run.interface';
-import {Executor} from '../history/dto/history.enum';
-import {CaseGrade, CaseType} from "../case/dto/case.dto";
 import {CaseEntity} from "../case/case.entity";
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
+import {CaseGrade, CaseType, Executor, RunStatus, TaskType} from "../../config/base.enum";
 
 var parser = require('cron-parser');
 

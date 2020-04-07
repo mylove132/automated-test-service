@@ -4,7 +4,7 @@ import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 import { ExceptionEntity } from "../../api/operate/expection.entity";
-import { OperateModule, OperateType } from "../../api/operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 
 /**
@@ -24,11 +24,11 @@ export const saveOperate = async (operateReposity: Repository<OperateEntity>, oe
 
 /**
  * 保存异常记录
- * @param exceptionReposity
+ * @param exceptionRepository
  * @param ee
  */
-export const saveException = async (exceptionReposity: Repository<ExceptionEntity>, ee: ExceptionEntity) => {
-  await exceptionReposity.save(ee).catch(
+export const saveException = async (exceptionRepository: Repository<ExceptionEntity>, ee: ExceptionEntity) => {
+  await exceptionRepository.save(ee).catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -45,27 +45,26 @@ export const saveException = async (exceptionReposity: Repository<ExceptionEntit
  */
 export const findOperateByUserAndOperate = async (operateEntityRepository: Repository<OperateEntity>,
                                                   userId, operateModule: OperateModule, operateType: OperateType) => {
-  return await operateEntityRepository.createQueryBuilder("operate").where(qb => {
+  return operateEntityRepository.createQueryBuilder("operate").where(qb => {
     if (userId) {
-      qb.where("operate.user = :user", { user: userId });
+      qb.where("operate.user = :user", {user: userId});
       if (operateModule) {
-        qb.andWhere("operate.operateModule = :operateModule", { operateModule: operateModule });
+        qb.andWhere("operate.operateModule = :operateModule", {operateModule: operateModule});
       }
       if (operateType) {
-        qb.andWhere("operate.operateType = :operateType", { operateType: operateType });
+        qb.andWhere("operate.operateType = :operateType", {operateType: operateType});
       }
     } else {
       if (operateModule) {
-        qb.where("operate.operateModule = :operateModule", { operateModule: operateModule });
+        qb.where("operate.operateModule = :operateModule", {operateModule: operateModule});
         if (operateType) {
-          qb.andWhere("operate.operateType = :operateType", { operateType: operateType });
+          qb.andWhere("operate.operateType = :operateType", {operateType: operateType});
         }
       } else {
         if (operateType) {
-          qb.where("operate.operateType = :operateType", { operateType: operateType });
+          qb.where("operate.operateType = :operateType", {operateType: operateType});
         }
       }
     }
-  }).leftJoinAndSelect('operate.user','user').
-  orderBy('operate.createDate','DESC');
+  }).leftJoinAndSelect('operate.user', 'user').orderBy('operate.createDate', 'DESC');
 };

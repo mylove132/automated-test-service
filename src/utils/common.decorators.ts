@@ -1,5 +1,5 @@
 import { SetMetadata} from '@nestjs/common';
-import { OperateType,OperateModule } from "../api/operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../config/base.enum";
 
 export const OpeModule = (module: OperateModule) => SetMetadata('operate_module', module);
 export const OpeType = (type: OperateType) => SetMetadata('operate_type', type);

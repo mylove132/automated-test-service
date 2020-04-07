@@ -5,7 +5,7 @@ import { OperateEntity } from "./operate.entity";
 import { ExceptionEntity } from "./expection.entity";
 import { findOperateByUserAndOperate, saveException, saveOperate } from "../../datasource/operate/operate.sql";
 import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
-import { OperateModule, OperateType } from "./dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 
 @Injectable()
@@ -47,7 +47,8 @@ export class OperateService {
   /**
    * 查询操作记录
    * @param userId
-   * @param envId
+   * @param operateModule
+   * @param operateType
    * @param options
    */
   async findOperate(userId: number, operateModule: OperateModule, operateType: OperateType, options: IPaginationOptions): Promise<Pagination<OperateEntity>> {

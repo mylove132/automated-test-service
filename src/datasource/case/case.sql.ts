@@ -1,10 +1,9 @@
-import {Brackets, Repository} from "typeorm";
+import { Repository} from "typeorm";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {HttpStatus} from "@nestjs/common";
 import {CaseEntity} from "../../api/case/case.entity";
 import {AssertJudgeEntity, AssertTypeEntity} from "../../api/case/assert.entity";
-import {CatalogEntity} from "../../api/catalog/catalog.entity";
 
 
 /**
@@ -181,10 +180,7 @@ export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, c
  * @param caseId
  */
 export const updateCase = async (caseEntityRepository: Repository<CaseEntity>, caseObj, caseId) => {
-    return await caseEntityRepository.createQueryBuilder().
-    update(CaseEntity).set(caseObj).
-    where('id = :id',{id: caseId}).
-    execute().
+    return await caseEntityRepository.update(caseId, caseObj).
     catch(
         err => {
             console.log(err);

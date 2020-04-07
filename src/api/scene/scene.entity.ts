@@ -1,15 +1,13 @@
 import {
     Column,
     CreateDateColumn,
-    Entity, JoinTable,
-    ManyToMany,
+    Entity,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm';
 import {CatalogEntity} from "../catalog/catalog.entity";
-import {CaseEntity} from "../case/case.entity";
-import {CaseGrade} from "../case/dto/case.dto";
+import {CaseGrade} from "../../config/base.enum";
 
 
 @Entity('scene')

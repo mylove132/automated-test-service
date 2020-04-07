@@ -4,10 +4,9 @@ import {
     Column,
     ManyToOne,
     CreateDateColumn,
-    OneToMany,
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
-import { OperateType,OperateModule } from "./dto/operate.dto";
+import { OperateType,OperateModule } from "../../config/base.enum";
 @Entity('operate')
 export class OperateEntity {
 

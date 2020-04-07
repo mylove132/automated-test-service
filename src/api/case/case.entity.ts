@@ -9,13 +9,12 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm';
-import {ParamType, RequestType} from './dto/http.enum';
+import {CaseGrade, CaseType, ParamType, RequestType} from '../../config/base.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {SchedulerEntity} from "../task/scheduler.entity";
-import {CaseGrade, CaseType} from "./dto/case.dto";
 import {CaselistEntity} from "../caselist/caselist.entity";
 import {TokenEntity} from "../token/token.entity";
 

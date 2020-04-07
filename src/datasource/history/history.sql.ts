@@ -6,11 +6,11 @@ import {HistoryEntity} from "../../api/history/history.entity";
 
 /**
  * 保存历史记录
- * @param historyReposity
+ * @param historyRepository
  * @param historyObj
  */
-export const saveHistory = async (historyReposity: Repository<HistoryEntity>, historyObj) => {
-    return await historyReposity.save(historyObj)
+export const saveHistory = async (historyRepository: Repository<HistoryEntity>, historyObj) => {
+    return await historyRepository.save(historyObj)
         .catch(
             err => {
                 console.log(err);
@@ -22,13 +22,11 @@ export const saveHistory = async (historyReposity: Repository<HistoryEntity>, hi
 
 /**
  * 查询历史记录
- * @param historyReposity
+ * @param historyRepository
  * @param path
  */
-export const findHistoryByPath = async (historyReposity: Repository<HistoryEntity>, path) => {
-    return await historyReposity.createQueryBuilder('history').
-    leftJoinAndSelect('history.case', 'case').
-    where(
+export const findHistoryByPath = async (historyRepository: Repository<HistoryEntity>, path) => {
+    return historyRepository.createQueryBuilder('history').leftJoinAndSelect('history.case', 'case').where(
         qb => {
             if (path) {
                 qb.where("case.path LIKE :param")

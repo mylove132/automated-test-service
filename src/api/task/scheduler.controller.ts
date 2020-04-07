@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common"
 import { TaskIdsDto, SIngleTaskDto, UpdateTaskDto } from "./dto/scheduler.dto";
 import { SchedulerService } from "./scheduler.service";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 ApiBearerAuth();
 

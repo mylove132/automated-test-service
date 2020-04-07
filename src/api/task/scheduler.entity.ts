@@ -4,14 +4,13 @@ import {
     Entity,
     JoinColumn, JoinTable, ManyToMany,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn
 } from 'typeorm';
 import {EnvEntity} from '../env/env.entity';
-import {RunStatus, TaskType} from './dto/run.status';
 import {CaseEntity} from "../case/case.entity";
+import {RunStatus, TaskType} from "../../config/base.enum";
 
 @Unique(['md5','name'])
 @Entity('secheduler')

@@ -3,7 +3,7 @@ import { RunService } from "./run.service";
 import { CovertDto, RunCaseByIdDto, RunCaseDto, RunCaseListByIdDto, RunSceneDto } from "./dto/run.dto";
 import { ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 @ApiUseTags('run')
 @Controller('run')

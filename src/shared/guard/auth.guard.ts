@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
             return true;
         }
         // 请求头必须要带token才可以访问
-        return this.validateRequest(request) && this.validateRequestId(request);
+        return this.validateRequest(request);
     }
 
   /**

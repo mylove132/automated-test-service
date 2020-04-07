@@ -2,9 +2,9 @@ import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common"
 
 import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CaseService } from "./case.service";
-import { CaseType, CreateCaseDto, DeleteCaseDto, UpdateCaseDto } from "./dto/case.dto";
+import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto } from "./dto/case.dto";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {CaseType, OperateModule, OperateType} from "../../config/base.enum";
 
 @ApiBearerAuth()
 @Controller('case')

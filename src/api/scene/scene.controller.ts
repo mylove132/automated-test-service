@@ -5,7 +5,7 @@ import { CreateSceneDto, DeleteSceneByIdDto, UpdateSceneDto } from "./dto/scene.
 import { Pagination } from "nestjs-typeorm-paginate";
 import { SceneEntity } from "./scene.entity";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 @ApiUseTags("scene")
 @Controller("scene")

@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common"
 import { TokenService } from "./token.service";
 import { CreateTokenDto, DeleteTokenDto, UpdateTokenDto } from "./dto/token.dto";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import { OperateModule, OperateType } from "../../config/base.enum";
 
 @ApiUseTags("token")
 @Controller("token")

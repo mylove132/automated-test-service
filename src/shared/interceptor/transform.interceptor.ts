@@ -5,8 +5,8 @@ import { Logger } from "../../utils/log4js";
 import { Reflector } from "@nestjs/core";
 import { OperateService } from "../../api/operate/operate.service";
 import { OperateEntity } from "../../api/operate/operate.entity";
-import { OperateModule, OperateType } from "../../api/operate/dto/operate.dto";
 import { ApiErrorCode } from "../enums/api.error.code";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {

@@ -108,18 +108,18 @@ export class RunService {
                     resultObj['assert'] = assert;
                     resultObj['errMsg'] = null;
                     if (caseObj.isFailNotice){
-                       if (!assert['result']) {
+                        if (!assert['result']) {
                             this.sendMessageQueue.add('sendMessage',{message: `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
                            期望条件 ${assert['relation']}
                            实际结果${assert['actual']} 不符合`});
-                       }
+                        }
                     }
                 } else {
                     resultObj['status'] = false;
                     resultObj['result'] = null;
                     resultObj['errMsg'] = result;
                     if (caseObj.isFailNotice){
-                      this.sendMessageQueue.add('sendMessage',`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
+                        this.sendMessageQueue.add('sendMessage',`接口 ${caseObj.name} 运行失败，失败内容: ${result}`)
                     }
                 }
                 // 保存历史记录
@@ -361,7 +361,7 @@ export class RunService {
 
     /**
      * 运行场景
-     * @param sceneId
+     * @param runSceneDto
      */
     async runScene(runSceneDto: RunSceneDto) {
         const scene = await this.sceneRepository.findOne(runSceneDto.sceneId).catch(

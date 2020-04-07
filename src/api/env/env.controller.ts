@@ -4,7 +4,7 @@ import { EnvService } from "./env.service";
 import { EnvEntity } from "./env.entity";
 import { AddEndpointDto, DeleteEndpointDto, DeleteEnvDto } from "./dto/env.dto";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 @ApiBearerAuth()
 @ApiUseTags('env')

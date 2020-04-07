@@ -1,7 +1,6 @@
 import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional} from 'class-validator';
-import {CaseGrade, CaseType} from "../../case/dto/case.dto";
-import {TaskType} from "./run.status";
 import {Optional} from "@nestjs/common";
+import {CaseGrade, CaseType, TaskType} from "../../../config/base.enum";
 
 
 export class TaskIdsDto {

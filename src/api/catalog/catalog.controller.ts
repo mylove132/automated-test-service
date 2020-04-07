@@ -8,7 +8,7 @@ import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
 import { PlatformCodeEntity } from "./platformCode.entity";
-import { OperateModule, OperateType } from "../operate/dto/operate.dto";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 
 @ApiBearerAuth()
