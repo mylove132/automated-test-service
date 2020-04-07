@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import { Logger } from "../../utils/log4js";
 import { Reflector } from "@nestjs/core";
 import { OperateService } from "../../api/operate/operate.service";
@@ -16,8 +16,6 @@ export class TransformInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
-    console.info("---------------------");
-    console.info(this.getClientIp(req));
     return next.handle().pipe(
       map(data => {
         const res = {
@@ -37,12 +35,13 @@ export class TransformInterceptor implements NestInterceptor {
         operate.operateModule = operate_module;
         operate.operateType = operate_type;
         operate.operateDesc = operate_desc;
-        operate.operateIp = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        operate.operateIp = this.getClientIp(req);
         operate.operateUri = req.originalUrl;
         operate.requestParam = JSON.stringify(req.body);
         operate.responseParam = JSON.stringify(data);
         operate.user = req.user;
-        this.operateService.createOperate(operate);
+        this.operateService.createOperate(operate).then(
+        )
         return res;
       })
     );

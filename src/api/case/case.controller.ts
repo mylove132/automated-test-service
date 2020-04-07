@@ -39,7 +39,7 @@ export class CaseController {
 
     @OpeModule(OperateModule.CASE)
     @OpeType(OperateType.DELETE)
-    @OperateDesc('通过ID删除接口')
+    @OperateDesc('')
     @ApiOperation({title: 'delete case'})
     @ApiResponse({status: 200, description: 'delete case success.'})
     @Delete('')
@@ -50,7 +50,7 @@ export class CaseController {
 
     @OpeModule(OperateModule.CASE)
     @OpeType(OperateType.UPDATE)
-    @OperateDesc('通过ID删除接口')
+    @OperateDesc('')
     @ApiOperation({title: 'update case'})
     @ApiResponse({status: 200, description: 'update case success.'})
     @Put('')
