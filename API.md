@@ -4686,182 +4686,84 @@ operateType				    |number		|O			|操作类型(1:创建，2：更改，3：删�
 /api/operate?userId=1&operateModule=1&operateType=2
 ```
 返回结果
-
-
-```{
-       "code": 0,
-       "msg": "success",
-       "data": {
-           "items": [
-               {
-                   "id": 1632,
-                   "createDate": "2020-04-06T02:05:24.372Z",
-                   "operateModule": 9,
-                   "operateType": 9,
-                   "operateDesc": "",
-                   "requestParam": "{}",
-                   "responseParam": "{\"status\":true}",
-                   "operateUri": "/api/scheduler/restart_system_task",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1631,
-                   "createDate": "2020-04-04T00:26:15.690Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"name\":\"测试父级目录3\",\"parentId\":186,\"platformCode\":\"0004\"}",
-                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":186,\"name\":\"测试父级目录3\",\"isPub\":false,\"id\":187,\"createDate\":\"2020-04-04T00:26:15.345Z\",\"updateDate\":\"2020-04-04T00:26:15.345Z\"}",
-                   "operateUri": "/api/catalog",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1630,
-                   "createDate": "2020-04-04T00:25:39.666Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"name\":\"测试父级目录3\",\"platformCode\":\"0004\"}",
-                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":null,\"name\":\"测试父级目录3\",\"isPub\":false,\"id\":186,\"createDate\":\"2020-04-04T00:25:39.361Z\",\"updateDate\":\"2020-04-04T00:25:39.361Z\"}",
-                   "operateUri": "/api/catalog",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1629,
-                   "createDate": "2020-04-04T00:22:43.201Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"name\":\"测试父级目录2\",\"platformCode\":\"0004\"}",
-                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":null,\"name\":\"测试父级目录2\",\"isPub\":false,\"id\":185,\"createDate\":\"2020-04-04T00:22:43.004Z\",\"updateDate\":\"2020-04-04T00:22:43.004Z\"}",
-                   "operateUri": "/api/catalog",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1628,
-                   "createDate": "2020-04-04T00:22:15.320Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"name\":\"测试父级目录1\",\"parentId\":181,\"platformCode\":\"0004\"}",
-                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":181,\"name\":\"测试父级目录1\",\"isPub\":false,\"id\":184,\"createDate\":\"2020-04-04T00:22:14.997Z\",\"updateDate\":\"2020-04-04T00:22:14.997Z\"}",
-                   "operateUri": "/api/catalog",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1627,
-                   "createDate": "2020-04-04T00:20:40.221Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"name\":\"测试父级目录\",\"parentId\":181,\"platformCode\":\"0004\"}",
-                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"name\":\"测试父级目录\",\"isPub\":false,\"parentId\":null,\"id\":183,\"createDate\":\"2020-04-04T00:20:39.585Z\",\"updateDate\":\"2020-04-04T00:20:39.585Z\"}",
-                   "operateUri": "/api/catalog",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1626,
-                   "createDate": "2020-04-04T00:13:57.235Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"caseIds\":[341],\"envId\":1}",
-                   "responseParam": "[{\"startTime\":\"2020-04-04T00:13:56.031Z\",\"caseId\":341,\"caseName\":\"测试随机字符串接口13\",\"endTime\":\"2020-04-04T00:13:56.426Z\",\"rumTime\":395,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null}]",
-                   "operateUri": "/api/run/case-script",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1625,
-                   "createDate": "2020-04-04T00:11:01.652Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"caseIds\":[341],\"envId\":1}",
-                   "responseParam": "[{\"startTime\":\"2020-04-04T00:10:57.257Z\",\"caseId\":341,\"caseName\":\"测试随机字符串接口13\",\"endTime\":\"2020-04-04T00:11:00.851Z\",\"rumTime\":3594,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null}]",
-                   "operateUri": "/api/run/case-script",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1624,
-                   "createDate": "2020-04-04T00:09:56.156Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"caseIds\":[265],\"envId\":1}",
-                   "responseParam": "[{\"startTime\":\"2020-04-04T00:09:55.998Z\"}]",
-                   "operateUri": "/api/run/case-script",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               },
-               {
-                   "id": 1623,
-                   "createDate": "2020-04-04T00:09:36.513Z",
-                   "operateModule": 1,
-                   "operateType": 1,
-                   "operateDesc": "",
-                   "requestParam": "{\"caseIds\":[265],\"envId\":1,\"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJjb20ueGRmLmJsaW5nIiwiYXVkIjoiY2xpZW50IiwidXNlcmNvZGUiOiJjcm1hZG1pbiIsImV4cCI6MTU4NTQ1NjA0MSwiaWF0IjoxNTg0ODUxMjQxfQ.i9K-X_Jark55lPL1UxjuYJE_S2vb-bR1Fs60vRysEHhb09PRLdkom4n7VZedXVkB1yTp-jMBAeb_Sd0w-qzUoA\",\"isNotice\":true}",
-                   "responseParam": "[{\"startTime\":\"2020-04-04T00:09:36.207Z\"}]",
-                   "operateUri": "/api/run/case-script",
-                   "operateIp": "::ffff:127.0.0.1",
-                   "user": {
-                       "id": 1,
-                       "username": "crmadmin",
-                       "userId": 20
-                   }
-               }
-           ],
-           "itemCount": 10,
-           "totalItems": 1497,
-           "pageCount": 150,
-           "next": "",
-           "previous": ""
-       }
-   }
-
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 4,
+                "createDate": "2020-04-07T03:38:39.366Z",
+                "operateModule": 1,
+                "operateType": 2,
+                "operateDesc": "",
+                "requestParam": "{\"name\":\"测试随机字符串接口15\",\"endpoint\":\"https://oapi-smix1.t.blingabc.com\",\"path\":\"/cms/user-api/student/homework/v2/homeworklist\",\"type\":1,\"catalogId\":115,\"endpointId\":1,\"assertText\":\"10000\",\"assertKey\":\"data.code\",\"assertType\":1,\"assertJudge\":1,\"isNeedToken\":true,\"isFailNotice\":false,\"caseGrade\":1,\"tokenId\":10,\"header\":\"{}\",\"param\":\"{\\\"stuNum\\\":\\\"{{$randomint}}\\\",\\\"page\\\":1,\\\"size\\\":5,\\\"type\\\":0}\",\"id\":372}",
+                "responseParam": "{\"generatedMaps\":[],\"raw\":[],\"affected\":1}",
+                "operateUri": "/api/case",
+                "operateIp": "127.0.0.1",
+                "user": {
+                    "id": 10,
+                    "username": "changpin",
+                    "userId": 215
+                }
+            },
+            {
+                "id": 3,
+                "createDate": "2020-04-07T03:36:44.845Z",
+                "operateModule": 1,
+                "operateType": 2,
+                "operateDesc": "",
+                "requestParam": "{\"name\":\"测试随机字符串接口15\",\"endpoint\":\"https://oapi-smix1.t.blingabc.com\",\"path\":\"/cms/user-api/student/homework/v2/homeworklist\",\"type\":1,\"catalogId\":115,\"endpointId\":1,\"assertText\":\"10000\",\"assertKey\":\"data.code\",\"assertType\":1,\"assertJudge\":1,\"isNeedToken\":true,\"isFailNotice\":false,\"caseGrade\":1,\"tokenId\":10,\"header\":\"{}\",\"param\":\"{\\\"stuNum\\\":\\\"{{$randomint}}\\\",\\\"page\\\":1,\\\"size\\\":5,\\\"type\\\":0}\",\"id\":372}",
+                "responseParam": "{\"generatedMaps\":[],\"raw\":[],\"affected\":1}",
+                "operateUri": "/api/case",
+                "operateIp": "::ffff:127.0.0.1",
+                "user": {
+                    "id": 10,
+                    "username": "changpin",
+                    "userId": 215
+                }
+            },
+            {
+                "id": 2,
+                "createDate": "2020-04-07T03:35:45.312Z",
+                "operateModule": 1,
+                "operateType": 2,
+                "operateDesc": "",
+                "requestParam": "{\"name\":\"测试随机字符串接口15\",\"endpoint\":\"https://oapi-smix1.t.blingabc.com\",\"path\":\"/cms/user-api/student/homework/v2/homeworklist\",\"type\":1,\"catalogId\":115,\"endpointId\":1,\"assertText\":\"10000\",\"assertKey\":\"data.code\",\"assertType\":1,\"assertJudge\":1,\"isNeedToken\":true,\"isFailNotice\":false,\"caseGrade\":1,\"tokenId\":10,\"header\":\"{}\",\"param\":\"{\\\"stuNum\\\":\\\"{{$randomint}}\\\",\\\"page\\\":1,\\\"size\\\":5,\\\"type\\\":0}\",\"id\":372}",
+                "responseParam": "{\"generatedMaps\":[],\"raw\":[],\"affected\":1}",
+                "operateUri": "/api/case",
+                "operateIp": "::ffff:127.0.0.1",
+                "user": {
+                    "id": 10,
+                    "username": "changpin",
+                    "userId": 215
+                }
+            },
+            {
+                "id": 1,
+                "createDate": "2020-04-07T03:34:32.055Z",
+                "operateModule": 1,
+                "operateType": 1,
+                "operateDesc": "",
+                "requestParam": "{\"name\":\"测试随机字符串接口\",\"endpoint\":\"https://oapi.t.blingabc.com/\",\"path\":\"/cms/user-api/student/homework/v2/homeworklist\",\"assertKey\":\"data.code\",\"assertText\":\"10000\",\"param\":\"{\\\"stuNum\\\":\\\"{{$randomint}}\\\",\\\"page\\\":1,\\\"size\\\":5,\\\"type\\\":0}\",\"type\":1,\"isNeedToken\":true,\"catalogId\":115,\"endpointId\":5,\"assertType\":1,\"assertJudge\":1}",
+                "responseParam": "{\"id\":372}",
+                "operateUri": "/api/case",
+                "operateIp": "::ffff:127.0.0.1",
+                "user": {
+                    "id": 10,
+                    "username": "changpin",
+                    "userId": 215
+                }
+            }
+        ],
+        "itemCount": 4,
+        "totalItems": 4,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
 ```
 
 
