@@ -12,10 +12,10 @@ export class ConfigService {
 
   constructor(filePath: string) {
     const config = dotenv.parse(fs.readFileSync(filePath));
-    this.envConfig = this.validateInput(config);
+    this.envConfig = ConfigService.validateInput(config);
   }
 
-  private validateInput(envConfig: EnvConfig): EnvConfig {
+  private static validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
       NODE_ENV: Joi.string()
         .allow(['development', 'production', 'test', 'provision'])
@@ -50,6 +50,8 @@ export class ConfigService {
       REDIS_HOST: Joi.string().required().default('127.0.0.1'),
 
       REDIS_PORT: Joi.number().default(6379),
+
+      REDIS_PASSWORD: Joi.string().default(''),
 
       DINGTALK_ACCESS_TOKEN: Joi.string().required(),
     });
@@ -90,6 +92,10 @@ export class ConfigService {
 
   get redisPort(): string {
     return this.envConfig.REDIS_PORT;
+  }
+
+  get redisPassword(): string {
+    return this.envConfig.REDIS_PASSWORD;
   }
 
   get databaseHost(): string {
@@ -157,7 +163,8 @@ export class ConfigService {
       name: this.queueName,
       redis: {
         host: this.redisHost,
-        port: this.redisPort
+        port: this.redisPort,
+        password: this.redisPassword
       }
     }
   }

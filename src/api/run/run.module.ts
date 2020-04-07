@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import {DynamicModule, Module} from '@nestjs/common';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CaseEntity } from '../case/case.entity';
@@ -13,11 +13,17 @@ import {SceneEntity} from "../scene/scene.entity";
 import {TokenEntity} from "../token/token.entity";
 import { RunProcessor } from "./run.processor";
 import { BullModule } from "@nestjs/bull";
+import {ConfigService} from "../../config/config.service";
+
+
+const RedisConfig = (): DynamicModule => {
+  console.log('连接redis中....');
+  const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
+  return BullModule.registerQueue(config.getQueueConfig());
+};
 
 @Module({
-  imports: [ BullModule.registerQueue({
-    name: 'dingdingProcessor',
-  }), EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity, SceneEntity, TokenEntity])],
+  imports: [RedisConfig(), EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, CaselistEntity, SceneEntity, TokenEntity])],
   providers: [RunService, RunProcessor],
   controllers: [RunController],
   exports: [RunService]

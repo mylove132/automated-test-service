@@ -4665,6 +4665,220 @@ data						|object		|R			|&nbsp;
 
 
 
+### 11.0 获取操作记录列表
+- **接口说明：** 获取平台集合
+- **请求方式：** GET
+- **接口地址：** /api/operate
+
+#### 11.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+page				    |number		|O			|请求页数
+limit				    |number		|O			|单页请求个数
+userId				    |number		|O			|用户ID
+operateModule				    |number		|O			|操作模块(1:接口，2：目录，3：环境，4：endpoint，5：历史记录，6：操作记录，7：运行，8：场景：9：定时任务，10：token)
+operateType				    |number		|O			|操作类型(1:创建，2：更改，3：删除，4：ID运行接口，5：运行临时接口，6：运行场景，7：转换请求，8：停止定时任务：9：重启定时任务)
+
+请求示例：
+
+```
+/api/operate?userId=1&operateModule=1&operateType=2
+```
+返回结果
+
+```{
+       "code": 0,
+       "msg": "success",
+       "data": {
+           "items": [
+               {
+                   "id": 1632,
+                   "createDate": "2020-04-06T02:05:24.372Z",
+                   "operateModule": 9,
+                   "operateType": 9,
+                   "operateDesc": "",
+                   "requestParam": "{}",
+                   "responseParam": "{\"status\":true}",
+                   "operateUri": "/api/scheduler/restart_system_task",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1631,
+                   "createDate": "2020-04-04T00:26:15.690Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"name\":\"测试父级目录3\",\"parentId\":186,\"platformCode\":\"0004\"}",
+                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":186,\"name\":\"测试父级目录3\",\"isPub\":false,\"id\":187,\"createDate\":\"2020-04-04T00:26:15.345Z\",\"updateDate\":\"2020-04-04T00:26:15.345Z\"}",
+                   "operateUri": "/api/catalog",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1630,
+                   "createDate": "2020-04-04T00:25:39.666Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"name\":\"测试父级目录3\",\"platformCode\":\"0004\"}",
+                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":null,\"name\":\"测试父级目录3\",\"isPub\":false,\"id\":186,\"createDate\":\"2020-04-04T00:25:39.361Z\",\"updateDate\":\"2020-04-04T00:25:39.361Z\"}",
+                   "operateUri": "/api/catalog",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1629,
+                   "createDate": "2020-04-04T00:22:43.201Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"name\":\"测试父级目录2\",\"platformCode\":\"0004\"}",
+                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":null,\"name\":\"测试父级目录2\",\"isPub\":false,\"id\":185,\"createDate\":\"2020-04-04T00:22:43.004Z\",\"updateDate\":\"2020-04-04T00:22:43.004Z\"}",
+                   "operateUri": "/api/catalog",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1628,
+                   "createDate": "2020-04-04T00:22:15.320Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"name\":\"测试父级目录1\",\"parentId\":181,\"platformCode\":\"0004\"}",
+                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"parentId\":181,\"name\":\"测试父级目录1\",\"isPub\":false,\"id\":184,\"createDate\":\"2020-04-04T00:22:14.997Z\",\"updateDate\":\"2020-04-04T00:22:14.997Z\"}",
+                   "operateUri": "/api/catalog",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1627,
+                   "createDate": "2020-04-04T00:20:40.221Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"name\":\"测试父级目录\",\"parentId\":181,\"platformCode\":\"0004\"}",
+                   "responseParam": "{\"platformCode\":{\"id\":4,\"platformCode\":\"0004\",\"name\":\"CRM平台\"},\"name\":\"测试父级目录\",\"isPub\":false,\"parentId\":null,\"id\":183,\"createDate\":\"2020-04-04T00:20:39.585Z\",\"updateDate\":\"2020-04-04T00:20:39.585Z\"}",
+                   "operateUri": "/api/catalog",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1626,
+                   "createDate": "2020-04-04T00:13:57.235Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"caseIds\":[341],\"envId\":1}",
+                   "responseParam": "[{\"startTime\":\"2020-04-04T00:13:56.031Z\",\"caseId\":341,\"caseName\":\"测试随机字符串接口13\",\"endTime\":\"2020-04-04T00:13:56.426Z\",\"rumTime\":395,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null}]",
+                   "operateUri": "/api/run/case-script",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1625,
+                   "createDate": "2020-04-04T00:11:01.652Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"caseIds\":[341],\"envId\":1}",
+                   "responseParam": "[{\"startTime\":\"2020-04-04T00:10:57.257Z\",\"caseId\":341,\"caseName\":\"测试随机字符串接口13\",\"endTime\":\"2020-04-04T00:11:00.851Z\",\"rumTime\":3594,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null}]",
+                   "operateUri": "/api/run/case-script",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1624,
+                   "createDate": "2020-04-04T00:09:56.156Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"caseIds\":[265],\"envId\":1}",
+                   "responseParam": "[{\"startTime\":\"2020-04-04T00:09:55.998Z\"}]",
+                   "operateUri": "/api/run/case-script",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               },
+               {
+                   "id": 1623,
+                   "createDate": "2020-04-04T00:09:36.513Z",
+                   "operateModule": 1,
+                   "operateType": 1,
+                   "operateDesc": "",
+                   "requestParam": "{\"caseIds\":[265],\"envId\":1,\"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJjb20ueGRmLmJsaW5nIiwiYXVkIjoiY2xpZW50IiwidXNlcmNvZGUiOiJjcm1hZG1pbiIsImV4cCI6MTU4NTQ1NjA0MSwiaWF0IjoxNTg0ODUxMjQxfQ.i9K-X_Jark55lPL1UxjuYJE_S2vb-bR1Fs60vRysEHhb09PRLdkom4n7VZedXVkB1yTp-jMBAeb_Sd0w-qzUoA\",\"isNotice\":true}",
+                   "responseParam": "[{\"startTime\":\"2020-04-04T00:09:36.207Z\"}]",
+                   "operateUri": "/api/run/case-script",
+                   "operateIp": "::ffff:127.0.0.1",
+                   "user": {
+                       "id": 1,
+                       "username": "crmadmin",
+                       "userId": 20
+                   }
+               }
+           ],
+           "itemCount": 10,
+           "totalItems": 1497,
+           "pageCount": 150,
+           "next": "",
+           "previous": ""
+       }
+   }
+
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;item						|number		|R			|&nbsp;平台ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|number		|R			|&nbsp;操作记录ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operateModule						|number		|R			|&nbsp;操作模块
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operateType						|number		|R			|&nbsp;操作类型
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operateDesc						|number		|R			|&nbsp;操作描述
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;requestParam						|string		|R			|&nbsp;请求参数
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;responseParam						|string		|R			|&nbsp;返回参数
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operateUri						|string		|R			|&nbsp;请求路径
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operateIp						|string		|R			|&nbsp;请求者IP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user						|user		|R			|&nbsp;请求者用户信息
+
 
 响应码	|说明  
 :----	|:---

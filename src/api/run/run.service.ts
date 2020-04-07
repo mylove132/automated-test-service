@@ -3,7 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {CaseEntity} from '../case/case.entity';
 import {CaselistEntity} from '../caselist/caselist.entity';
-import {CovertDto, RunCaseByIdDto, RunCaseDto, RunCaseListByIdDto, RunSceneDto} from './dto/run.dto';
+import {CovertDto, RunCaseDto, RunSceneDto} from './dto/run.dto';
 import {CurlService} from '../curl/curl.service';
 import {EnvService} from '../env/env.service';
 import {ApiException} from '../../shared/exceptions/api.exception';
@@ -45,8 +45,8 @@ export class RunService {
 
     /**
      * 执行临时的case用例请求
-     * @param {runCaseDto}: 请求配置信息
      * @return {Promise<any>}: 发起请求后的响应结果
+     * @param runCaseDto
      */
     async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
         let resultObj = {};
@@ -223,8 +223,8 @@ export class RunService {
 
     /**
      * 执行测试用例中的所有接口
-     * @param {RunCaseListByIdDto}: 用例Id及环境Id
      * @return {Promise<any>}: 发起请求后的响应结果
+     * @param runcaseList
      */
     async runCaseListById(runcaseList: IRunCaseList): Promise<any[]> {
         const caseList = await this.caseListRepository
