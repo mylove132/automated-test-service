@@ -7,7 +7,9 @@
  */
 
 import * as path from 'path';
-const baseLogPath = path.resolve(__dirname, '../../logs');
+import {ConfigService} from "./config.service";
+const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
+const baseLogPath = config.logDir ? config.logDir : path.resolve(__dirname, '../../logs');
 
 const log4jsConfig = {
   appenders: {
