@@ -54,7 +54,6 @@ export class OperateService {
   async findOperate(userId: number, operateModule: OperateModule, operateType: OperateType, options: IPaginationOptions): Promise<Pagination<OperateEntity>> {
 
     const queryBuilder = await findOperateByUserAndOperate(this.operateRepository, userId, operateModule, operateType);
-    const result = await paginate<OperateEntity>(queryBuilder, options);
-    return result;
+    return await paginate<OperateEntity>(queryBuilder, options);
   }
 }

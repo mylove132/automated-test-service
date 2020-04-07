@@ -33,19 +33,18 @@ export class CreateCaseDto {
     @IsNotEmpty()
     readonly path: string;
 
-    @IsNumber()
     @IsOptional()
     readonly type: RequestType;
 
     //接口等级
     @IsNumber()
     @IsOptional()
-    readonly caseGrade: number | CaseGrade;
+    readonly caseGrade: CaseGrade;
 
     //用例类别
     @IsNumber()
     @IsOptional()
-    readonly caseType:number | CaseType;
+    readonly caseType: CaseType;
 
     @IsNotEmpty()
     catalogId: number;
@@ -76,7 +75,7 @@ export class CreateCaseDto {
     tokenId: number;
 
     @Optional()
-    isFailNotice?: boolean;
+    isFailNotice: boolean;
 }
 
 export class UpdateCaseDto {
@@ -103,12 +102,10 @@ export class UpdateCaseDto {
     readonly endpoint: string;
 
     //接口等级
-    @IsNumber()
     @IsOptional()
     readonly caseGrade: CaseGrade;
 
     //用例类别
-    @IsNumber()
     @IsOptional()
     readonly caseType: CaseType;
 
@@ -119,9 +116,8 @@ export class UpdateCaseDto {
     @IsOptional()
     catalogId: string;
 
-    @IsNumberString()
     @IsOptional()
-    paramType: string;
+    paramType: ParamType;
 
     @Optional()
     assertText: string;
@@ -147,7 +143,7 @@ export class UpdateCaseDto {
     tokenId: number;
 
     @Optional()
-    isFailNotice?: boolean;
+    isFailNotice: boolean;
 
 }
 

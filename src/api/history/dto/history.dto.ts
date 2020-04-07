@@ -1,10 +1,11 @@
 import {IsNotEmpty, IsNumber, IsOptional, IsNumberString, IsString, IsJSON, IsDate} from 'class-validator';
+import { Executor, RequestStatusEnum } from "../../../config/base.enum";
 
 export class CreateHistoryDto {
 
     @IsNumber()
     @IsNotEmpty()
-    status: number;
+    status: RequestStatusEnum;
 
     @IsNumber()
     @IsNotEmpty()
@@ -12,7 +13,7 @@ export class CreateHistoryDto {
 
     @IsNumber()
     @IsNotEmpty()
-    executor: number;
+    executor: Executor;
 
     @IsJSON()
     re: string;

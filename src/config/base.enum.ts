@@ -1,35 +1,33 @@
 //接口请求类型
 export enum RequestType {
-    STATELESS = 0, GET = 1, POST = 2, DELETE = 3, PUT = 4
+   GET = 0, POST = 1, DELETE = 2, PUT = 3
 }
 
 //参数类型
 export enum ParamType {
-    STATELESS = 0, TEXT = 1, FILE = 2
+     TEXT = 0, FILE = 1
 }
 
 //接口请求状态
 export enum RequestStatusEnum {
-    STATELESS = 0,
-    SUCCESS = 1,
-    FAIL = 2
+    SUCCESS = 0,
+    FAIL = 1
 }
 
 //用例执行者
 export enum Executor {
-    STATELESS = 0,
-    MANUAL = 1 //手动,
+    MANUAL = 0 //手动,
     , SCHEDULER = 1//定时任务
 }
 
 //用例等级
 export enum CaseGrade {
-    STATELESS = 0, HIGH = 1, IN = 2, LOW = 3
+  HIGH = 0, IN = 1, LOW = 2
 }
 
 //用例类型
 export enum CaseType {
-    STATELESS = 0, SINGLE = 1, SCENE = 2, BLEND = 3
+    SINGLE = 0, SCENE = 1, BLEND = 2
 }
 
 //操作记录类型
@@ -44,10 +42,10 @@ export enum OperateModule {
 
 //定时任务状态
 export enum RunStatus {
-    STATELESS = 0, RUNNING = 1, STOP = 2, DELETE = 3
+     RUNNING = 0, STOP = 1, DELETE = 2
 }
 
 //定时任务类型
 export enum TaskType {
-    STATELESS = 0, SINGLE = 1, SCENE = 2
+     SINGLE = 0, SCENE = 1
 }

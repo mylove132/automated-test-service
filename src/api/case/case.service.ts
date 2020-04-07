@@ -58,16 +58,16 @@ export class CaseService {
     async addCase(createCaseDto: CreateCaseDto) {
 
         const caseObj = new CaseEntity();
-        if (createCaseDto.caseGrade) caseObj.caseGrade = createCaseDto.caseGrade;
-        if (createCaseDto.caseType) caseObj.caseType = createCaseDto.caseType;
-        if (createCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, createCaseDto.tokenId);
+        if (createCaseDto.caseGrade != null) caseObj.caseGrade = createCaseDto.caseGrade;
+        if (createCaseDto.caseType != null) caseObj.caseType = createCaseDto.caseType;
+        if (createCaseDto.tokenId != null) caseObj.token = await findTokenById(this.tokenRepository, createCaseDto.tokenId);
         if (createCaseDto.isFailNotice) caseObj.isFailNotice = createCaseDto.isFailNotice;
         const catalogId = createCaseDto.catalogId;
         const [catalog] = await Promise.all([findCatalogById(this.catalogRepository, createCaseDto.catalogId)]);
         if (!catalog) throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
-        if (createCaseDto.type) caseObj.type = createCaseDto.type;
-        if (createCaseDto.paramType) caseObj.paramType = createCaseDto.paramType;
-        if (createCaseDto.endpointId) caseObj.endpointObject = await findEndpointById(this.endpointRepository, createCaseDto.endpointId);
+        if (createCaseDto.type != null) caseObj.type = createCaseDto.type;
+        if (createCaseDto.paramType != null) caseObj.paramType = createCaseDto.paramType;
+        if (createCaseDto.endpointId != null) caseObj.endpointObject = await findEndpointById(this.endpointRepository, createCaseDto.endpointId);
         if (!caseObj.endpointObject) throw new ApiException(`endpointId:${createCaseDto.endpointId}不存在`, ApiErrorCode.ENDPOINT_ID_INVALID, HttpStatus.BAD_REQUEST);
         let pa = CommonUtil.handlePath(createCaseDto.path);
         const caObj = await findCaseByPathAndName(this.caseRepository, pa.trim(), createCaseDto.name);
@@ -89,7 +89,6 @@ export class CaseService {
         caseObj.header = createCaseDto.header;
         caseObj.param = createCaseDto.param;
 
-        await this.caseRepository.createQueryBuilder().insert()
         const result: InsertResult = await saveCase(this.caseRepository, caseObj);
         const addId = result.identifiers[0].id;
         return {id: addId};
@@ -144,27 +143,28 @@ export class CaseService {
         if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
         if (updateCaseDto.isFailNotice) caseObj.isFailNotice = updateCaseDto.isFailNotice;
         if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
-        console.log(updateCaseDto.caseGrade)
-        if (updateCaseDto.caseGrade) caseObj.caseGrade = updateCaseDto.caseGrade;
-        console.log(caseObj.caseGrade)
-        if (updateCaseDto.caseType) caseObj.caseType = updateCaseDto.caseType;
+        if (updateCaseDto.caseGrade != null) caseObj.caseGrade = updateCaseDto.caseGrade;
+
+        if (updateCaseDto.caseType != null) caseObj.caseType = updateCaseDto.caseType;
         if (! await findCaseById(this.caseRepository, updateCaseDto.id)){
             throw new ApiException(`更改case的id:${updateCaseDto.id}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
         }
-        if (updateCaseDto.endpointId) caseObj.endpointObject = await findEndpointById(this.endpointRepository, updateCaseDto.endpointId);
-        if (updateCaseDto.catalogId) caseObj.catalog = await findCatalogById(this.catalogRepository, updateCaseDto.catalogId);
+        if (updateCaseDto.endpointId != null) caseObj.endpointObject = await findEndpointById(this.endpointRepository, updateCaseDto.endpointId);
+        if (updateCaseDto.catalogId != null) caseObj.catalog = await findCatalogById(this.catalogRepository, updateCaseDto.catalogId);
         if (updateCaseDto.header) caseObj.header = updateCaseDto.header;
 
+        if (updateCaseDto.paramType != null) caseObj.paramType = updateCaseDto.paramType;
+
         if (updateCaseDto.param) caseObj.param = updateCaseDto.param;
-        if (updateCaseDto.type) caseObj.type = updateCaseDto.type;
-        if (updateCaseDto.path) caseObj.path = CommonUtil.handlePath(updateCaseDto.path);
+        if (updateCaseDto.type != null) caseObj.type = updateCaseDto.type;
+        if (updateCaseDto.path != null) caseObj.path = CommonUtil.handlePath(updateCaseDto.path);
         if (updateCaseDto.endpoint) caseObj.endpoint = updateCaseDto.endpoint;
 
         if (updateCaseDto.name) caseObj.name = updateCaseDto.name;
         if (updateCaseDto.assertText) caseObj.assertText = updateCaseDto.assertText;
-        if (updateCaseDto.assertType) caseObj.assertType = await findAssertTypeById(this.assertTypeRepository, updateCaseDto.assertType);
-        if (updateCaseDto.assertJudge) caseObj.assertJudge = await findAssertJudgeById(this.assertJudgeRepository, updateCaseDto.assertJudge);
-        if (updateCaseDto.assertKey)  caseObj.assertKey = updateCaseDto.assertKey;
+        if (updateCaseDto.assertType != null) caseObj.assertType = await findAssertTypeById(this.assertTypeRepository, updateCaseDto.assertType);
+        if (updateCaseDto.assertJudge != null) caseObj.assertJudge = await findAssertJudgeById(this.assertJudgeRepository, updateCaseDto.assertJudge);
+        if (updateCaseDto.assertKey != null)  caseObj.assertKey = updateCaseDto.assertKey;
 
         return await updateCase(this.caseRepository, caseObj, updateCaseDto.id);
     }
