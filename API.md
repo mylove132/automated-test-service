@@ -4753,6 +4753,7 @@ data						|object		|R			|&nbsp;
 :----						|:---		|:------	|:---	
 page				    |number		|O			|请求页数
 limit				    |number		|O			|单页请求个数
+keyword				    |string		|O			|模糊匹配关键字
 userId				    |number		|O			|用户ID
 operateModule				    |number		|O			|操作模块(1:接口，2：目录，3：环境，4：endpoint，5：历史记录，6：操作记录，7：运行，8：场景：9：定时任务，10：token)
 operateType				    |number		|O			|操作类型(1:创建，2：更改，3：删除，4：ID运行接口，5：运行临时接口，6：运行场景，7：转换请求，8：停止定时任务：9：重启定时任务)
