@@ -5,7 +5,6 @@ import {
     IsJSON,
     IsNotEmpty,
     IsNumber,
-    IsNumberString,
     IsOptional,
     IsString,
     IsUrl,
@@ -149,7 +148,6 @@ export class UpdateCaseDto {
 
 
 export class DeleteCaseDto {
-
     @ArrayMinSize(1,{message: "删除的ID至少为1个"})
     @ArrayMaxSize(20,{message: "删除ID数组最多一次20个"})
     @IsArray()

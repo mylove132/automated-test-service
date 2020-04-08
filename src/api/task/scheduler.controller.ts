@@ -1,6 +1,6 @@
 import { ApiBearerAuth, ApiUseTags } from "@nestjs/swagger";
 import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
-import { TaskIdsDto, SIngleTaskDto, UpdateTaskDto } from "./dto/scheduler.dto";
+import { TaskIdsDto, SingleTaskDto, UpdateTaskDto } from "./dto/scheduler.dto";
 import { SchedulerService } from "./scheduler.service";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
 import {OperateModule, OperateType} from "../../config/base.enum";
@@ -18,7 +18,7 @@ export class SchedulerController {
   @OpeType(OperateType.CREAT)
   @OperateDesc("")
   @Post("")
-  async addTask(@Body() singleTaskDto: SIngleTaskDto) {
+  async addTask(@Body() singleTaskDto: SingleTaskDto) {
     return await this.schedulerService.addRunSingleTask(singleTaskDto);
   }
 

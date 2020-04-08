@@ -1,28 +1,30 @@
-import { Cron, SchedulerRegistry } from "@nestjs/schedule";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ApiException } from "../../shared/exceptions/api.exception";
-import { ApiErrorCode } from "../../shared/enums/api.error.code";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import {Cron, SchedulerRegistry} from "@nestjs/schedule";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import {ApiException} from "../../shared/exceptions/api.exception";
+import {ApiErrorCode} from "../../shared/enums/api.error.code";
+import {HttpException, HttpStatus} from "@nestjs/common";
 import * as crypto from "crypto";
-import { CronJob } from "cron";
-import { SchedulerEntity } from "./scheduler.entity";
-import { EnvEntity } from "../env/env.entity";
-import { SIngleTaskDto, TaskIdsDto, UpdateTaskDto } from "./dto/scheduler.dto";
-import { CommonUtil } from "../../utils/common.util";
-import { RunService } from "../run/run.service";
-import { IRunCaseById } from "../run/run.interface";
-import { CaseEntity } from "../case/case.entity";
-import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
-import { CaseGrade, Executor, RunStatus, TaskType } from "../../config/base.enum";
-import { findCaseByCaseType } from "../../datasource/case/case.sql";
+import {CronJob} from "cron";
+import {SchedulerEntity} from "./scheduler.entity";
+import {EnvEntity} from "../env/env.entity";
+import {RunCaseListDto, SingleTaskDto, TaskIdsDto, UpdateTaskDto} from "./dto/scheduler.dto";
+import {CommonUtil} from "../../utils/common.util";
+import {RunService} from "../run/run.service";
+import {CaseEntity} from "../case/case.entity";
+import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
+import {CaseGrade, Executor, RunStatus, TaskType} from "../../config/base.enum";
+import {findCaseByCaseType} from "../../datasource/case/case.sql";
 import {
+  findScheduleById,
+  findScheduleByStatus,
   findSchedulerOfCaseAndEnvById,
+  findSchedulerOfCaseAndEnvByIds,
   saveScheduler,
   updateScheduler,
   updateSchedulerRunStatus
 } from "../../datasource/scheduler/scheduler.sql";
-import { findEnvById } from "../../datasource/env/env.sql";
+import {findEnvById} from "../../datasource/env/env.sql";
 
 var parser = require("cron-parser");
 
@@ -47,42 +49,23 @@ export class SchedulerService {
   }
 
   /**
-   * 获取所有运行中的定时任务
+   * 根据状态获取所有的定时任务
    */
   async getAllJobs(runStatus: RunStatus, options: IPaginationOptions) {
-    let queryBuilder;
-    if (runStatus == null) {
-      queryBuilder = await this.scheRepository.createQueryBuilder();
-    } else {
-      queryBuilder = await this.scheRepository.createQueryBuilder("sch").where("sch.status = :status", { status: runStatus });
-    }
+    let queryBuilder = await findScheduleByStatus(this.scheRepository, runStatus);
     return await paginate<SchedulerEntity>(queryBuilder, options);
   }
 
   /**
    * 删除定时任务
-   * @param deleteRunningTaskDto
+   * @param taskIdsDto
    */
   async deleteJob(taskIdsDto: TaskIdsDto) {
     try {
       for (const id of taskIdsDto.ids) {
-        const schObj = await this.scheRepository.findOne(id).catch(
-          err => {
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-        );
-        if (schObj.status == RunStatus.RUNNING) {
-          await this.schedulerRegistry.deleteCronJob(schObj.md5);
-        }
-        const delSchedulerObj = await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.DELETE }).where("id = :id", { id: schObj.id }).execute().catch(
-          err => {
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-        );
-        if (!delSchedulerObj) {
-          throw new ApiException(`删除的任务id:${schObj.id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
-        }
-
+        const schObj = await findScheduleById(this.scheRepository, id);
+        if (schObj.status == RunStatus.RUNNING) await this.schedulerRegistry.deleteCronJob(schObj.md5);
+        const delSchedulerObj = await updateSchedulerRunStatus(this.scheRepository, RunStatus.DELETE, id);
       }
     } catch (e) {
       throw new HttpException("定时任务删除异常", HttpStatus.BAD_REQUEST);
@@ -93,30 +76,18 @@ export class SchedulerService {
 
   /**
    * 停止运行中的定时任务
-   * @param deleteRunningTaskDto
+   * @param taskIdsDto
    */
   async stopJob(taskIdsDto: TaskIdsDto) {
     let stopSuccess = [];
     let stopFail = [];
     for (const id of taskIdsDto.ids) {
-      const task = await this.scheRepository.findOne(id).catch(
-        err => {
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-      );
-      if (!task) {
-        throw new ApiException(`停止的任务id:${id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
-      }
-      if (task.status != RunStatus.RUNNING) {
-        throw new ApiException(`定时任务已停止或删除`, ApiErrorCode.SCHEDULER_STOP_OR_DELETE, HttpStatus.BAD_REQUEST);
-      }
+      const task = await findScheduleById(this.scheRepository, id);
+      if (!task) throw new ApiException(`停止的任务id:${id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
+      if (task.status != RunStatus.RUNNING) throw new ApiException(`定时任务已停止或删除`, ApiErrorCode.SCHEDULER_STOP_OR_DELETE, HttpStatus.BAD_REQUEST);
       try {
-        this.schedulerRegistry.getCronJob(task.md5).stop();
-        await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.STOP }).where("id = :id", { id: task.id }).execute().catch(
-          err => {
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-        );
+        await this.schedulerRegistry.getCronJob(task.md5).stop();
+        await updateSchedulerRunStatus(this.scheRepository,RunStatus.STOP, id);
         stopSuccess.push(task.id);
       } catch (e) {
         stopFail.push(task.id);
@@ -135,7 +106,6 @@ export class SchedulerService {
     } catch (e) {
       return { status: false };
     }
-
     return { status: true };
   }
 
@@ -156,59 +126,36 @@ export class SchedulerService {
    * 重启定时任务
    */
   async restartCheckJobTask(taskIdsDto: TaskIdsDto) {
-    console.log(taskIdsDto.ids);
-    const schObjList: SchedulerEntity[] = await this.scheRepository.createQueryBuilder("sch").leftJoinAndSelect("sch.cases", "cases").leftJoinAndSelect("sch.env", "env").where("sch.id IN (:...ids)", { ids: taskIdsDto.ids }).getMany().catch(
-      err => {
-        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    );
-    let resultList = [];
+    const schObjList: SchedulerEntity[] = await findSchedulerOfCaseAndEnvByIds(this.scheRepository, taskIdsDto.ids);
     for (let schedulerEntity of schObjList) {
       if (this.isExistTask(schedulerEntity.md5)) {
         await this.schedulerRegistry.getCronJob(schedulerEntity.md5).stop();
         await this.schedulerRegistry.getCronJob(schedulerEntity.md5).start();
-        if (!this.isExistTask(schedulerEntity.md5)) {
-          throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.RUNNING }).where("id = :id", { id: schedulerEntity.id }).execute().catch(
-          err => {
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-        );
+        if (!this.isExistTask(schedulerEntity.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
       } else {
         if (schedulerEntity.taskType == TaskType.SINGLE) {
-          console.log(schedulerEntity);
           const caseList = schedulerEntity.cases;
-          let caseIds = [];
-          caseList.forEach(
-            cas => {
-              caseIds.push(cas.id);
-            }
-          );
+          let caseIds = caseList.map( cas => {return cas.id});
           await this.runSingleTask(caseIds, schedulerEntity.env.id, schedulerEntity.cron, schedulerEntity.md5);
           if (!this.isExistTask(schedulerEntity.md5)) {
             throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           }
-          await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.RUNNING }).where("id = :id", { id: schedulerEntity.id }).execute().catch(
-            err => {
-              throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-            }
-          );
+          await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
         } else if (schedulerEntity.taskType == TaskType.SCENE) {
           //场景任务
           this.runSceneTask(schedulerEntity);
         }
       }
     }
-
-    return resultList;
+    return true;
   }
 
   /**
    * 添加单接口定时任务
    * @param singleTaskDto
    */
-  async addRunSingleTask(singleTaskDto: SIngleTaskDto) {
+  async addRunSingleTask(singleTaskDto: SingleTaskDto) {
     const caseGrade = singleTaskDto.caseGrade == null ? CaseGrade.LOW : singleTaskDto.caseGrade;
     const envId = singleTaskDto.envId == null ? 5 : singleTaskDto.envId;
 
@@ -218,7 +165,7 @@ export class SchedulerService {
     }
     let caseIds = caseList.map(cas => {return cas.id});
     console.log("运行的定时任务接口：" + caseIds);
-    const secheduler = new SchedulerEntity();
+    const scheduler = new SchedulerEntity();
     const createDate = new Date();
     const md5 = crypto.createHmac("sha256", createDate + CommonUtil.randomChar(10)).digest("hex");
     const scheObj = await this.scheRepository.createQueryBuilder().select().where("md5 = :md5", { md5: md5 }).getOne().catch(
@@ -230,21 +177,21 @@ export class SchedulerService {
     if (scheObj) {
       throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
     }
-    secheduler.taskType = singleTaskDto.taskType != null ? singleTaskDto.taskType : TaskType.SINGLE;
-    secheduler.name = singleTaskDto.name;
-    secheduler.md5 = md5;
-    secheduler.createDate = createDate;
-    secheduler.env = await this.envRepository.findOne(envId);
-    secheduler.cron = singleTaskDto.cron;
-    secheduler.status = RunStatus.RUNNING;
-    secheduler.cases = caseList;
-    const result = await saveScheduler(this.scheRepository, secheduler);
-    switch (secheduler.taskType) {
+    scheduler.taskType = singleTaskDto.taskType != null ? singleTaskDto.taskType : TaskType.SINGLE;
+    scheduler.name = singleTaskDto.name;
+    scheduler.md5 = md5;
+    scheduler.createDate = createDate;
+    scheduler.env = await this.envRepository.findOne(envId);
+    scheduler.cron = singleTaskDto.cron;
+    scheduler.status = RunStatus.RUNNING;
+    scheduler.cases = caseList;
+    const result = await saveScheduler(this.scheRepository, scheduler);
+    switch (scheduler.taskType) {
       case TaskType.SINGLE:
-        await this.runSingleTask(caseIds, secheduler.env.id, secheduler.cron, secheduler.md5);
+        await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
         break;
       case TaskType.SCENE:
-        await this.runSceneTask(secheduler);
+        await this.runSceneTask(scheduler);
         break;
     }
     return { id: result.id };
@@ -298,7 +245,7 @@ export class SchedulerService {
   }
 
   /**
-   * 检查crom表达式
+   * 检查cron表达式
    * @param cron
    */
   async checkCron(cron: string) {
@@ -351,7 +298,10 @@ export class SchedulerService {
 
   /**
    * 运行单接口任务
-   * @param sch
+   * @param caseIds
+   * @param envId
+   * @param cron
+   * @param md5
    */
   private async runSingleTask(caseIds: number[], envId, cron, md5) {
     const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
@@ -389,20 +339,4 @@ export class SchedulerService {
       return false;
     }
   }
-}
-
-
-class RunCaseListDto implements IRunCaseById {
-
-  readonly caseIds: number[];
-  readonly envId: number;
-  readonly executor: Executor;
-
-  constructor(private readonly cIds: number[], private readonly eId: number, private readonly exec: Executor) {
-    this.caseIds = cIds;
-    this.envId = eId;
-    this.executor = exec;
-  }
-
-
 }

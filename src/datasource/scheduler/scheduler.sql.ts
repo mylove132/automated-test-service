@@ -7,11 +7,11 @@ import { RunStatus } from "../../config/base.enum";
 
 /**
  * 通过ID查询定时任务
- * @param schedulerReposity
+ * @param schedulerRepository
  * @param id
  */
-export const findSchedulerOfCaseAndEnvById = async (schedulerReposity: Repository<SchedulerEntity>, id) => {
-  return await schedulerReposity.createQueryBuilder("sch").
+export const findSchedulerOfCaseAndEnvById = async (schedulerRepository: Repository<SchedulerEntity>, id) => {
+  return await schedulerRepository.createQueryBuilder("sch").
   leftJoinAndSelect("sch.cases", "cases").
   leftJoinAndSelect("sch.env", "env").
   where("sch.id = :id", { id: id }).
@@ -23,14 +23,59 @@ export const findSchedulerOfCaseAndEnvById = async (schedulerReposity: Repositor
   );
 };
 
+/**
+ * 查询定时任务通过ID集合
+ * @param schedulerRepository
+ * @param ids
+ */
+export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Repository<SchedulerEntity>, ids) => {
+    return await schedulerRepository.createQueryBuilder("sch").
+    leftJoinAndSelect("sch.cases", "cases").
+    leftJoinAndSelect("sch.env", "env").
+    where("sch.id IN (:...ids)", { ids: ids }).
+    getMany().
+    catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    );
+};
+
+/**
+ * 根据状态查询定时任务
+ * @param schedulerRepository
+ * @param runStatus
+ */
+export const findScheduleByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
+    return schedulerRepository.createQueryBuilder("sch").where(qb => {
+        if (runStatus != null) {
+            qb.where("sch.status = :status", {status: runStatus});
+        }
+    });
+};
+
+
+/**
+ * 通过ID查询
+ * @param schedulerRepository
+ * @param id
+ */
+export const findScheduleById = async (schedulerRepository: Repository<SchedulerEntity>, id) => {
+    return await schedulerRepository.findOne(id).catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
 
 /**
  * 保存定时任务
- * @param schedulerReposity
+ * @param schedulerRepository
  * @param schedulerObj
  */
-export const saveScheduler = async (schedulerReposity: Repository<SchedulerEntity>, schedulerObj) => {
-  return await schedulerReposity.save(schedulerObj).catch(
+export const saveScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj) => {
+  return await schedulerRepository.save(schedulerObj).catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -41,12 +86,12 @@ export const saveScheduler = async (schedulerReposity: Repository<SchedulerEntit
 
 /**
  * 更新定时任务
- * @param schedulerReposity
+ * @param schedulerRepository
  * @param schedulerObj
  * @param id
  */
-export const updateScheduler = async (schedulerReposity: Repository<SchedulerEntity>, schedulerObj, id) => {
-  return await schedulerReposity.update(id, schedulerObj).catch(
+export const updateScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj, id) => {
+  return await schedulerRepository.update(id, schedulerObj).catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -56,14 +101,14 @@ export const updateScheduler = async (schedulerReposity: Repository<SchedulerEnt
 
 /**
  * 更新定时任务运行状态
- * @param schedulerReposity
- * @param runstatus
+ * @param schedulerRepository
+ * @param runStatus
  * @param id
  */
-export const updateSchedulerRunStatus = async (schedulerReposity: Repository<SchedulerEntity>, runstatus: RunStatus, id) => {
-  return await schedulerReposity.createQueryBuilder().
+export const updateSchedulerRunStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus, id) => {
+  return await schedulerRepository.createQueryBuilder().
   update().
-  set({status: runstatus}).
+  set({status: runStatus}).
   where('id = :id', {id: id}).
   execute().catch(
     err => {
