@@ -38,19 +38,8 @@ class SingleTaskDto {
 
 class UpdateTaskDto {
 
-    //任务类型
-    @Optional()
-    taskType: TaskType;
-
     @IsNotEmpty()
     id: number;
-
-    @IsOptional()
-    readonly caseGrade: CaseGrade;
-
-    @IsNumber()
-    @IsOptional()
-    readonly caseType: CaseType;
 
     @IsOptional()
     readonly envId: number;

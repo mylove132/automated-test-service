@@ -22,6 +22,7 @@ import {OperateModule} from "./api/operate/operate.module";
 import {TransformInterceptor} from "./shared/interceptor/transform.interceptor";
 import {HttpExceptionFilter} from "./shared/filters/http-exception.filter";
 import {AllExceptionsFilter} from "./shared/filters/any-exception.filter";
+import {RequestIdGuard} from "./shared/guard/requestId.guard";
 
 const Orm = (): DynamicModule => {
     console.log('连接数据库中....');
@@ -30,52 +31,56 @@ const Orm = (): DynamicModule => {
 };
 
 const modules = [
-  ScheduleModule.forRoot(), //开启定时任务服务
-  ConfigModule,
-  Orm(),
-  CaseModule,
-  CatalogModule,
-  UserModule,
-  EnvModule,
-  CaseListModule,
-  RunModule,
-  HistoryModule,
-  SchedulerModule,
-  JmeterModule,
-  SceneModule,
-  TokenModule,
-  OperateModule
+    ScheduleModule.forRoot(), //开启定时任务服务
+    ConfigModule,
+    Orm(),
+    CaseModule,
+    CatalogModule,
+    UserModule,
+    EnvModule,
+    CaseListModule,
+    RunModule,
+    HistoryModule,
+    SchedulerModule,
+    JmeterModule,
+    SceneModule,
+    TokenModule,
+    OperateModule
 ];
 
 const provides = [
-  {
-    provide: APP_GUARD,
-    useClass: AuthGuard,
-  },
-  {
-    provide: APP_INTERCEPTOR,
-    useClass: TransformInterceptor,
-  },
-  {
-    provide: APP_FILTER,
-    useClass: AllExceptionsFilter,
-  },
-  {
-    provide: APP_FILTER,
-    useClass: HttpExceptionFilter,
-  },
+    {
+        provide: APP_GUARD,
+        useClass: RequestIdGuard,
+    },
+    {
+        provide: APP_GUARD,
+        useClass: AuthGuard,
+    },
+    {
+        provide: APP_INTERCEPTOR,
+        useClass: TransformInterceptor,
+    },
+    {
+        provide: APP_FILTER,
+        useClass: AllExceptionsFilter,
+    },
+    {
+        provide: APP_FILTER,
+        useClass: HttpExceptionFilter,
+    },
 ];
 
 @Module({
     imports: [
-      ...modules
+        ...modules
     ],
     controllers: [
         AppController
     ],
     providers: [
         // 全局绑定守卫
-      ...provides
+        ...provides
     ]
 })
 export class ApplicationModule {

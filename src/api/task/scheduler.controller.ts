@@ -41,7 +41,7 @@ export class SchedulerController {
   @OpeType(OperateType.DELETE)
   @OperateDesc("")
   @Delete("")
-  async deleRunnigJobs(@Body() taskIdsDto: TaskIdsDto) {
+  async delRunningJobs(@Body() taskIdsDto: TaskIdsDto) {
     return this.schedulerService.deleteJob(taskIdsDto);
   }
 

@@ -4259,9 +4259,6 @@ data						|any		|R			|&nbsp;返回历史记录值
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 id				    |number		|R			|任务的ID
-caseGrade				    |number		|O			|接口的等级（默认0：高级）
-caseType				    |number		|R			|接口类型（默认0：单接口,1:场景接口,2:混合接口）
-taskType				    |number		|O			|任务类型(默认1:单接口任务，2：场景任务)
 envId				        |number		|R			|环境ID
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
@@ -4273,7 +4270,6 @@ isRestart	                    |bool		|O			|定时任务是否重启
 ```
 {
 	"id":30,
-	"caseGrade": 0,
 	"envId": 5,
 	"name":"测试定时任务修改1",
 	"cron":"* * * * * *",

@@ -84,13 +84,16 @@ export class SchedulerService {
     for (const id of taskIdsDto.ids) {
       const task = await findScheduleById(this.scheRepository, id);
       if (!task) throw new ApiException(`停止的任务id:${id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
-      if (task.status != RunStatus.RUNNING) throw new ApiException(`定时任务已停止或删除`, ApiErrorCode.SCHEDULER_STOP_OR_DELETE, HttpStatus.BAD_REQUEST);
-      try {
-        await this.schedulerRegistry.getCronJob(task.md5).stop();
-        await updateSchedulerRunStatus(this.scheRepository,RunStatus.STOP, id);
-        stopSuccess.push(task.id);
-      } catch (e) {
-        stopFail.push(task.id);
+      if (this.isExistTask(task.md5)){
+        try {
+          await this.schedulerRegistry.getCronJob(task.md5).stop();
+          await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, id);
+          stopSuccess.push(task.id);
+        } catch (e) {
+          stopFail.push(task.id);
+        }
+      }else {
+        await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, id);
       }
     }
     return { success: stopSuccess, fail: stopFail };
@@ -205,11 +208,12 @@ export class SchedulerService {
   async updateRunSingleTask(updateTaskDto: UpdateTaskDto) {
     const schObj = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
     if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
-    schObj.name = updateTaskDto.name != null ? updateTaskDto.name : schObj.name;
-    schObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
-    if (updateTaskDto.isRestart) schObj.status = RunStatus.RUNNING;
-
-    schObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
+    const sObj = new SchedulerEntity();
+    sObj.name = updateTaskDto.name != null ? updateTaskDto.name : schObj.name;
+    sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
+    sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
+    sObj.status = RunStatus.RUNNING;
+    const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
     if (updateTaskDto.isRestart) {
       try {
         if (this.isExistTask(schObj.md5)) {
@@ -225,7 +229,6 @@ export class SchedulerService {
             await this.runSingleTask(caseIds, schObj.env.id, schObj.cron, schObj.md5);
             if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
-
           } else if (schObj.taskType == TaskType.SCENE) {
             //场景任务
             this.runSceneTask(schObj);
@@ -234,9 +237,7 @@ export class SchedulerService {
       } catch (e) {
         throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
       }
-
     }
-    const result = await updateScheduler(this.scheRepository, schObj, updateTaskDto.id);
     if (result.affected == 1) {
       return { status: true };
     } else {
@@ -264,7 +265,7 @@ export class SchedulerService {
    * 排查定时任务库，确认定时任务是否存活
    *
    */
-  @Cron("* * * * * *", { name: "checkStatus" })
+  @Cron("0 0/10 * * * *", { name: "checkStatus" })
   async checkJobRunStatus() {
     //console.log('------------------------排查定时任务--------------------')
     const runningSchObj: SchedulerEntity[] = await this.scheRepository.createQueryBuilder("sch").where("sch.status = :status", { status: RunStatus.RUNNING }).getMany().catch(
@@ -317,18 +318,13 @@ export class SchedulerService {
    * @param sch
    */
   private async runSceneTask(sch: SchedulerEntity) {
-    let caseIds = [];
-    sch.cases.forEach(
-      cas => {
-        caseIds.push(cas.id);
-      }
-    );
-    const caseListDto = new RunCaseListDto(caseIds, sch.env.id, Executor.SCHEDULER);
-    const job = new CronJob(sch.cron, () => {
-      this.runService.runCaseById(caseListDto);
-    });
-    this.schedulerRegistry.addCronJob(sch.md5, job);
-    job.start();
+    // let caseIds = sch.cases.map(cas => {cas.id});
+    // //const caseListDto = new RunCaseListDto(caseIds, sch.env.id, Executor.SCHEDULER);
+    // const job = new CronJob(sch.cron, () => {
+    //   this.runService.runCaseById(caseListDto);
+    // });
+    // this.schedulerRegistry.addCronJob(sch.md5, job);
+    // job.start();
   }
 
   private isExistTask(md5) {

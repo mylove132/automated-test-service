@@ -42,7 +42,7 @@ export enum OperateModule {
 
 //定时任务状态
 export enum RunStatus {
-     RUNNING = 0, STOP = 1, DELETE = 2
+     RUNNING = 1, STOP = 2, DELETE = 3
 }
 
 //定时任务类型
