@@ -1,14 +1,14 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinTable,
-    ManyToMany,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from 'typeorm';
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn, Unique,
+  UpdateDateColumn
+} from "typeorm";
 import {CaseGrade, CaseType, ParamType, RequestType} from '../../config/base.enum';
 import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
@@ -18,6 +18,7 @@ import {SchedulerEntity} from "../task/scheduler.entity";
 import {CaselistEntity} from "../caselist/caselist.entity";
 import {TokenEntity} from "../token/token.entity";
 
+@Unique(['alias'])
 @Entity('case')
 export class CaseEntity {
 

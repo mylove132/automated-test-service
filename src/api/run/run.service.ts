@@ -23,7 +23,7 @@ import { findTokenById } from "../../datasource/token/token.sql";
 import { findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
-import { Executor } from "../../config/base.enum";
+import { Executor, ParamType } from "../../config/base.enum";
 
 
 @Injectable()
@@ -308,7 +308,7 @@ export class RunService {
       headers: headers
     };
     // 判断是否是上传文件
-    if (runCaseDto.paramType == "1") {
+    if (runCaseDto.paramType == ParamType.FILE) {
       // 将requestData的data转化成文件流
       if (!runCaseDto.param) {
         throw new ApiException("没有正确传入文件地址", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);

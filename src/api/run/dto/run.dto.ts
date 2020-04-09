@@ -31,9 +31,8 @@ export class RunCaseDto {
     @IsOptional()
     readonly param: string = '{}';
 
-    @IsNumberString()
     @IsOptional()
-    readonly paramType: string | ParamType;
+    readonly paramType: ParamType;
 
     @IsNumberString()
     @IsOptional()
