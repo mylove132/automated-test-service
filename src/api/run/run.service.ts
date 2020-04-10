@@ -110,11 +110,10 @@ export class RunService {
           resultObj["errMsg"] = null;
           if (caseObj.isFailNotice) {
             if (!assert["result"]) {
-              this.sendMessageQueue.add("sendMessage", {
-                message: `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
+              this.sendMessageQueue.add("sendMessage",
+                 `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
                            期望条件 ${assert["relation"]}
-                           实际结果${assert["actual"]} 不符合`
-              });
+                           实际结果${assert["actual"]} 不符合`);
             }
           }
         } else {
