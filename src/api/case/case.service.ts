@@ -62,7 +62,7 @@ export class CaseService {
     if (createCaseDto.caseGrade != null) caseObj.caseGrade = createCaseDto.caseGrade;
     if (createCaseDto.caseType != null) caseObj.caseType = createCaseDto.caseType;
     if (createCaseDto.tokenId != null) caseObj.token = await findTokenById(this.tokenRepository, createCaseDto.tokenId);
-    if (createCaseDto.isFailNotice) caseObj.isFailNotice = createCaseDto.isFailNotice;
+    if (createCaseDto.isFailNotice != null) caseObj.isFailNotice = createCaseDto.isFailNotice;
     const catalogId = createCaseDto.catalogId;
     const [catalog] = await Promise.all([findCatalogById(this.catalogRepository, createCaseDto.catalogId)]);
     if (!catalog) throw new ApiException(`添加的catalogid:${catalogId}不存在`, ApiErrorCode.CATALOG_ID_INVALID, HttpStatus.BAD_REQUEST);
@@ -141,7 +141,7 @@ export class CaseService {
 
     const caseObj = new CaseEntity();
     if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
-    if (updateCaseDto.isFailNotice) caseObj.isFailNotice = updateCaseDto.isFailNotice;
+    if (updateCaseDto.isFailNotice != null) caseObj.isFailNotice = updateCaseDto.isFailNotice;
     if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
     if (updateCaseDto.caseGrade != null) caseObj.caseGrade = updateCaseDto.caseGrade;
 
