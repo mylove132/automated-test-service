@@ -18,7 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest();
     const exceptionObj = new ExceptionEntity();
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    this.doLog(request, exception);
+    this.doLog(request, exception.toString());
     exceptionObj.excName = exception instanceof ApiException ? "ApiException" : exception.name;
     exceptionObj.exceptionMsg = exception instanceof ApiException ? exception.getErrorMessage() : exception.message;
     exceptionObj.errorCode = exception instanceof ApiException ? exception.getErrorCode() : status;

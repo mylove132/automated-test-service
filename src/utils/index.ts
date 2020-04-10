@@ -27,7 +27,13 @@ export function generateEndpointByEnv(env: string, endpoint: string): string {
  */
 export function getAssertObjectValue(obj: any, keys: string): any {
 	// 断言的key列表
-	let keyList = keys.split('.');
+  let keyList = [];
+  if (keys.indexOf('.') != -1){
+    keyList = keys.split('.');
+  }else {
+    return JSON.stringify(obj);
+  }
+  console.log(keyList)
 	keyList.shift();
 	const haveArray = new RegExp('\[[0-9]+\]');
 	return keyList.reduce((preValue, currentValue, currentIndex) => {

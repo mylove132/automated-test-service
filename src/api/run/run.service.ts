@@ -578,6 +578,7 @@ export class RunService {
             assertResult["relation"] = caseObj.assertJudge.name;
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
+            console.log(execResult)
             assertResult["result"] = (execResult.toString().indexOf(caseObj.assertText) == -1);
             break;
           case 9:
@@ -586,6 +587,13 @@ export class RunService {
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
             assertResult["result"] = (execResult == null);
+            break;
+          case 10:
+            assertResult["assertKey"] = caseObj.assertKey;
+            assertResult["relation"] = caseObj.assertJudge.name;
+            assertResult["expect"] = caseObj.assertText;
+            assertResult["actual"] = execResult;
+            assertResult["result"] = (execResult != null);
             break;
         }
         break;
