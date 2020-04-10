@@ -15,7 +15,7 @@ import { forkJoin } from "rxjs";
 import * as FormData from "form-data";
 import * as request from "request";
 import { IRunCaseById, IRunCaseList } from "./run.interface";
-import { map } from "rxjs/operators";
+import { map, single } from "rxjs/operators";
 import { SceneEntity } from "../scene/scene.entity";
 import { CommonUtil } from "../../utils/common.util";
 import { TokenEntity } from "../token/token.entity";
@@ -300,6 +300,13 @@ export class RunService {
       headers["content-type"] = "application/x-www-form-urlencoded";
     } else {
       if (!contentTypeFlag) headers["content-type"] = "application/json";
+    }
+
+    if (runCaseDto.isNeedSign == true){
+      const isProdEnv = runCaseDto.endpoint == "https://oapi.blingabc.com";
+      const signHeader = CommonUtil.generateSign(runCaseDto.param, isProdEnv);
+      headers['ts'] = signHeader.ts;
+      headers['sign'] = signHeader.md5;
     }
     const requestData: AxiosRequestConfig = {
       url: runCaseDto.endpoint + runCaseDto.path,

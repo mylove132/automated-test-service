@@ -44,7 +44,11 @@ export class ConfigService {
       LOG_DIR: Joi.string().default(join(__dirname, '..', 'logs')),
 
       JAVA_OAPI: Joi.string(),
-      
+
+      TEST_APP_KEY: Joi.string().required().default('02e5e263e6c1cb81af0ce92fc93095d'),
+
+      PROD_APP_KEY: Joi.string().required().default('02e5e263e6c1cb81af0ce92fc93095d'),
+
       QUEUE_NAME: Joi.string().required(),
 
       REDIS_HOST: Joi.string().required().default('127.0.0.1'),
@@ -120,6 +124,14 @@ export class ConfigService {
 
   get logDir(): string {
     return this.envConfig.LOG_DIR;
+  }
+
+  get testAppKey(): string {
+    return this.envConfig.TEST_APP_KEY;
+  }
+
+  get prodAppKey(): string {
+    return this.envConfig.PROD_APP_KEY;
   }
 
   get databaseSynchronize(): boolean {

@@ -49,6 +49,7 @@
     "rxjs": "^6.5.3",
     "stacktrace-js": "^2.0.2",
     "swagger-ui-express": "^4.1.4",
+    "ts-md5": "^1.2.7",
     "typeorm": "^0.2.15"
   },
   "devDependencies": {

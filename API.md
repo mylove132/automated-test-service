@@ -599,6 +599,7 @@ caseType				    |number		|O			|用例类型（0：单接口用例，1：场景�
 caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 &emsp;tokenId			        |number		|O			|tokenId
+&emsp;isNeedSign			    |bool		|O			|是否需要签名
 
 
 请求示例：
@@ -715,6 +716,8 @@ data						|object		|R			|
 &emsp;caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 &emsp;tokenId			|number		|O			|tokenId
+&emsp;isNeedSign			    |bool		|O			|是否需要签名
+
 
 请求示例：
 
@@ -873,6 +876,7 @@ data						|object		|R			|&nbsp;
 &emsp;type			    |number		|O			|请求方式(0:get,1:post)
 &emsp;assertText			    |string		|O			|断言内容
 &emsp;tokenId			    |number		|O			|tokenId值
+&emsp;isNeedSign			    |bool		|O			|是否需要签名
 
 
 请求示例：

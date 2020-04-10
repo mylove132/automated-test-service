@@ -89,6 +89,9 @@ export class CaseEntity {
     @Column({default: false})
     isFailNotice: boolean;
 
+    @Column({default: false})
+    isNeedSign: boolean;
+
     //返回值别名
     @Column({nullable: true})
     alias: string;

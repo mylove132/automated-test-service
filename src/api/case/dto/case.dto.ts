@@ -75,6 +75,10 @@ export class CreateCaseDto {
 
     @Optional()
     isFailNotice: boolean;
+
+    //是否需要签名
+    @Optional()
+    isNeedSign: boolean;
 }
 
 export class UpdateCaseDto {
@@ -143,6 +147,9 @@ export class UpdateCaseDto {
 
     @Optional()
     isFailNotice: boolean;
+
+    @Optional()
+    isNeedSign: boolean;
 
 }
 

@@ -45,6 +45,10 @@ export class RunCaseDto {
     @IsOptional()
     tokenId?: number;
 
+
+    @Optional()
+    isNeedSign: boolean;
+
 }
 
 export class RunCaseByIdDto implements IRunCaseById{

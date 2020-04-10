@@ -33,15 +33,15 @@ export class RunController {
         return await this.runService.runCaseById(runCaseByIdDto);
     }
 
-  @OpeModule(OperateModule.RUN)
-  @OpeType(OperateType.RUNTMPCASE)
-    @OperateDesc('')
-    @ApiOperation({title: 'run caselist by id', description: '运行样例里的所有接口请求'})
-    @ApiResponse({status: 200, description: 'run caselist success.'})
-    @Post('caselist-script')
-    async runCaseListById(@Body() runCaseListByIdDto: RunCaseListByIdDto): Promise<any> {
-        return await this.runService.runCaseListById(runCaseListByIdDto);
-    }
+  // @OpeModule(OperateModule.RUN)
+  // @OpeType(OperateType.RUNTMPCASE)
+  //   @OperateDesc('')
+  //   @ApiOperation({title: 'run caselist by id', description: '运行样例里的所有接口请求'})
+  //   @ApiResponse({status: 200, description: 'run caselist success.'})
+  //   @Post('caselist-script')
+  //   async runCaseListById(@Body() runCaseListByIdDto: RunCaseListByIdDto): Promise<any> {
+  //       return await this.runService.runCaseListById(runCaseListByIdDto);
+  //   }
 
   @OpeModule(OperateModule.RUN)
   @OpeType(OperateType.COVERT)

@@ -59,6 +59,8 @@ export class CaseService {
 
     console.info(JSON.stringify(createCaseDto));
     const caseObj = new CaseEntity();
+
+    if (createCaseDto.isNeedSign != null) caseObj.isNeedSign = createCaseDto.isNeedSign;
     if (createCaseDto.caseGrade != null) caseObj.caseGrade = createCaseDto.caseGrade;
     if (createCaseDto.caseType != null) caseObj.caseType = createCaseDto.caseType;
     if (createCaseDto.tokenId != null) caseObj.token = await findTokenById(this.tokenRepository, createCaseDto.tokenId);
@@ -140,6 +142,8 @@ export class CaseService {
   async updateCase(updateCaseDto: UpdateCaseDto) {
 
     const caseObj = new CaseEntity();
+
+    if (updateCaseDto.isNeedSign != null) caseObj.isNeedSign = updateCaseDto.isNeedSign;
     if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
     if (updateCaseDto.isFailNotice != null) caseObj.isFailNotice = updateCaseDto.isFailNotice;
     if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
