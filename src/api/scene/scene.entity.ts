@@ -1,13 +1,14 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from 'typeorm';
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne, OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import {CatalogEntity} from "../catalog/catalog.entity";
 import {CaseGrade} from "../../config/base.enum";
+import { CaseEntity } from "../case/case.entity";
 
 
 @Entity('scene')
@@ -36,9 +37,9 @@ export class SceneEntity {
 
     @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '场景等级'})
     sceneGrade: CaseGrade;
-    //
-    // @ManyToMany(type => CaseEntity, cases => cases.scenes)
-    // cases: CaseEntity[];
+
+    @OneToMany(type => CaseEntity, cas => cas.scenes)
+    cas: CaseEntity;
 
 }
 

@@ -17,6 +17,7 @@ import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {SchedulerEntity} from "../task/scheduler.entity";
 import {CaselistEntity} from "../caselist/caselist.entity";
 import {TokenEntity} from "../token/token.entity";
+import { SceneEntity } from "../scene/scene.entity";
 
 @Unique(['alias'])
 @Entity('case')
@@ -107,9 +108,8 @@ export class CaseEntity {
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     token: TokenEntity;
 
-    // @ManyToMany(type => SceneEntity, scenes => scenes.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
-    // @JoinTable()
-    // scenes: SceneEntity[];
+     @ManyToOne(type => SceneEntity, scenes => scenes.cas,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+     scenes: SceneEntity[];
 
 }
 
