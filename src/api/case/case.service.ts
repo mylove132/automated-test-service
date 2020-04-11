@@ -141,14 +141,13 @@ export class CaseService {
    */
   async updateCase(updateCaseDto: UpdateCaseDto) {
 
+    console.log(JSON.stringify(updateCaseDto))
     const caseObj = new CaseEntity();
-
     if (updateCaseDto.isNeedSign != null) caseObj.isNeedSign = updateCaseDto.isNeedSign;
     if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
     if (updateCaseDto.isFailNotice != null) caseObj.isFailNotice = updateCaseDto.isFailNotice;
     if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
     if (updateCaseDto.caseGrade != null) caseObj.caseGrade = updateCaseDto.caseGrade;
-
     if (updateCaseDto.caseType != null) caseObj.caseType = updateCaseDto.caseType;
     if (!await findCaseById(this.caseRepository, updateCaseDto.id)) {
       throw new ApiException(`更改case的id:${updateCaseDto.id}不存在`, ApiErrorCode.CASE_ID_INVALID, HttpStatus.OK);
@@ -156,9 +155,7 @@ export class CaseService {
     if (updateCaseDto.endpointId != null) caseObj.endpointObject = await findEndpointById(this.endpointRepository, updateCaseDto.endpointId);
     if (updateCaseDto.catalogId != null) caseObj.catalog = await findCatalogById(this.catalogRepository, updateCaseDto.catalogId);
     if (updateCaseDto.header) caseObj.header = updateCaseDto.header;
-
     if (updateCaseDto.paramType != null) caseObj.paramType = updateCaseDto.paramType;
-
     if (updateCaseDto.param) caseObj.param = updateCaseDto.param;
     if (updateCaseDto.type != null) caseObj.type = updateCaseDto.type;
     if (updateCaseDto.path != null) caseObj.path = CommonUtil.handlePath(updateCaseDto.path);
@@ -169,7 +166,8 @@ export class CaseService {
     if (updateCaseDto.assertType != null) caseObj.assertType = await findAssertTypeById(this.assertTypeRepository, updateCaseDto.assertType);
     if (updateCaseDto.assertJudge != null) caseObj.assertJudge = await findAssertJudgeById(this.assertJudgeRepository, updateCaseDto.assertJudge);
     if (updateCaseDto.assertKey != null) caseObj.assertKey = updateCaseDto.assertKey;
-
+    console.log('----------1111----------')
+    console.log(caseObj)
     return await updateCase(this.caseRepository, caseObj, updateCaseDto.id);
   }
 
