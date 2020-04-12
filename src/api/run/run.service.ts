@@ -253,8 +253,8 @@ export class RunService {
           }
         }
       }
-      else if (paramReg.test(param[paramsKey])) {
-        const regData = value.toString().replace(paramReg, "$1");
+      else if (regex2.test(param[paramsKey])) {
+        const regData = value.toString().replace(regex2, "$1");
         const alias = regData.split(".")[0];
         const caseInstance = await findCaseByAlias(this.caseRepository, alias);
         const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
@@ -268,10 +268,13 @@ export class RunService {
 
 
   private async runCaseByCaseInstance(caseInstance: CaseEntity, endpoint) {
+    console.log(JSON.stringify(caseInstance))
     const runCaseDto: RunCaseDto = Object.assign({}, caseInstance, {
       endpoint: endpoint,
       type: String(caseInstance.type),
+      tokenId: caseInstance.token != null ? caseInstance.token.id : null
     });
+    CommonUtil.printLog2(JSON.stringify(runCaseDto))
     let requestData: AxiosRequestConfig = {};
     const headers = await this.parseRequestHeader(runCaseDto);
     const url = this.parseUrl(runCaseDto);
@@ -279,12 +282,15 @@ export class RunService {
     runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
     requestData.method = this.parseRequestMethod(runCaseDto);
     requestData.headers = headers;
+    CommonUtil.printLog1(JSON.stringify(headers))
     requestData.url = url;
+    CommonUtil.printLog2(JSON.stringify(requestData));
     const result = await this.curlService.makeRequest(requestData).toPromise();
+    CommonUtil.printLog2(result)
     if (result.result){
       return result.data;
     } else {
-      throw new ApiException(`运行接口：${caseInstance.name}失败`,ApiErrorCode.REQUESTID_NULL, HttpStatus.BAD_REQUEST);
+      throw new ApiException(`运行接口：${caseInstance.name}失败`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
     }
   }
 

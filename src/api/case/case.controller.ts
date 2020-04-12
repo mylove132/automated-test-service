@@ -24,6 +24,15 @@ export class CaseController {
         return this.caseService.addCase(createCaseDto);
     }
 
+
+  @OperateDesc('')
+  @ApiOperation({title: 'search case'})
+  @ApiResponse({status: 200, description: 'search case success.'})
+  @Get('search')
+  async queryCase(@Query('name')name: string) {
+    return this.caseService.searchCaseByNameService(name);
+  }
+
     @ApiOperation({title: 'query case'})
     @ApiResponse({status: 200, description: 'query case success.'})
     @Get()

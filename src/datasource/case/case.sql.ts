@@ -5,6 +5,7 @@ import { HttpStatus } from "@nestjs/common";
 import { CaseEntity } from "../../api/case/case.entity";
 import { AssertJudgeEntity, AssertTypeEntity } from "../../api/case/assert.entity";
 import { CaseGrade, CaseType } from "../../config/base.enum";
+import { HistoryEntity } from "../../api/history/history.entity";
 
 
 /**
@@ -27,8 +28,10 @@ export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>,
  * @param alias
  */
 export const findCaseByAlias = async (caseEntityRepository: Repository<CaseEntity>, alias: string) => {
-  return await caseEntityRepository.
-  findOne({where:{"alias": alias}}).
+  return await caseEntityRepository.createQueryBuilder('cas').
+  leftJoinAndSelect('cas.token','token').
+  where('cas.alias = :alias',{alias: alias}).
+  getOne().
   catch(
     err => {
       console.log(err);
@@ -233,4 +236,23 @@ export const findAllAssertJudge = async (assertJudgeEntityRepository: Repository
     console.log(err);
     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
   });
+};
+
+
+/**
+ * 按名称模糊匹配接口
+ * @param caseRepository
+ * @param name
+ */
+export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, name) => {
+  return caseRepository.createQueryBuilder('cas').where(
+    qb => {
+      if (name) {
+        qb.where("cas.name LIKE :param")
+          .setParameters({
+            param: '%' + name + '%'
+          })
+      }
+    }
+  ).orderBy('cas.createDate', 'DESC').getMany();
 };

@@ -19,8 +19,6 @@ export class RequestIdGuard implements CanActivate {
     async validateRequestId(req: Request): Promise<boolean> {
         const authRequestId = req.headers.requestid;
         if (authRequestId) {
-            const requestId = authRequestId;
-            req.requestId = authRequestId;
             return true
         } else {
             throw new ApiException('requestId不能为空', ApiErrorCode.REQUESTID_NULL, HttpStatus.BAD_REQUEST);

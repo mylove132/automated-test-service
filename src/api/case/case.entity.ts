@@ -1,7 +1,7 @@
 import {
   Column,
   CreateDateColumn,
-  Entity,
+  Entity, Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -26,6 +26,7 @@ export class CaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column({comment: "用例名称"})
     name: string;
 

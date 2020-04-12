@@ -19,7 +19,7 @@ import {
   findCaseByCatalogIdAndCaseTypeAndCaseGrade,
   findCaseByPathAndName,
   saveCase,
-  deleteCase, findAllAssertType, findAllAssertJudge, findCaseById, updateCase, findCaseUnionEndpoint
+  deleteCase, findAllAssertType, findAllAssertJudge, findCaseById, updateCase, findCaseUnionEndpoint, searchCaseByName
 } from "../../datasource/case/case.sql";
 import { findTokenById } from "../../datasource/token/token.sql";
 import { TokenEntity } from "../token/token.entity";
@@ -166,9 +166,11 @@ export class CaseService {
     if (updateCaseDto.assertType != null) caseObj.assertType = await findAssertTypeById(this.assertTypeRepository, updateCaseDto.assertType);
     if (updateCaseDto.assertJudge != null) caseObj.assertJudge = await findAssertJudgeById(this.assertJudgeRepository, updateCaseDto.assertJudge);
     if (updateCaseDto.assertKey != null) caseObj.assertKey = updateCaseDto.assertKey;
-    console.log('----------1111----------')
-    console.log(caseObj)
     return await updateCase(this.caseRepository, caseObj, updateCaseDto.id);
+  }
+
+  async searchCaseByNameService(name: string){
+    return await searchCaseByName(this.caseRepository, name);
   }
 
   async unionFindAllEndpoint() {
