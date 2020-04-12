@@ -68,9 +68,6 @@ export class CreateCaseDto {
     assertJudge: number;
 
     @Optional()
-    alias: string;
-
-    @Optional()
     tokenId: number;
 
     @Optional()
@@ -138,9 +135,6 @@ export class UpdateCaseDto {
     @IsNumber()
     @IsOptional()
     assertJudge: number;
-
-    @Optional()
-    alias: string;
 
     @Optional()
     tokenId: number;

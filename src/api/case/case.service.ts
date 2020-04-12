@@ -79,7 +79,8 @@ export class CaseService {
     if (!assertType) throw new ApiException(`assertTypeId:${createCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
     const assertJudge = await findAssertJudgeById(this.assertJudgeRepository, createCaseDto.assertJudge);
     if (!assertJudge) throw new ApiException(`assertJudgeId:${createCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-    if (createCaseDto.alias) caseObj.alias = createCaseDto.alias;
+    const alias = CommonUtil.randomChar(3)+new Date().getTime().toString();
+    caseObj.alias = alias;
 
     caseObj.assertKey = createCaseDto.assertKey;
     caseObj.assertType = assertType;
@@ -146,7 +147,6 @@ export class CaseService {
     if (updateCaseDto.isNeedSign != null) caseObj.isNeedSign = updateCaseDto.isNeedSign;
     if (updateCaseDto.tokenId) caseObj.token = await findTokenById(this.tokenRepository, updateCaseDto.tokenId);
     if (updateCaseDto.isFailNotice != null) caseObj.isFailNotice = updateCaseDto.isFailNotice;
-    if (updateCaseDto.alias) caseObj.alias = updateCaseDto.alias;
     if (updateCaseDto.caseGrade != null) caseObj.caseGrade = updateCaseDto.caseGrade;
     if (updateCaseDto.caseType != null) caseObj.caseType = updateCaseDto.caseType;
     if (!await findCaseById(this.caseRepository, updateCaseDto.id)) {

@@ -985,6 +985,84 @@ data						|object		|R			|&nbsp;true表示执行用例成功
     "message": "success"
 }
 ```
+### 2.8.5  搜索接口用例
+- **接口说明：** 搜索接口用例
+- **请求方式：** GET
+- **接口地址：** /api/case/search
+
+#### 2.7.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+&emsp;name				|string		|O			|接口名称
+
+
+请求示例：
+
+```
+/api/case/search?name=教材
+```
+返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|
+&nbsp;&nbsp;&nbsp;&nbsp;list						|object		|R			|
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id						|number		|R			|删除的接口ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status						|number		|R			|true表示删除成功,false表示删除失败
+
+返回成功示例
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": [
+        {
+            "id": 392,
+            "name": "教材下载2",
+            "header": "{}",
+            "param": "{\"recordId\":\"[jcxz.code]\"}",
+            "paramType": 0,
+            "caseGrade": 1,
+            "caseType": 0,
+            "path": "/sale/user-api/regulation/v3/download-record",
+            "endpoint": "https://oapi-smix5.t.blingabc.com",
+            "type": 0,
+            "createDate": "2020-04-12T01:36:43.882Z",
+            "updateDate": "2020-04-12T01:36:43.882Z",
+            "assertText": "10093",
+            "assertKey": "data.code",
+            "isNeedToken": false,
+            "isFailNotice": false,
+            "isNeedSign": false,
+            "alias": null
+        },
+        {
+            "id": 391,
+            "name": "教材下载",
+            "header": "{}",
+            "param": "{\"recordId\":\"{{$randomint-[100,200]}} \"}",
+            "paramType": 0,
+            "caseGrade": 1,
+            "caseType": 0,
+            "path": "/sale/user-api/regulation/v3/download-record",
+            "endpoint": "https://oapi-smix5.t.blingabc.com",
+            "type": 0,
+            "createDate": "2020-04-10T23:23:09.965Z",
+            "updateDate": "2020-04-12T01:33:34.133Z",
+            "assertText": "190003",
+            "assertKey": "data.code",
+            "isNeedToken": false,
+            "isFailNotice": false,
+            "isNeedSign": false,
+            "alias": "jcxz"
+        }
+    ]
+}
+```
+
 
 
 ### 2.9  通过用例Id执行接口用例

@@ -257,12 +257,14 @@ export class RunService {
         const regData = value.toString().replace(regex2, "$1");
         const alias = regData.split(".")[0];
         const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+
         const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
         const newVal = regData.replace(alias, "data");
         const paramValue = getAssertObjectValue(runResult, newVal);
         param[paramsKey] = paramValue;
       }
     }
+    CommonUtil.printLog1(JSON.stringify(param));
     return param;
   }
 
@@ -274,7 +276,6 @@ export class RunService {
       type: String(caseInstance.type),
       tokenId: caseInstance.token != null ? caseInstance.token.id : null
     });
-    CommonUtil.printLog2(JSON.stringify(runCaseDto))
     let requestData: AxiosRequestConfig = {};
     const headers = await this.parseRequestHeader(runCaseDto);
     const url = this.parseUrl(runCaseDto);
@@ -282,11 +283,9 @@ export class RunService {
     runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
     requestData.method = this.parseRequestMethod(runCaseDto);
     requestData.headers = headers;
-    CommonUtil.printLog1(JSON.stringify(headers))
     requestData.url = url;
-    CommonUtil.printLog2(JSON.stringify(requestData));
     const result = await this.curlService.makeRequest(requestData).toPromise();
-    CommonUtil.printLog2(result)
+    CommonUtil.printLog1("运行结果:"+JSON.stringify(result));
     if (result.result){
       return result.data;
     } else {
