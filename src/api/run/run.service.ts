@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CaseEntity } from "../case/case.entity";
 import { CaselistEntity } from "../caselist/caselist.entity";
-import { CovertDto, RunCaseDto, RunSceneDto } from "./dto/run.dto";
+import { CovertDto, RunCaseDto } from "./dto/run.dto";
 import { CurlService } from "../curl/curl.service";
 import { EnvService } from "../env/env.service";
 import { ApiException } from "../../shared/exceptions/api.exception";
@@ -11,10 +11,9 @@ import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { AxiosRequestConfig } from "axios";
 import { getAssertObjectValue, getRequestMethodTypeString } from "../../utils";
 import { HistoryService } from "../history/history.service";
-import { forkJoin } from "rxjs";
 import * as FormData from "form-data";
 import * as request from "request";
-import { IRunCaseById, IRunCaseList } from "./run.interface";
+import { IRunCaseById } from "./run.interface";
 import { SceneEntity } from "../scene/scene.entity";
 import { CommonUtil } from "../../utils/common.util";
 import { TokenEntity } from "../token/token.entity";
@@ -22,8 +21,7 @@ import { findTokenById } from "../../datasource/token/token.sql";
 import { findCaseByAlias, findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
-import { Executor, ParamType } from "../../config/base.enum";
-import { findSceneById, findSceneOfCaseListById } from "../../datasource/scene/scene.sql";
+import { ParamType } from "../../config/base.enum";
 
 
 @Injectable()
@@ -56,12 +54,13 @@ export class RunService {
     let requestData: AxiosRequestConfig = {};
     const headers = await this.parseRequestHeader(runCaseDto);
     const url = this.parseUrl(runCaseDto);
-    let data = await this.parseRequestData(runCaseDto);
+    let data = await this.parseRequestData(runCaseDto, runCaseDto.endpoint);
     runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
     requestData.method = this.parseRequestMethod(runCaseDto);
     requestData.headers = headers;
     requestData.url = url;
     // 响应结果
+
     const result = await this.curlService.makeRequest(requestData).toPromise();
     const endTime = new Date();
     resultObj["endTime"] = endTime;
@@ -88,11 +87,10 @@ export class RunService {
         endpoint: endpoint,
         type: String(caseObj.type),
       });
-      console.log('-------------------------'+JSON.stringify(runCaseDto));
       let requestData: AxiosRequestConfig = {};
       const headers = await this.parseRequestHeader(runCaseDto);
       const url = this.parseUrl(runCaseDto);
-      let data = await this.parseRequestData(runCaseDto);
+      let data = await this.parseRequestData(runCaseDto, endpoint);
       runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
       requestData.method = this.parseRequestMethod(runCaseDto);
       requestData.headers = headers;
@@ -196,7 +194,6 @@ export class RunService {
       const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
       headers = form.getHeaders();
     }
-    CommonUtil.printLog1(JSON.stringify(headers));
     return headers;
   }
 
@@ -204,7 +201,7 @@ export class RunService {
    * 解析参数
    * @param runCaseDto
    */
-  async parseRequestData(runCaseDto: RunCaseDto) {
+  async parseRequestData(runCaseDto: RunCaseDto, endpoint) {
     if (runCaseDto.paramType == ParamType.FILE) {
       // 将requestData的data转化成文件流
       if (!runCaseDto.param) {
@@ -213,147 +210,18 @@ export class RunService {
       const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
       return form;
     } else {
-      if (!runCaseDto.param){
+      if (runCaseDto.param){
         const vParams = JSON.parse(runCaseDto.param);
-        return await this.analysisParam(vParams);
+        return await this.analysisParam(vParams, endpoint);
       }
     }
   }
-
-
 
   /**
-   *
+   * 解析参数
+   * @param param
    */
-  async runCaseId(caseId, envId, token, isDenpenceParam = false, param = null, executor: Executor) {
-    let resultObj = {};
-    const startTime = new Date();
-    resultObj["startTime"] = startTime;
-    const caseObj = await this.caseRepository
-      .createQueryBuilder("case")
-      .select()
-      .leftJoinAndSelect("case.endpointObject", "endpointObj")
-      .where("case.id = :id", { id: caseId })
-      .getOne()
-      .catch(
-        err => {
-          console.log(err);
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-      );
-    if (isDenpenceParam) {
-      caseObj.param = param;
-    }
-    if (caseObj instanceof CaseEntity) {
-      const endpoint = await this.envService.formatEndpoint(envId, caseObj.endpointObject.endpoint);
-      const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
-        endpoint: endpoint,
-        type: String(caseObj.type)
-      });
-      resultObj["caseId"] = caseId;
-      resultObj["caseName"] = caseObj.name;
-      console.log("requestBaseData", requestBaseData);
-      const requestData = this.generateRequestData(requestBaseData);
-      if (token != null && token != "") {
-        requestData.headers["token"] = token;
-      }
-      const result = await this.curlService.makeRequest(requestData).toPromise();
-      const endTime = new Date();
-      resultObj["endTime"] = endTime;
-      const rumTime = endTime.getTime() - startTime.getTime();
-      resultObj["rumTime"] = rumTime;
-      const res = JSON.stringify(result.data);
-      if (result.result) {
-        const assert = await this.execAssert(caseId, result.data);
-        resultObj["result"] = result.data;
-        resultObj["status"] = assert["result"];
-        resultObj["assert"] = assert;
-        resultObj["errMsg"] = null;
-      } else {
-        resultObj["status"] = false;
-        resultObj["result"] = null;
-        resultObj["errMsg"] = result;
-      }
-      // 保存历史记录
-      const historyData = {
-        caseId: caseId,
-        status: resultObj["status"] ? 0 : 1,
-        executor: executor,
-        re: res,
-        startTime: startTime,
-        endTime: endTime
-      };
-      console.log(historyData);
-      await this.historyService.createHistory(historyData).catch(
-        err => {
-          console.log(err);
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-      );
-      if (result.result) {
-        return res;
-      } else {
-        return null;
-      }
-    }
-  }
-
-
-  // 生成请求参数
-  private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
-    let headers: {};
-    if (runCaseDto.header) {
-      headers = JSON.parse(runCaseDto.header);
-    } else {
-      headers = {};
-    }
-    let contentTypeFlag = false;
-    for (const key in headers) {
-      if (headers.hasOwnProperty(key) && key.toLocaleLowerCase() === "content-type") {
-        contentTypeFlag = true;
-      }
-    }
-    if (runCaseDto.type == "0") {
-      headers["content-type"] = "application/x-www-form-urlencoded";
-    } else {
-      if (!contentTypeFlag) headers["content-type"] = "application/json";
-    }
-
-    if (runCaseDto.isNeedSign == true) {
-      const isProdEnv = runCaseDto.endpoint == "https://oapi.blingabc.com";
-      const signHeader = CommonUtil.generateSign(runCaseDto.param, isProdEnv);
-      headers["ts"] = signHeader.ts;
-      headers["sign"] = signHeader.md5;
-    }
-    const requestData: AxiosRequestConfig = {
-      url: runCaseDto.endpoint + runCaseDto.path,
-      method: getRequestMethodTypeString(Number(runCaseDto.type)),
-      headers: headers
-    };
-    // 判断是否是上传文件
-    if (runCaseDto.paramType == ParamType.FILE) {
-      // 将requestData的data转化成文件流
-      if (!runCaseDto.param) {
-        throw new ApiException("没有正确传入文件地址", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
-      }
-      const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
-      requestData.data = form;
-      requestData.headers = form.getHeaders();
-    } else {
-      // 如果为get方法，则参数为params，否则为data
-      if (runCaseDto.type === "0") {
-        const vParams = JSON.parse(runCaseDto.param);
-        requestData.params = this.analysisParam(vParams);
-      } else {
-        const tmpParam = JSON.parse(runCaseDto.param);
-        requestData.data = this.analysisParam(tmpParam);
-      }
-    }
-    return requestData;
-  }
-
-
-  private async analysisParam(param) {
+  private async analysisParam(param, endpoint) {
     const paramReg = /\{\{(.+?)\}\}/g;
     var regex2 = /\[(.+?)\]/g;
     for (let paramsKey in param) {
@@ -387,7 +255,7 @@ export class RunService {
         const regData = value.toString().replace(paramReg, "$1");
         const alias = regData.split(".")[0];
         const caseInstance = await findCaseByAlias(this.caseRepository, alias);
-        const runResult = await this.runCaseByCaseInstance(caseInstance);
+        const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
         const newVal = regData.replace(alias, "data");
         const paramValue = getAssertObjectValue(runResult, newVal);
         param[paramsKey] = paramValue;
@@ -397,9 +265,25 @@ export class RunService {
   }
 
 
-  private async runCaseByCaseInstance(caseInstance) {
-
-
+  private async runCaseByCaseInstance(caseInstance: CaseEntity, endpoint) {
+    const runCaseDto: RunCaseDto = Object.assign({}, caseInstance, {
+      endpoint: endpoint,
+      type: String(caseInstance.type),
+    });
+    let requestData: AxiosRequestConfig = {};
+    const headers = await this.parseRequestHeader(runCaseDto);
+    const url = this.parseUrl(runCaseDto);
+    let data = await this.parseRequestData(runCaseDto, endpoint);
+    runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
+    requestData.method = this.parseRequestMethod(runCaseDto);
+    requestData.headers = headers;
+    requestData.url = url;
+    const result = await this.curlService.makeRequest(requestData).toPromise();
+    if (result.result){
+      return result.data;
+    } else {
+      throw new ApiException(`运行接口：${caseInstance.name}失败`,ApiErrorCode.REQUESTID_NULL, HttpStatus.BAD_REQUEST);
+    }
   }
 
 
