@@ -86,6 +86,7 @@ export class RunService {
       const runCaseDto: RunCaseDto = Object.assign({}, caseObj, {
         endpoint: endpoint,
         type: String(caseObj.type),
+        tokenId: caseObj.token.id,
       });
       let requestData: AxiosRequestConfig = {};
       const headers = await this.parseRequestHeader(runCaseDto);
@@ -95,6 +96,7 @@ export class RunService {
       requestData.method = this.parseRequestMethod(runCaseDto);
       requestData.headers = headers;
       requestData.url = url;
+      CommonUtil.printLog1(JSON.stringify(requestData));
       const result = await this.curlService.makeRequest(requestData).toPromise();
 
       const endTime = new Date();
