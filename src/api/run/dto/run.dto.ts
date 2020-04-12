@@ -109,7 +109,4 @@ export class RunSceneDto{
 
     @Optional()
     readonly executor: Executor;
-
-    @Optional()
-    readonly token: string;
 }

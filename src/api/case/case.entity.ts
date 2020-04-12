@@ -97,10 +97,6 @@ export class CaseEntity {
     @Column({nullable: true})
     alias: string;
 
-
-    @Column({default: false})
-    isDependenceParam: boolean;
-
     @ManyToMany(type => SchedulerEntity, secheduler => secheduler.cases)
     sechedulers: SchedulerEntity[];
 
@@ -108,8 +104,8 @@ export class CaseEntity {
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     token: TokenEntity;
 
-     @ManyToOne(type => SceneEntity, scenes => scenes.cas,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
-     scenes: SceneEntity[];
+     @ManyToOne(type => SceneEntity, scene => scene.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+     scene: SceneEntity;
 
 }
 

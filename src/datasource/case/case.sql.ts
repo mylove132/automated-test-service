@@ -21,6 +21,23 @@ export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>,
   );
 };
 
+/**
+ * 通过id查询case
+ * @param caseEntityRepository
+ * @param alias
+ */
+export const findCaseByAlias = async (caseEntityRepository: Repository<CaseEntity>, alias: string) => {
+  return await caseEntityRepository.
+  findOne({where:{"alias": alias}}).
+  catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  );
+};
+
+
 
 /**
  * 通过接口名称和接口路径查找接口

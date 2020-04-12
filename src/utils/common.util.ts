@@ -41,9 +41,11 @@ export class CommonUtil {
    * @param app_key
    */
   static generateSign(param: string, isProdEnv) {
+    this.printLog1(param+'------'+isProdEnv)
     let jsonParam = JSON.parse(param);
     const timeUnix = (Math.round(new Date().getTime()/1000).toString());
     jsonParam['ts'] = timeUnix;
+    this.printLog1(JSON.stringify(jsonParam))
     jsonParam = this.sort_ASCII(jsonParam);
     let paramValue: string = '';
     for (let key in jsonParam) {
@@ -51,7 +53,9 @@ export class CommonUtil {
     }
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
     const app_key = !isProdEnv ? config.testAppKey : config.prodAppKey;
+    console.log(app_key)
     paramValue += 'app_key='+app_key;
+    console.log(paramValue)
     const md5 = new Md5();
     return {md5:md5.appendAsciiStr(paramValue).end(),ts: timeUnix};
   }
@@ -129,6 +133,14 @@ export class CommonUtil {
       return (ele.parentId === null && ele.isPub === x);
     }); //这一步是过滤，按树展开，将多余的数组剔除；
     return oldArr;
+  }
+
+  static printLog2(meg) {
+    console.log('-----------------------------'+meg);
+  }
+
+  static printLog1(meg) {
+    console.log('-----------**********************------------------'+meg);
   }
 
 }

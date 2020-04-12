@@ -29,17 +29,14 @@ export class SceneEntity {
     @Column()
     name: String;
 
-    @Column('text',{nullable: true})
-    dependenceCaseJson: string;
-
     @Column({comment: "场景描述"})
     desc: string;
 
     @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '场景等级'})
     sceneGrade: CaseGrade;
 
-    @OneToMany(type => CaseEntity, cas => cas.scenes)
-    cas: CaseEntity;
+    @OneToMany(type => CaseEntity, cases => cases.scene)
+    cases: CaseEntity[];
 
 }
 

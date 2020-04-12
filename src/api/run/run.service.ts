@@ -15,15 +15,15 @@ import { forkJoin } from "rxjs";
 import * as FormData from "form-data";
 import * as request from "request";
 import { IRunCaseById, IRunCaseList } from "./run.interface";
-import { map, single } from "rxjs/operators";
 import { SceneEntity } from "../scene/scene.entity";
 import { CommonUtil } from "../../utils/common.util";
 import { TokenEntity } from "../token/token.entity";
 import { findTokenById } from "../../datasource/token/token.sql";
-import { findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
+import { findCaseByAlias, findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { Executor, ParamType } from "../../config/base.enum";
+import { findSceneById, findSceneOfCaseListById } from "../../datasource/scene/scene.sql";
 
 
 @Injectable()
@@ -53,11 +53,14 @@ export class RunService {
     let resultObj = {};
     resultObj["startTime"] = new Date();
     // 生成请求数据
-    const requestData = this.generateRequestData(runCaseDto);
-    if (runCaseDto.tokenId) {
-      const tokenObj = await findTokenById(this.tokenRepository, runCaseDto.tokenId);
-      requestData.headers["token"] = tokenObj.token;
-    }
+    let requestData: AxiosRequestConfig = {};
+    const headers = await this.parseRequestHeader(runCaseDto);
+    const url = this.parseUrl(runCaseDto);
+    let data = await this.parseRequestData(runCaseDto);
+    runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
+    requestData.method = this.parseRequestMethod(runCaseDto);
+    requestData.headers = headers;
+    requestData.url = url;
     // 响应结果
     const result = await this.curlService.makeRequest(requestData).toPromise();
     const endTime = new Date();
@@ -80,72 +83,144 @@ export class RunService {
       const startTime = new Date();
       resultObj["startTime"] = startTime;
       const caseObj = await findCaseOfEndpointAndTokenById(this.caseRepository, caseId);
-      if (caseObj instanceof CaseEntity) {
-        const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
-        const requestBaseData: RunCaseDto = Object.assign({}, caseObj, {
-          endpoint: endpoint,
-          type: String(caseObj.type)
-        });
-        resultObj["caseId"] = caseId;
-        resultObj["caseName"] = caseObj.name;
-        const requestData = this.generateRequestData(requestBaseData);
+      const endpoint = await this.envService.formatEndpoint(runCaseById.envId, caseObj.endpointObject.endpoint);
+      const runCaseDto: RunCaseDto = Object.assign({}, caseObj, {
+        endpoint: endpoint,
+        type: String(caseObj.type),
+      });
+      console.log('-------------------------'+JSON.stringify(runCaseDto));
+      let requestData: AxiosRequestConfig = {};
+      const headers = await this.parseRequestHeader(runCaseDto);
+      const url = this.parseUrl(runCaseDto);
+      let data = await this.parseRequestData(runCaseDto);
+      runCaseDto.type == "0" ? requestData.params = data : requestData.data = data;
+      requestData.method = this.parseRequestMethod(runCaseDto);
+      requestData.headers = headers;
+      requestData.url = url;
+      const result = await this.curlService.makeRequest(requestData).toPromise();
 
-        let token;
-        if (caseObj.token != null) {
-          token = caseObj.token.token;
-          requestData.headers["token"] = token;
-        }
-        const result = await this.curlService.makeRequest(requestData).toPromise();
-
-        const endTime = new Date();
-        resultObj["endTime"] = endTime;
-        const rumTime = endTime.getTime() - startTime.getTime();
-        resultObj["rumTime"] = rumTime;
-        const res = JSON.stringify(result.data);
-        if (result.result) {
-          const assert = await this.execAssert(caseId, result.data);
-          resultObj["result"] = result.data;
-          resultObj["status"] = assert["result"];
-          resultObj["assert"] = assert;
-          resultObj["errMsg"] = null;
-          if (caseObj.isFailNotice) {
-            if (!assert["result"]) {
-              this.sendMessageQueue.add("sendMessage",
-                 `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
+      const endTime = new Date();
+      resultObj["endTime"] = endTime;
+      const rumTime = endTime.getTime() - startTime.getTime();
+      resultObj["rumTime"] = rumTime;
+      const res = JSON.stringify(result.data);
+      if (result.result) {
+        const assert = await this.execAssert(caseId, result.data);
+        resultObj["result"] = result.data;
+        resultObj["status"] = assert["result"];
+        resultObj["assert"] = assert;
+        resultObj["errMsg"] = null;
+        if (caseObj.isFailNotice) {
+          if (!assert["result"]) {
+            this.sendMessageQueue.add("sendMessage",
+              `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
                            期望条件 ${assert["relation"]}
                            实际结果${assert["actual"]} 不符合`);
-            }
-          }
-        } else {
-          resultObj["status"] = false;
-          resultObj["result"] = null;
-          resultObj["errMsg"] = result;
-          if (caseObj.isFailNotice) {
-            this.sendMessageQueue.add("sendMessage", `接口 ${caseObj.name} 运行失败，失败内容: ${result}`);
           }
         }
-        // 保存历史记录
-        const historyData = {
-          caseId: caseId,
-          status: resultObj["status"] ? 0 : 1,
-          executor: runCaseById.executor,
-          re: res,
-          startTime: startTime,
-          endTime: endTime
-        };
-        await this.historyService.createHistory(historyData).catch(
-          err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-          }
-        );
-
+      } else {
+        resultObj["status"] = false;
+        resultObj["result"] = null;
+        resultObj["errMsg"] = result;
+        if (caseObj.isFailNotice) {
+          this.sendMessageQueue.add("sendMessage", `接口 ${caseObj.name} 运行失败，失败内容: ${result}`);
+        }
       }
-      console.log("接口执行返回结果：" + JSON.stringify(resultObj));
-      resultList.push(resultObj);
-    }
+      // 保存历史记录
+      const historyData = {
+        caseId: caseId,
+        status: resultObj["status"] ? 0 : 1,
+        executor: runCaseById.executor,
+        re: res,
+        startTime: startTime,
+        endTime: endTime
+      };
+      await this.historyService.createHistory(historyData).catch(
+        err => {
+          console.log(err);
+          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+      );
+
+    console.log("接口执行返回结果：" + JSON.stringify(resultObj));
+    resultList.push(resultObj);
+  }
     return resultList;
   }
+
+
+  /**
+   * 解析请求url
+   * @param runCaseDto
+   */
+  parseUrl(runCaseDto: RunCaseDto) {
+    return runCaseDto.endpoint + runCaseDto.path;
+  }
+
+  /**
+   * 解析请求方法
+   * @param runCaseDto
+   */
+  parseRequestMethod(runCaseDto: RunCaseDto) {
+    return getRequestMethodTypeString(Number(runCaseDto.type));
+  }
+
+  /**
+   * 解析请求头
+   * @param runCaseDto
+   */
+  async parseRequestHeader(runCaseDto: RunCaseDto) {
+
+    //处理头部
+    let headers = runCaseDto.header != null ? JSON.parse(runCaseDto.header) : {};
+    let contentTypeFlag = false;
+    for (const key in headers) {
+      if (headers.hasOwnProperty(key) && key.toLocaleLowerCase() === "content-type") contentTypeFlag = true;
+    }
+    if (runCaseDto.type == "0") {
+      headers["content-type"] = "application/x-www-form-urlencoded";
+    } else {
+      if (!contentTypeFlag) headers["content-type"] = "application/json";
+    }
+    if (runCaseDto.tokenId) {
+      const tokenObj = await findTokenById(this.tokenRepository, runCaseDto.tokenId);
+      headers["token"] = tokenObj.token;
+    }
+    if (runCaseDto.isNeedSign == true) {
+      const isProdEnv = runCaseDto.endpoint == "https://oapi.blingabc.com";
+      const signHeader = CommonUtil.generateSign(runCaseDto.param, isProdEnv);
+      headers["ts"] = signHeader.ts;
+      headers["sign"] = signHeader.md5;
+    }
+    if (runCaseDto.paramType == ParamType.FILE) {
+      const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
+      headers = form.getHeaders();
+    }
+    CommonUtil.printLog1(JSON.stringify(headers));
+    return headers;
+  }
+
+  /**
+   * 解析参数
+   * @param runCaseDto
+   */
+  async parseRequestData(runCaseDto: RunCaseDto) {
+    if (runCaseDto.paramType == ParamType.FILE) {
+      // 将requestData的data转化成文件流
+      if (!runCaseDto.param) {
+        throw new ApiException("没有正确传入文件地址", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
+      }
+      const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
+      return form;
+    } else {
+      if (!runCaseDto.param){
+        const vParams = JSON.parse(runCaseDto.param);
+        return await this.analysisParam(vParams);
+      }
+    }
+  }
+
+
 
   /**
    *
@@ -223,64 +298,6 @@ export class RunService {
     }
   }
 
-  /**
-   * 执行测试用例中的所有接口
-   * @return {Promise<any>}: 发起请求后的响应结果
-   * @param runcaseList
-   */
-  async runCaseListById(runcaseList: IRunCaseList): Promise<any[]> {
-    const caseList = await this.caseListRepository
-      .createQueryBuilder("caselist")
-      .where("caselist.id = :id", { id: runcaseList.caseListId })
-      .leftJoinAndSelect("caselist.cases", "cases")
-      .leftJoinAndSelect("cases.endpointObject", "end")
-      .getOne()
-      .catch(
-        err => {
-          console.log(err);
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-      );
-    if (!caseList) {
-      throw new ApiException("未找到相关用例", ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.OK);
-    }
-    const caseIdList = [];
-    const startTime = new Date();
-    const requestAsyncList = caseList.cases.map(async v => {
-      if (v instanceof CaseEntity) {
-        const endpoint = await this.envService.formatEndpoint(runcaseList.envId, v.endpointObject.endpoint);
-        const requestBaseData: RunCaseDto = Object.assign({}, v, {
-          token: "",
-          endpoint: endpoint,
-          type: String(v.type)
-        });
-        caseIdList.push(v.id);
-        const requestData = this.generateRequestData(requestBaseData);
-        return this.curlService.makeRequest(requestData);
-      } else {
-        throw new ApiException("样例中接口未找到", ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    });
-    const requestList = await Promise.all(requestAsyncList);
-    const endTime = new Date();
-    const resultList = await forkJoin(requestList).pipe(map(res => {
-      res.forEach(async (value, index) => {
-        // 保存历史记录
-        const historyData = {
-          caseId: caseIdList[index].id,
-          status: value.result ? 0 : 1,
-          executor: runcaseList.executor || 0,
-          re: JSON.stringify(value.data),
-          startTime: startTime,
-          endTime: endTime
-        };
-        await this.historyService.createHistory(historyData);
-      });
-      return res;
-    })).toPromise();
-    return resultList;
-  }
-
 
   // 生成请求参数
   private generateRequestData(runCaseDto: RunCaseDto): AxiosRequestConfig {
@@ -302,11 +319,11 @@ export class RunService {
       if (!contentTypeFlag) headers["content-type"] = "application/json";
     }
 
-    if (runCaseDto.isNeedSign == true){
+    if (runCaseDto.isNeedSign == true) {
       const isProdEnv = runCaseDto.endpoint == "https://oapi.blingabc.com";
       const signHeader = CommonUtil.generateSign(runCaseDto.param, isProdEnv);
-      headers['ts'] = signHeader.ts;
-      headers['sign'] = signHeader.md5;
+      headers["ts"] = signHeader.ts;
+      headers["sign"] = signHeader.md5;
     }
     const requestData: AxiosRequestConfig = {
       url: runCaseDto.endpoint + runCaseDto.path,
@@ -335,12 +352,14 @@ export class RunService {
     return requestData;
   }
 
-  private analysisParam(param) {
+
+  private async analysisParam(param) {
     const paramReg = /\{\{(.+?)\}\}/g;
     var regex2 = /\[(.+?)\]/g;
     for (let paramsKey in param) {
-      if (paramReg.test(param[paramsKey])) {
-        const regData = param[paramsKey].replace(paramReg, "$1");
+      const value = param[paramsKey];
+      if (paramReg.test(value)) {
+        const regData = value.replace(paramReg, "$1");
         if (regData.indexOf("$randomint") != -1) {
           if (regData.indexOf("-") != -1) {
             const limit = regData.split("-")[1];
@@ -364,80 +383,23 @@ export class RunService {
           }
         }
       }
+      else if (paramReg.test(param[paramsKey])) {
+        const regData = value.toString().replace(paramReg, "$1");
+        const alias = regData.split(".")[0];
+        const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+        const runResult = await this.runCaseByCaseInstance(caseInstance);
+        const newVal = regData.replace(alias, "data");
+        const paramValue = getAssertObjectValue(runResult, newVal);
+        param[paramsKey] = paramValue;
+      }
     }
     return param;
   }
 
-  /**
-   * 运行场景
-   * @param runSceneDto
-   */
-  async runScene(runSceneDto: RunSceneDto) {
-    const scene = await this.sceneRepository.findOne(runSceneDto.sceneId).catch(
-      err => {
-        console.log(err);
-        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    );
-    if (!scene) {
-      throw new ApiException(`场景ID ${runSceneDto.sceneId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-    }
-    let caseObjList = [];
-    const caseJson = JSON.parse(scene.dependenceCaseJson);
 
-    for (let caseJ of caseJson) {
-      let caseId = caseJ.caseId;
-      const caseObj = await this.caseRepository.findOne(caseId).catch(
-        err => {
-          console.log(err);
-          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-      );
-      const index = caseJ.index;
-      const isDependenceParam = caseJ.isDependenceParam;
-      const caseInstance = { index: index, case: caseObj, isDependenceParam: isDependenceParam };
-      caseObjList.push(caseInstance);
-    }
-    let resultList = [];
-    let resultMap = {};
-    const paramReg = /\{\{(.+?)\}\}/g;
-    const cases = caseObjList.sort(CommonUtil.compare("index"));
-    for (let caseObj of cases) {
-      const alias = caseObj.case.alias;
-      if (caseObj.isDependenceParam) {
-        const paramJson = JSON.parse(caseObj.case.param);
-        for (let pJson in paramJson) {
-          const value = paramJson[pJson];
-          if (paramReg.test(value)) {
-            const regData = value.toString().replace(paramReg, "$1");
-            const alias = regData.split(".")[0];
-            const newVal = regData.replace(alias, "data");
-            const paramValue = getAssertObjectValue(JSON.parse(resultMap[alias]), newVal);
-            paramJson[pJson] = paramValue;
-          }
-        }
-        caseObj.case.param = JSON.stringify(paramJson);
-        const result = await this.runCaseId(caseObj.case.id, runSceneDto.envId, runSceneDto.token, true, caseObj.case.param, runSceneDto.executor);
-        if (result == null) {
-          throw new ApiException(`运行接口ID:${caseObj.case.id}失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        resultMap[alias] = result;
-        resultList.push(
-          { id: caseObj.case.id, result: result }
-        );
-      } else {
-        const result = await this.runCaseId(caseObj.case.id, runSceneDto.envId, runSceneDto.token, false, caseObj.case.param, runSceneDto.executor);
-        if (result == null) {
-          throw new ApiException(`运行接口ID:${caseObj.case.id}失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        resultMap[alias] = result;
-        resultList.push(
-          { id: caseObj.case.id, result: result }
-        );
-      }
+  private async runCaseByCaseInstance(caseInstance) {
 
-    }
-    return resultList;
+
   }
 
 
@@ -578,7 +540,7 @@ export class RunService {
             assertResult["relation"] = caseObj.assertJudge.name;
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
-            console.log(execResult)
+            console.log(execResult);
             assertResult["result"] = (execResult.toString().indexOf(caseObj.assertText) == -1);
             break;
           case 9:

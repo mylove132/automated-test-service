@@ -62,3 +62,35 @@ export const findScene = async (sceneRepository: Repository<SceneEntity>, catalo
         }).orderBy('scene.createDate','DESC');
 };
 
+/**
+ * 通过ID查找场景
+ * @param sceneRepository
+ * @param id
+ */
+export const findSceneById = async (sceneRepository: Repository<SceneEntity>, id) => {
+  return  await sceneRepository.findOne(id).catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};
+
+
+/**
+ * 通过ID查询场景关联用例
+ * @param sceneRepository
+ * @param id
+ */
+export const findSceneOfCaseListById = async (sceneRepository: Repository<SceneEntity>, id) => {
+  return  await sceneRepository.createQueryBuilder('scene').
+  leftJoinAndSelect('scene.cases','cases').
+  where('scene.id = :id',{id: id}).
+  getOne().
+  catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};

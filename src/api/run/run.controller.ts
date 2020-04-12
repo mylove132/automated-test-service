@@ -53,13 +53,13 @@ export class RunController {
         return await this.runService.covertCurl(covertDto);
     }
 
-  @OpeModule(OperateModule.RUN)
-  @OpeType(OperateType.RUNSCENE)
-    @OperateDesc('')
-    @ApiOperation({title: 'run scene by id', description: '运行场景'})
-    @ApiResponse({status: 200, description: 'run scene success.'})
-    @Post('scene')
-    async runScene(@Body() runSceneDto: RunSceneDto): Promise<any> {
-        return await this.runService.runScene(runSceneDto);
-    }
+  // @OpeModule(OperateModule.RUN)
+  // @OpeType(OperateType.RUNSCENE)
+  //   @OperateDesc('')
+  //   @ApiOperation({title: 'run scene by id', description: '运行场景'})
+  //   @ApiResponse({status: 200, description: 'run scene success.'})
+  //   @Post('scene')
+  //   async runScene(@Body() runSceneDto: RunSceneDto): Promise<any> {
+  //       return await this.runService.runScene(runSceneDto);
+  //   }
 }
