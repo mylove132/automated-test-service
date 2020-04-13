@@ -75,7 +75,6 @@ export class RunService {
    * @param runCaseById
    */
   async runCaseById(runCaseById: IRunCaseById): Promise<any> {
-
     let resultList = [];
     for (let caseId of runCaseById.caseIds) {
       let resultObj = {};
@@ -86,7 +85,7 @@ export class RunService {
       const runCaseDto: RunCaseDto = Object.assign({}, caseObj, {
         endpoint: endpoint,
         type: String(caseObj.type),
-        tokenId: caseObj.token.id,
+        tokenId: caseObj.token != null ? caseObj.token.id : null,
       });
       let requestData: AxiosRequestConfig = {};
       const headers = await this.parseRequestHeader(runCaseDto);
