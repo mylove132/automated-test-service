@@ -29,6 +29,7 @@ import {findEnvById} from "../../datasource/env/env.sql";
 import {findPlatformCodeById} from "../../datasource/platformCode/platform.sql";
 import {from} from "rxjs";
 import {distinct} from "rxjs/operators";
+import { CommonUtil } from "../../utils/common.util";
 
 
 @Injectable()
@@ -191,20 +192,7 @@ export class TokenService {
         }
         let token;
         if (result.data.code === 10000) {
-            switch (platformCodeId) {
-                case 1:
-                    token = result.data.data.userInfoVO.token;
-                    break;
-                case 2:
-                    token = result.data.data.userInfo.token;
-                    break;
-                case 3:
-                    token = result.data.data.userInfo.token;
-                    break;
-                case 4:
-                    token = result.data.data.userInfoVO.token;
-                    break;
-            }
+            token = CommonUtil.getTokenFromResult(result.data);
         } else {
             throw new ApiException(`登录失败:code：${result.data.code}`,
                 ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);

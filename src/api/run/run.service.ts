@@ -255,10 +255,11 @@ export class RunService {
       else if (regex2.test(param[paramsKey])) {
         const regData = value.toString().replace(regex2, "$1");
         const alias = regData.split(".")[0];
-        const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+        const dataName = regData.split(".")[1];
 
+        const caseInstance = await findCaseByAlias(this.caseRepository, alias);
         const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
-        const newVal = regData.replace(alias, "data");
+        const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
         const paramValue = getAssertObjectValue(runResult, newVal);
         param[paramsKey] = paramValue;
       }

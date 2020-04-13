@@ -3,6 +3,8 @@ import { ConfigService } from "../config/config.service";
 
 export class CommonUtil {
 
+  private static token: any;
+
   /**
    * 判断参数是否是数字
    * @param val
@@ -42,18 +44,18 @@ export class CommonUtil {
    */
   static generateSign(param: string, isProdEnv) {
     let jsonParam = JSON.parse(param);
-    const timeUnix = (Math.round(new Date().getTime()/1000).toString());
-    jsonParam['ts'] = timeUnix;
+    const timeUnix = (Math.round(new Date().getTime() / 1000).toString());
+    jsonParam["ts"] = timeUnix;
     jsonParam = this.sort_ASCII(jsonParam);
-    let paramValue: string = '';
+    let paramValue: string = "";
     for (let key in jsonParam) {
       paramValue += key + "=" + jsonParam[key] + "&";
     }
     const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
     const app_key = !isProdEnv ? config.testAppKey : config.prodAppKey;
-    paramValue += 'app_key='+app_key;
+    paramValue += "app_key=" + app_key;
     const md5 = new Md5();
-    return {md5:md5.appendAsciiStr(paramValue).end(),ts: timeUnix};
+    return { md5: md5.appendAsciiStr(paramValue).end(), ts: timeUnix };
   }
 
   private static sort_ASCII(obj) {
@@ -131,12 +133,26 @@ export class CommonUtil {
     return oldArr;
   }
 
+
+  static getTokenFromResult(res) {
+    for (let resKey in res) {
+      if (this.token != null) return;
+      if (resKey == "token") {
+         this.token = res[resKey];
+      } else if (typeof(res[resKey]) == 'object') {
+        this.getTokenFromResult(res[resKey]);
+      }
+    }
+    return this.token;
+  }
+
+
   static printLog2(meg) {
-    console.log('-----------------------------'+meg);
+    console.log("-----------------------------" + meg);
   }
 
   static printLog1(meg) {
-    console.log('-----------**********************------------------'+meg);
+    console.log("-----------**********************------------------" + meg);
   }
 
 }
