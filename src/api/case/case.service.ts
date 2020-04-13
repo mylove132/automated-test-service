@@ -79,8 +79,6 @@ export class CaseService {
     if (!assertType) throw new ApiException(`assertTypeId:${createCaseDto.assertType}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
     const assertJudge = await findAssertJudgeById(this.assertJudgeRepository, createCaseDto.assertJudge);
     if (!assertJudge) throw new ApiException(`assertJudgeId:${createCaseDto.assertJudge}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-    const alias = CommonUtil.randomChar(3)+new Date().getTime().toString();
-    caseObj.alias = alias;
 
     caseObj.assertKey = createCaseDto.assertKey;
     caseObj.assertType = assertType;
@@ -93,6 +91,9 @@ export class CaseService {
     caseObj.header = createCaseDto.header;
     caseObj.param = createCaseDto.param;
     const result = await saveCase(this.caseRepository, caseObj);
+    const cObj = new CaseEntity();
+    cObj.alias = "alias"+result.id;
+    await updateCase(this.caseRepository, cObj, result.id);
     return { id: result.id };
 
   }
