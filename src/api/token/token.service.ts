@@ -149,9 +149,6 @@ export class TokenService {
         tokenObj.token = updateTokenDto.token != null ? updateTokenDto.token : tokenObj.token;
         tokenObj.url = updateTokenDto.url != null ? updateTokenDto.url.charAt(updateTokenDto.url.length - 1) == '/' ?
             updateTokenDto.url.substring(0, updateTokenDto.url.length - 1) : updateTokenDto.url : tokenObj.url;
-        const verifyTokenObj = await findTokenByUrlAndUsername(this.tokenRepository, tokenObj.url, tokenObj.username);
-        if (verifyTokenObj) throw new ApiException(`url: ${tokenObj.url} 与用户名: ${tokenObj.username} 已存在`,
-            ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
 
         return await updateToken(this.tokenRepository, tokenObj, updateTokenDto.id);
     }
