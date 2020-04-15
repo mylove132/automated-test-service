@@ -266,9 +266,8 @@ data						|object		|R			|&nbsp;true表示删除成功
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 catalogId				    |number		|O			|目录id(默认查询所有用例)
-caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
 caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认所有等级,多个等级查询用英文逗号隔开）
-envId				    |number		|R			|运行环境ID
+envId				        |number		|R			|运行环境ID
 page	                    |number		|O			|页数(默认1)
 limit	                    |number		|O			|每页展示个数(默认10)
 
@@ -595,7 +594,6 @@ data						|object		|R			|&nbsp;
 &emsp;paramType			        |number		|O			|请求类型（0:TEXT,1:FILE)
 &emsp;endpointId			        |number		|O			|
 &emsp;isNeedToken			        |boolean		|O			|
-caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
 caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 &emsp;tokenId			        |number		|O			|tokenId
@@ -712,7 +710,6 @@ data						|object		|R			|
 &emsp;path			|string		|R			|接口路径
 &emsp;endpointId			|number		|R			|endpointId
 &emsp;isNeedToken			        |boolean		|O			|
-&emsp;caseType				    |number		|O			|用例类型（0：单接口用例，1：场景接口用例，2：混合接口用例，默认0（查询单接口用例））
 &emsp;caseGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认2（用例等级低）,多个等级查询用英文逗号隔开）
 &emsp;alias			|string		|O			|接口别名（适用于场景级联调用）
 &emsp;tokenId			|number		|O			|tokenId
@@ -3415,64 +3412,6 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 ```
 
 
-### 3.6  获取用例信息
-- **接口说明：** 获取用例信息接口
-- **请求方式：** GET
-- **接口地址：** /api/caseList
-
-#### 3.6.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;isTask			    |string		|O		    |true(查询定时任务类型的用例)
-&emsp;envId			        |number		|O		    |查询该环境下的用例
-page	                    |number		|O			|页数(默认1)
-limit	                    |number		|O			|每页展示个数(默认10)
-请求示例：
-
-```
-/api/caselist?isTask=false&envId=1
-
-```
-返回结果
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;true表示执行用例成功
-&nbsp;&nbsp;&nbsp;cases					|list		|R			|&nbsp;接口数组
-&nbsp;&nbsp;&nbsp;env       |object		|R			|&nbsp;环境信息
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endpoints       |object		|R			|&nbsp;环境对应的endpoints
-
-返回成功示例
-```
-{
-    "data": {
-        "items": [
-            {
-                "id": 4,
-                "name": "测试用例2.1",
-                "desc": "注册信息如下：",
-                "cron": "2 * * * * *",
-                "isTask": false,
-                "createDate": "2019-12-30T08:28:39.193Z",
-                "updateDate": "2019-12-30T08:28:39.193Z",
-                "cases": [],
-                "env": null
-            }
-        ],
-        "itemCount": 1,
-        "totalItems": 1,
-        "pageCount": 1,
-        "next": "",
-        "previous": ""
-    },
-    "code": 0,
-    "message": "success"
-}
-```
-
 ### 4.1  启动数据库扫描定时任务
 - **接口说明：** 启动数据库扫描监控接口
 - **请求方式：** GET
@@ -3566,7 +3505,7 @@ data						|object		|R			|&nbsp;true表示执行用例成功
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;true表示执行用例成功
-&nbsp;&nbsp;&nbsp;result	|boolean	    |R			|&nbsp; true表示正确，false表示错误
+&nbsp;&nbsp;&nbsp;result	|boolean	|R			|&nbsp; true表示正确，false表示错误
 
 
 
@@ -3969,99 +3908,6 @@ data						|any		|R			|&nbsp;返回历史记录值
 ```
 
 
-### 7.1  添加场景接口
-- **接口说明：** 添加场景接口
-- **请求方式：** POST
-- **接口地址：** /api/scene
-
-#### 7.1.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;name			        |string		|R		    |场景名称
-&emsp;desc			        |string		|O		    |场景描述
-&emsp;catalogId             |number		|R		    |场景关联的目录ID
-&emsp;caseList              |json		|R		    |场景关联的接口
-
-请求示例
-
-```
-{
-	"name": "获取首页课程信息",
-	"desc": "",
-     "catalogId":1,
-     "caseList":"[{"caseId":1,"index",1,"isDependenceParam":false},
-                    {"caseId":2,"index",2,"isDependenceParam":true},
-                   {"caseId":3,"index",3,"isDependenceParam":true}]"
-}
-```
-### 7.2  更改场景接口
-- **接口说明：** 更改场景接口
-- **请求方式：** PUT
-- **接口地址：** /api/scene
-
-#### 7.2.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;id			        |number		|R		    |场景id
-&emsp;name			        |string		|O		    |场景名称
-&emsp;desc			        |string		|O		    |场景描述
-&emsp;catalogId             |number		|O		    |场景关联的目录ID
-&emsp;caseList              |json		|O		    |场景关联的接口
-
-请求示例
-
-```
-{
-    "id":1,
-	"name": "获取首页课程信息",
-	"desc": "",
-     "catalogId":1,
-     "caseList":"[{"caseId":1,"index",1,"isDependenceParam":false},
-                    {"caseId":2,"index",2,"isDependenceParam":true},
-                   {"caseId":3,"index",3,"isDependenceParam":true}]"
-}
-```
-### 7.3  删除场景接口
-- **接口说明：** 删除场景接口
-- **请求方式：** DELETE
-- **接口地址：** /api/scene
-
-#### 7.3.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-&emsp;sceneIds			        |number[]		|R		    |场景id
-
-请求示例
-
-```
-{
-    "sceneIds": [1,3],
-}
-```
-
-### 7.4  查询场景用例
-- **接口说明：** 查询场景用例
-- **请求方式：** GET
-- **接口地址：** /api/scene
-
-#### 7.4.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---
-catalogId				    |number		|O			|目录id(默认查询所有用例)
-sceneGrade				    |string		|O			|用例等级（0：高，1：中，2：低，默认所有登记,多个等级查询用英文逗号隔开）
-page	                    |number		|O			|页数(默认1)
-limit	                    |number		|O			|每页展示个数(默认10)
-
-请求示例
-
-```
-/api/scene?catalogId=1&sceneGrade=1,2
-```
-
 ### 8.0  添加接口定时任务
 - **接口说明：** 添加定时任务
 - **请求方式：** POST
@@ -4072,8 +3918,6 @@ limit	                    |number		|O			|每页展示个数(默认10)
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 caseGrade				    |number		|O			|接口的等级（默认0：高级）
-caseType				    |number		|R			|接口类型（默认0：单接口,1:场景接口,2:混合接口）
-taskType				    |number		|O			|任务类型(默认1:单接口任务，2：场景任务)
 envId				        |number		|R			|环境ID
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
@@ -4084,8 +3928,6 @@ cron	                    |string		|R			|定时任务cron表达式
 ```
 {
 	"caseGrade": 1,
-	"caseType":0,
-	"taskType":1,
 	"envId": 1,
 	"name":"测试定时任务test",
 	"cron":"1 * * * * *"
@@ -4340,11 +4182,11 @@ data						|any		|R			|&nbsp;返回历史记录值
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-id				    |number		|R			|任务的ID
+id				            |number		|R			|任务的ID
 envId				        |number		|R			|环境ID
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
-isRestart	                    |bool		|O			|定时任务是否重启
+isRestart	                |bool		|O			|定时任务是否重启
 
 
 请求示例

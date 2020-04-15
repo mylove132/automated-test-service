@@ -186,7 +186,7 @@ export class RunService {
       headers["sign"] = signHeader.md5;
     }
     if (runCaseDto.paramType == ParamType.FILE) {
-      const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
+      const form = RunService.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
       headers = form.getHeaders();
     }
     return headers;
@@ -195,6 +195,7 @@ export class RunService {
   /**
    * 解析参数
    * @param runCaseDto
+   * @param endpoint
    */
   async parseRequestData(runCaseDto: RunCaseDto, endpoint) {
     if (runCaseDto.paramType == ParamType.FILE) {
@@ -202,7 +203,7 @@ export class RunService {
       if (!runCaseDto.param) {
         throw new ApiException("没有正确传入文件地址", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
       }
-      const form = this.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
+      const form = RunService.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
       return form;
     } else {
       if (runCaseDto.param){
@@ -215,6 +216,7 @@ export class RunService {
   /**
    * 解析参数
    * @param param
+   * @param endpoint
    */
   private async analysisParam(param, endpoint) {
     const paramReg = /\{\{(.+?)\}\}/g;
@@ -258,7 +260,6 @@ export class RunService {
         param[paramsKey] = paramValue;
       }
     }
-    CommonUtil.printLog1(JSON.stringify(param));
     return param;
   }
 
@@ -289,7 +290,7 @@ export class RunService {
 
 
   // 生成文件流
-  private generateFileStream(paramName: string, address: string) {
+  private static generateFileStream(paramName: string, address: string) {
     const form = new FormData();
     form.append(paramName, request(address));
     return form;

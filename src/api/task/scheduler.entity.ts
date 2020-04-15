@@ -31,17 +31,21 @@ export class SchedulerEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @ManyToMany(type => CaseEntity, cases => cases.sechedulers, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @ManyToMany(type => CaseEntity, cases => cases.sechedulers, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+    })
     @JoinTable()
     cases: CaseEntity[];
 
-    @ManyToOne(type => EnvEntity,env => env.sechedulers,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @ManyToOne(type => EnvEntity, env => env.sechedulers, {cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     @JoinColumn()
     env: EnvEntity;
 
-    @Column('enum', {default: RunStatus.STOP, nullable:false, comment: '定时任务状态', enum: RunStatus})
+    @Column('enum', {default: RunStatus.STOP, nullable: false, comment: '定时任务状态', enum: RunStatus})
     status: RunStatus;
 
-    @Column({nullable:false})
+    @Column({nullable: false})
     cron: string;
 }

@@ -51,8 +51,9 @@ export const findScheduleByStatus = async (schedulerRepository: Repository<Sched
         if (runStatus != null) {
             qb.where("sch.status = :status", {status: runStatus});
         }
-    });
+    }).orderBy("sch.updateDate", "DESC");
 };
+
 
 
 /**
