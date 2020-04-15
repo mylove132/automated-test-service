@@ -1,25 +1,25 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CaseEntity } from "../case/case.entity";
-import { CovertDto, RunCaseDto } from "./dto/run.dto";
-import { CurlService } from "../curl/curl.service";
-import { EnvService } from "../env/env.service";
-import { ApiException } from "../../shared/exceptions/api.exception";
-import { ApiErrorCode } from "../../shared/enums/api.error.code";
-import { AxiosRequestConfig } from "axios";
-import { getAssertObjectValue, getRequestMethodTypeString } from "../../utils";
-import { HistoryService } from "../history/history.service";
+import {HttpStatus, Injectable} from "@nestjs/common";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import {CaseEntity} from "../case/case.entity";
+import {CovertDto, RunCaseDto} from "./dto/run.dto";
+import {CurlService} from "../curl/curl.service";
+import {EnvService} from "../env/env.service";
+import {ApiException} from "../../shared/exceptions/api.exception";
+import {ApiErrorCode} from "../../shared/enums/api.error.code";
+import {AxiosRequestConfig} from "axios";
+import {getAssertObjectValue, getRequestMethodTypeString} from "../../utils";
+import {HistoryService} from "../history/history.service";
 import * as FormData from "form-data";
 import * as request from "request";
-import { IRunCaseById } from "./run.interface";
-import { CommonUtil } from "../../utils/common.util";
-import { TokenEntity } from "../token/token.entity";
-import { findTokenById } from "../../datasource/token/token.sql";
-import { findCaseByAlias, findCaseOfEndpointAndTokenById } from "../../datasource/case/case.sql";
-import { InjectQueue } from "@nestjs/bull";
-import { Queue } from "bull";
-import { ParamType } from "../../config/base.enum";
+import {IRunCaseById} from "./run.interface";
+import {CommonUtil} from "../../utils/common.util";
+import {TokenEntity} from "../token/token.entity";
+import {findTokenById} from "../../datasource/token/token.sql";
+import {findCaseByAlias, findCaseOfEndpointAndTokenById} from "../../datasource/case/case.sql";
+import {InjectQueue} from "@nestjs/bull";
+import {Queue} from "bull";
+import {ParamType} from "../../config/base.enum";
 
 
 @Injectable()
@@ -255,6 +255,9 @@ export class RunService {
         const dataName = regData.split(".")[1];
 
         const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+        if (!caseInstance) {
+          throw new ApiException(`别名:${alias}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
         const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
         const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
         const paramValue = getAssertObjectValue(runResult, newVal);
