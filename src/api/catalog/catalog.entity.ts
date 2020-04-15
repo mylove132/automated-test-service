@@ -5,9 +5,8 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    TreeChildren, TreeParent, Tree, OneToMany, OneToOne, JoinColumn
+    OneToMany
 } from 'typeorm';
-import {UserEntity} from "../user/user.entity";
 import {CaseEntity} from '../case/case.entity';
 import {PlatformCodeEntity} from "./platformCode.entity";
 
@@ -36,6 +35,6 @@ export class CatalogEntity {
     cases: CaseEntity[];
 
 
-    @ManyToOne(type => PlatformCodeEntity,platformCode =>platformCode.catalog)
+    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.catalog)
     platformCode: PlatformCodeEntity;
 }
