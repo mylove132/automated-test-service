@@ -146,3 +146,14 @@ export class DeleteCaseDto {
     ids: number[];
 }
 
+
+export class BatchUpdateCatalogDto {
+
+    @ArrayMinSize(1,{message: "更新的接口ID至少为1个"})
+    @IsArray()
+    caseIds: number[];
+
+    @IsNumber()
+    @IsNotEmpty()
+    catalogId: number;
+}

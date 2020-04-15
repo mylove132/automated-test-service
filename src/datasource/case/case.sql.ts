@@ -5,6 +5,8 @@ import { HttpStatus } from "@nestjs/common";
 import { CaseEntity } from "../../api/case/case.entity";
 import { AssertJudgeEntity, AssertTypeEntity } from "../../api/case/assert.entity";
 import { CaseGrade} from "../../config/base.enum";
+import {findCatalogById} from "../catalog/catalog.sql";
+import {CatalogEntity} from "../../api/catalog/catalog.entity";
 
 
 /**
@@ -246,4 +248,21 @@ export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, n
       }
     }
   ).orderBy('cas.createDate', 'DESC').getMany();
+};
+
+
+export const batchUpdateCaseOfCatalogId =
+    async (caseRepository: Repository<CaseEntity>, caseIds: number[], catalog: CatalogEntity) => {
+    caseRepository.createQueryBuilder().
+    update(CaseEntity).
+    set({
+        catalog: catalog
+    }).where('id IN (:...caseIds)',{caseIds: caseIds}).
+    execute().
+    catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
 };

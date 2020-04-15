@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
 import {ApiBearerAuth, ApiOperation, ApiResponse} from "@nestjs/swagger";
 import {CaseService} from "./case.service";
-import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
+import {BatchUpdateCatalogDto, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
 import {OpeModule, OperateDesc, OpeType} from "../../utils/common.decorators";
 import {OperateModule, OperateType} from "../../config/base.enum";
 
@@ -66,6 +66,13 @@ export class CaseController {
         return this.caseService.updateCase(updateCaseDto);
     }
 
+    @ApiOperation({title: 'batch update case'})
+    @ApiResponse({status: 200, description: 'batch update case success.'})
+    @Put('batchUpdate')
+    async batchUpdate(@Body() batchUpdateCatalogDto: BatchUpdateCatalogDto) {
+        return this.caseService.batchUpdateCatalog(batchUpdateCatalogDto);
+    }
+
     @ApiOperation({title: 'get all union endpoint case'})
     @ApiResponse({status: 200, description: 'get all union endpoint success.'})
     @Get('endpoints')
@@ -87,5 +94,7 @@ export class CaseController {
     async allAssertJudge() {
         return this.caseService.getAllAssertJudge();
     }
+
+
 
 }

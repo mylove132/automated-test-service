@@ -1,7 +1,7 @@
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CaseEntity} from "./case.entity";
-import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
+import {BatchUpdateCatalogDto, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
 import {CatalogEntity} from "../catalog/catalog.entity";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
@@ -19,7 +19,14 @@ import {
     findCaseByCatalogIdAndCaseTypeAndCaseGrade,
     findCaseByPathAndName,
     saveCase,
-    deleteCase, findAllAssertType, findAllAssertJudge, findCaseById, updateCase, findCaseUnionEndpoint, searchCaseByName
+    deleteCase,
+    findAllAssertType,
+    findAllAssertJudge,
+    findCaseById,
+    updateCase,
+    findCaseUnionEndpoint,
+    searchCaseByName,
+    batchUpdateCaseOfCatalogId
 } from "../../datasource/case/case.sql";
 import {findTokenById} from "../../datasource/token/token.sql";
 import {TokenEntity} from "../token/token.entity";
@@ -172,5 +179,15 @@ export class CaseService {
 
     async unionFindAllEndpoint() {
         return await findCaseUnionEndpoint(this.caseRepository);
+    }
+
+    /**
+     * 批量更新目录ID
+     * @param batchUpdateCatalogDto
+     */
+    async batchUpdateCatalog(batchUpdateCatalogDto: BatchUpdateCatalogDto){
+        const catalog = await findCatalogById(this.catalogRepository, batchUpdateCatalogDto.catalogId);
+        CommonUtil.printLog1(JSON.stringify(catalog))
+        return await batchUpdateCaseOfCatalogId(this.caseRepository, batchUpdateCatalogDto.caseIds, catalog);
     }
 }

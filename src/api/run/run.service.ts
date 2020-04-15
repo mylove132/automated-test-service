@@ -42,6 +42,7 @@ export class RunService {
    * @param runCaseDto
    */
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
+    CommonUtil.printLog1(JSON.stringify(runCaseDto))
     let resultObj = {};
     resultObj["startTime"] = new Date();
     // 生成请求数据
@@ -54,7 +55,7 @@ export class RunService {
     requestData.headers = headers;
     requestData.url = url;
     // 响应结果
-
+    CommonUtil.printLog1(JSON.stringify(requestData));
     const result = await this.curlService.makeRequest(requestData).toPromise();
     const endTime = new Date();
     resultObj["endTime"] = endTime;
@@ -258,6 +259,9 @@ export class RunService {
         const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
         const paramValue = getAssertObjectValue(runResult, newVal);
         param[paramsKey] = paramValue;
+      }
+      else {
+        return param;
       }
     }
     return param;
