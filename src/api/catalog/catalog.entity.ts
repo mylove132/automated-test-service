@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import {UserEntity} from "../user/user.entity";
 import {CaseEntity} from '../case/case.entity';
-import {SceneEntity} from "../scene/scene.entity";
 import {PlatformCodeEntity} from "./platformCode.entity";
 
 @Entity('catalog')
@@ -36,9 +35,6 @@ export class CatalogEntity {
     @OneToMany(type => CaseEntity, cases => cases.catalog)
     cases: CaseEntity[];
 
-
-    @OneToMany(type => SceneEntity, cases => cases.catalog)
-    scenes: SceneEntity[];
 
     @ManyToOne(type => PlatformCodeEntity,platformCode =>platformCode.catalog)
     platformCode: PlatformCodeEntity;

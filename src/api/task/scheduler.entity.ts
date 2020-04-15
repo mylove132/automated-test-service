@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import {EnvEntity} from '../env/env.entity';
 import {CaseEntity} from "../case/case.entity";
-import {RunStatus, TaskType} from "../../config/base.enum";
+import {RunStatus} from "../../config/base.enum";
 
 @Unique(['md5','name'])
 @Entity('secheduler')
@@ -24,9 +24,6 @@ export class SchedulerEntity {
 
     @Column()
     md5: string;
-
-    @Column('enum',{default: TaskType.SINGLE, nullable: false, enum: TaskType, comment: '任务类别'})
-    taskType: TaskType;
 
     @CreateDateColumn()
     createDate: Date;

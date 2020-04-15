@@ -5,7 +5,6 @@ import {UserModule} from './api/user/user.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {Connection} from 'typeorm';
 import {EnvModule} from './api/env/env.module';
-import {CaseListModule} from './api/caselist/caselist.module';
 import {ConfigService} from "./config/config.service";
 import {ConfigModule} from "./config/config.module";
 import {CatalogModule} from "./api/catalog/catalog.module";
@@ -16,7 +15,6 @@ import {ScheduleModule} from '@nestjs/schedule';
 import {AuthGuard} from './shared/guard/auth.guard';
 import {HistoryModule} from './api/history/history.module';
 import {JmeterModule} from "./api/jmeter/jmeter.module";
-import {SceneModule} from "./api/scene/scene.module";
 import {TokenModule} from "./api/token/token.module";
 import {OperateModule} from "./api/operate/operate.module";
 import {TransformInterceptor} from "./shared/interceptor/transform.interceptor";
@@ -38,12 +36,10 @@ const modules = [
     CatalogModule,
     UserModule,
     EnvModule,
-    CaseListModule,
     RunModule,
     HistoryModule,
     SchedulerModule,
     JmeterModule,
-    SceneModule,
     TokenModule,
     OperateModule
 ];

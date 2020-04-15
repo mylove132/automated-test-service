@@ -4,8 +4,7 @@ import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 import { CaseEntity } from "../../api/case/case.entity";
 import { AssertJudgeEntity, AssertTypeEntity } from "../../api/case/assert.entity";
-import { CaseGrade, CaseType } from "../../config/base.enum";
-import { HistoryEntity } from "../../api/history/history.entity";
+import { CaseGrade} from "../../config/base.enum";
 
 
 /**
@@ -76,23 +75,23 @@ export const findCaseUnionEndpoint = async (caseEntityRepository: Repository<Cas
  * 通过目录ID和用例类型以及用例等级查询case
  * @param caseEntityRepository
  * @param catalogId
- * @param caseType
  * @param caseGradeList
  */
-export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, catalogId, caseType, caseGradeList) => {
-  return caseEntityRepository.createQueryBuilder("case").leftJoinAndSelect("case.endpointObject", "endpoint").leftJoinAndSelect("case.assertType", "assertType").leftJoinAndSelect("case.assertJudge", "assertJudge").leftJoinAndSelect("case.token", "token").leftJoinAndSelect("token.platformCode", "platformCode").leftJoinAndSelect("token.env", "env").where(qb => {
+export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, catalogId, caseGradeList) => {
+  return caseEntityRepository.createQueryBuilder("case").
+  leftJoinAndSelect("case.endpointObject", "endpoint").
+  leftJoinAndSelect("case.assertType", "assertType").
+  leftJoinAndSelect("case.assertJudge", "assertJudge").
+  leftJoinAndSelect("case.token", "token").
+  leftJoinAndSelect("token.platformCode", "platformCode").
+  leftJoinAndSelect("token.env", "env").where(qb => {
     if (catalogId) {
       qb.where("case.catalog = :catalog", { catalog: catalogId });
-      if (caseType) {
-        qb.andWhere("case.caseType = :caseType", { caseType: caseType });
-      }
-    } else {
-      if (caseType) {
-        qb.where("case.caseType = :caseType", { caseType: caseType });
-      }
+      qb.andWhere("case.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
+    }else {
+        qb.where("case.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
     }
-
-  }).andWhere("case.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList }).orderBy("case.updateDate", "DESC");
+  }).orderBy("case.updateDate", "DESC");
 };
 
 
@@ -121,21 +120,13 @@ export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repos
  * 通过caseType查询case
  * @param caseEntityRepository
  * @param caseGrade
- * @param caseType
  */
-export const findCaseByCaseType = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, caseType: CaseType) => {
+export const findCaseByCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade) => {
   return await caseEntityRepository
-    .createQueryBuilder("cas").where(qb => {
-      if (caseType == CaseType.SINGLE) {
-        qb.where(
-          "cas.caseType IN (:...caseType)", { caseType: [CaseType.SINGLE, CaseType.BLEND] }
-        );
-      } else {
-        qb.where(
-          "cas.caseType IN (:...caseType)", { caseType: [CaseType.SCENE, CaseType.BLEND] }
-        );
-      }
-    }).andWhere("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).getMany().catch(
+    .createQueryBuilder("cas").where
+      ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
+      getMany().
+      catch(
       err => {
         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }

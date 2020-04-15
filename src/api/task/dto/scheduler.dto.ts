@@ -1,6 +1,6 @@
 import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional} from 'class-validator';
 import {Optional} from "@nestjs/common";
-import {CaseGrade, CaseType, Executor, TaskType} from "../../../config/base.enum";
+import {CaseGrade, Executor} from "../../../config/base.enum";
 import {IRunCaseById} from "../../run/run.interface";
 
 
@@ -13,10 +13,6 @@ class TaskIdsDto {
 
 class SingleTaskDto {
 
-    @IsNumber()
-    @IsNotEmpty()
-    readonly caseType: CaseType;
-
     @IsNumber({allowNaN: true})
     readonly envId: number;
 
@@ -25,10 +21,6 @@ class SingleTaskDto {
 
     @IsNotEmpty()
     name: string;
-
-    //任务类型
-    @Optional()
-    taskType: TaskType;
 
     //任务类型
     @Optional()

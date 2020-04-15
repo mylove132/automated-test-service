@@ -2,7 +2,6 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CaseEntity } from "../case/case.entity";
-import { CaselistEntity } from "../caselist/caselist.entity";
 import { CovertDto, RunCaseDto } from "./dto/run.dto";
 import { CurlService } from "../curl/curl.service";
 import { EnvService } from "../env/env.service";
@@ -14,7 +13,6 @@ import { HistoryService } from "../history/history.service";
 import * as FormData from "form-data";
 import * as request from "request";
 import { IRunCaseById } from "./run.interface";
-import { SceneEntity } from "../scene/scene.entity";
 import { CommonUtil } from "../../utils/common.util";
 import { TokenEntity } from "../token/token.entity";
 import { findTokenById } from "../../datasource/token/token.sql";
@@ -29,12 +27,8 @@ export class RunService {
   constructor(
     @InjectRepository(CaseEntity)
     private readonly caseRepository: Repository<CaseEntity>,
-    @InjectRepository(SceneEntity)
-    private readonly sceneRepository: Repository<SceneEntity>,
     @InjectRepository(TokenEntity)
     private readonly tokenRepository: Repository<TokenEntity>,
-    @InjectRepository(CaselistEntity)
-    private readonly caseListRepository: Repository<CaselistEntity>,
     private readonly curlService: CurlService,
     private readonly historyService: HistoryService,
     private readonly envService: EnvService,

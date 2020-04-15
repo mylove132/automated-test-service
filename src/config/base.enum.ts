@@ -25,10 +25,6 @@ export enum CaseGrade {
   HIGH = 0, IN = 1, LOW = 2
 }
 
-//用例类型
-export enum CaseType {
-    SINGLE = 0, SCENE = 1, BLEND = 2
-}
 
 //操作记录类型
 export enum OperateType {
@@ -45,7 +41,3 @@ export enum RunStatus {
      RUNNING = 1, STOP = 2, DELETE = 3
 }
 
-//定时任务类型
-export enum TaskType {
-     SINGLE = 0, SCENE = 1
-}

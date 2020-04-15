@@ -13,8 +13,8 @@ import {CommonUtil} from "../../utils/common.util";
 import {RunService} from "../run/run.service";
 import {CaseEntity} from "../case/case.entity";
 import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
-import {CaseGrade, Executor, RunStatus, TaskType} from "../../config/base.enum";
-import {findCaseByCaseType} from "../../datasource/case/case.sql";
+import {CaseGrade, Executor, RunStatus} from "../../config/base.enum";
+import {findCaseByCaseGrade} from "../../datasource/case/case.sql";
 import {
   findScheduleById,
   findScheduleByStatus,
@@ -137,7 +137,6 @@ export class SchedulerService {
         if (!this.isExistTask(schedulerEntity.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
       } else {
-        if (schedulerEntity.taskType == TaskType.SINGLE) {
           const caseList = schedulerEntity.cases;
           let caseIds = caseList.map( cas => {return cas.id});
           await this.runSingleTask(caseIds, schedulerEntity.env.id, schedulerEntity.cron, schedulerEntity.md5);
@@ -145,10 +144,7 @@ export class SchedulerService {
             throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           }
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
-        } else if (schedulerEntity.taskType == TaskType.SCENE) {
-          //场景任务
-          this.runSceneTask(schedulerEntity);
-        }
+
       }
     }
     return true;
@@ -162,7 +158,7 @@ export class SchedulerService {
     const caseGrade = singleTaskDto.caseGrade == null ? CaseGrade.LOW : singleTaskDto.caseGrade;
     const envId = singleTaskDto.envId == null ? 5 : singleTaskDto.envId;
 
-    let caseList: CaseEntity[] = await findCaseByCaseType(this.caseRepository, caseGrade, singleTaskDto.caseType);
+    let caseList: CaseEntity[] = await findCaseByCaseGrade(this.caseRepository, caseGrade);
     if (caseList.length == 0) {
       throw new ApiException("需要执行的接口列表为空", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
     }
@@ -180,7 +176,6 @@ export class SchedulerService {
     if (scheObj) {
       throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
     }
-    scheduler.taskType = singleTaskDto.taskType != null ? singleTaskDto.taskType : TaskType.SINGLE;
     scheduler.name = singleTaskDto.name;
     scheduler.md5 = md5;
     scheduler.createDate = createDate;
@@ -189,14 +184,7 @@ export class SchedulerService {
     scheduler.status = RunStatus.RUNNING;
     scheduler.cases = caseList;
     const result = await saveScheduler(this.scheRepository, scheduler);
-    switch (scheduler.taskType) {
-      case TaskType.SINGLE:
-        await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
-        break;
-      case TaskType.SCENE:
-        await this.runSceneTask(scheduler);
-        break;
-    }
+    await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
     return { id: result.id };
   }
 
@@ -222,17 +210,12 @@ export class SchedulerService {
           if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
         } else {
-          if (schObj.taskType == TaskType.SINGLE) {
             let caseIds = schObj.cases.map(cas => {
               return cas.id;
             });
             await this.runSingleTask(caseIds, schObj.env.id, schObj.cron, schObj.md5);
             if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
-          } else if (schObj.taskType == TaskType.SCENE) {
-            //场景任务
-            this.runSceneTask(schObj);
-          }
         }
       } catch (e) {
         throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);

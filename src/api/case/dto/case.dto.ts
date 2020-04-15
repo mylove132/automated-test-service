@@ -10,7 +10,7 @@ import {
     IsUrl,
 } from 'class-validator';
 import {Optional} from '@nestjs/common';
-import {CaseGrade, CaseType, ParamType, RequestType} from "../../../config/base.enum";
+import {CaseGrade, ParamType, RequestType} from "../../../config/base.enum";
 
 export class CreateCaseDto {
 
@@ -39,11 +39,6 @@ export class CreateCaseDto {
     @IsNumber()
     @IsOptional()
     readonly caseGrade: CaseGrade;
-
-    //用例类别
-    @IsNumber()
-    @IsOptional()
-    readonly caseType: CaseType;
 
     @IsNotEmpty()
     catalogId: number;
@@ -104,10 +99,6 @@ export class UpdateCaseDto {
     //接口等级
     @IsOptional()
     readonly caseGrade: CaseGrade;
-
-    //用例类别
-    @IsOptional()
-    readonly caseType: CaseType;
 
     @IsNumber()
     @IsOptional()

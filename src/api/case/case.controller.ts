@@ -1,10 +1,9 @@
-import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
-
-import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { CaseService } from "./case.service";
-import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto } from "./dto/case.dto";
-import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import {CaseType, OperateModule, OperateType} from "../../config/base.enum";
+import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
+import {ApiBearerAuth, ApiOperation, ApiResponse} from "@nestjs/swagger";
+import {CaseService} from "./case.service";
+import {CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
+import {OpeModule, OperateDesc, OpeType} from "../../utils/common.decorators";
+import {OperateModule, OperateType} from "../../config/base.enum";
 
 @ApiBearerAuth()
 @Controller('case')
@@ -25,25 +24,25 @@ export class CaseController {
     }
 
 
-  @OperateDesc('')
-  @ApiOperation({title: 'search case'})
-  @ApiResponse({status: 200, description: 'search case success.'})
-  @Get('search')
-  async queryCase(@Query('name')name: string) {
-    return this.caseService.searchCaseByNameService(name);
-  }
+    @OperateDesc('')
+    @ApiOperation({title: 'search case'})
+    @ApiResponse({status: 200, description: 'search case success.'})
+    @Get('search')
+    async queryCase(@Query('name')name: string) {
+        return this.caseService.searchCaseByNameService(name);
+    }
 
     @ApiOperation({title: 'query case'})
     @ApiResponse({status: 200, description: 'query case success.'})
     @Get()
     async findCaseById(@Query('catalogId') catalogId: number, @Query('envId') envId: number,
-                       @Query('caseType') caseType: CaseType = CaseType.SINGLE, @Query('caseGrade') caseGrade?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
+                       @Query('caseGrade') caseGrade?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
         limit = limit > 100 ? 100 : limit;
         let caseGradeList = [];
         caseGrade == null ? caseGradeList.push(0, 1, 2) : caseGrade.indexOf(',') ? caseGrade.split(',').map(grade => {
             caseGradeList.push(Number(grade))
         }) : caseGradeList.push(Number(caseGrade));
-        return this.caseService.findCase(catalogId, envId, Number(caseType), caseGradeList, {page, limit});
+        return this.caseService.findCase(catalogId, envId, caseGradeList, {page, limit});
     }
 
     @OpeModule(OperateModule.CASE)
