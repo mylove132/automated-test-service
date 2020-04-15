@@ -57,6 +57,8 @@ export class ConfigService {
 
       REDIS_PASSWORD: Joi.string().default(''),
 
+      TASK_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com'),
+
       DINGTALK_ACCESS_TOKEN: Joi.string().required(),
     });
 
@@ -132,6 +134,10 @@ export class ConfigService {
 
   get prodAppKey(): string {
     return this.envConfig.PROD_APP_KEY;
+  }
+
+  get taskResultUrl(): string {
+    return this.envConfig.TASK_RESULT_URL;
   }
 
   get databaseSynchronize(): boolean {

@@ -4,6 +4,7 @@ import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 import { RunStatus } from "../../config/base.enum";
+import { TaskResultEntity } from "../../api/task/task_result.entity";
 
 /**
  * 通过ID查询定时任务
@@ -71,6 +72,20 @@ export const findScheduleById = async (schedulerRepository: Repository<Scheduler
 };
 
 /**
+ * 通过md5查询
+ * @param schedulerRepository
+ * @param md5
+ */
+export const findScheduleByMd5 = async (schedulerRepository: Repository<SchedulerEntity>, md5) => {
+  return await schedulerRepository.findOne({md5: md5}).catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};
+
+/**
  * 保存定时任务
  * @param schedulerRepository
  * @param schedulerObj
@@ -112,6 +127,20 @@ export const updateSchedulerRunStatus = async (schedulerRepository: Repository<S
   set({status: runStatus}).
   where('id = :id', {id: id}).
   execute().catch(
+    err => {
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  );
+};
+
+
+/**
+ * 保存定时任务执行结果
+ * @param taskResultRepository
+ * @param taskResultObj
+ */
+export const saveTaskResult = async (taskResultRepository: Repository<TaskResultEntity>, taskResultObj: TaskResultEntity) => {
+  return await taskResultRepository.save(taskResultObj).catch(
     err => {
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     }

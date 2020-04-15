@@ -9,20 +9,12 @@ import { CurlModule } from '../curl/curl.module'
 import { EnvModule } from '../env/env.module'
 import { HistoryModule } from '../history/history.module';
 import {TokenEntity} from "../token/token.entity";
-import { RunProcessor } from "./run.processor";
-import { BullModule } from "@nestjs/bull";
-import {ConfigService} from "../../config/config.service";
+import { QueueModule } from "../queue/queue.module";
 
-
-const RedisConfig = (): DynamicModule => {
-  console.log('连接redis中....');
-  const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-  return BullModule.registerQueue(config.getQueueConfig());
-};
 
 @Module({
-  imports: [RedisConfig(), EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, TokenEntity])],
-  providers: [RunService, RunProcessor],
+  imports: [QueueModule, EnvModule, CurlModule, HistoryModule, TypeOrmModule.forFeature([CaseEntity, TokenEntity])],
+  providers: [RunService],
   controllers: [RunController],
   exports: [RunService]
 })

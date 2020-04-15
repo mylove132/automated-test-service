@@ -1,16 +1,17 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn, JoinTable, ManyToMany,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    Unique,
-    UpdateDateColumn
-} from 'typeorm';
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn, JoinTable, ManyToMany,
+  ManyToOne, OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn
+} from "typeorm";
 import {EnvEntity} from '../env/env.entity';
 import {CaseEntity} from "../case/case.entity";
 import {RunStatus} from "../../config/base.enum";
+import { TaskResultEntity } from "./task_result.entity";
 
 @Unique(['md5','name'])
 @Entity('secheduler')
@@ -48,4 +49,8 @@ export class SchedulerEntity {
 
     @Column({nullable: false})
     cron: string;
+
+
+    @OneToMany(type => TaskResultEntity, taskResults => taskResults.scheduler)
+    taskResults: TaskResultEntity[];
 }
