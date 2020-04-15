@@ -134,18 +134,28 @@ export class CommonUtil {
   }
 
 
-  static getTokenFromResult(res) {
-    for (let resKey in res) {
-      if (this.token != null) return;
-      if (resKey == "token") {
-         this.token = res[resKey];
-      } else if (typeof(res[resKey]) == 'object') {
-        this.getTokenFromResult(res[resKey]);
-      }
+  static getTokenFromResult(data) {
+      for (var key in data) {
+        if (this.token) {
+          break
+        }
+        if (data.hasOwnProperty(key) === true) {
+          if (key === "token") {
+            this.token = data[key];
+            break
+          } else {
+            if (data[key] instanceof Object) {
+              this.token = this.getTokenFromResult(data[key]);
+            }
+          }
+        }
     }
-    return this.token;
+    if (this.token) {
+      return this.token;
+    } else {
+      return null
+    }
   }
-
 
   static printLog2(meg) {
     console.log("-----------------------------" + meg);

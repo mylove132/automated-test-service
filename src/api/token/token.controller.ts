@@ -32,6 +32,14 @@ export class TokenController {
     return await this.tokenService.updateTokenService(updateTokenDto);
   }
 
+  @OperateDesc("")
+  @ApiOperation({ title: "update all token" })
+  @ApiResponse({ status: 200, description: "update all token success." })
+  @Get("updateAll")
+  async updateAllToken() {
+    return await this.tokenService.updateTokenTask();
+  }
+
 
   @ApiOperation({ title: "query token" })
   @ApiResponse({ status: 200, description: "query token success." })

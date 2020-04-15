@@ -60,7 +60,6 @@ export class TokenService {
     async addTokenService(createTokenDto: CreateTokenDto) {
         const url = createTokenDto.url.charAt(createTokenDto.url.length - 1) ==
         '/' ? createTokenDto.url.substring(0, createTokenDto.url.length - 1) : createTokenDto.url;
-        console.log(url)
         const tObj = await findTokenByUrlAndUsername(this.tokenRepository, url, createTokenDto.username);
         if (tObj) throw new ApiException(`url: ${createTokenDto.url} 与用户名: ${createTokenDto.username} 已存在`,
             ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -70,7 +69,7 @@ export class TokenService {
         tokenObj.url = url;
         tokenObj.body = createTokenDto.body;
         tokenObj.platformCode = await findPlatformCodeById(this.platformRepository, createTokenDto.platformCodeId);
-        const token = await this.getNewToken(tokenObj.url, tokenObj.body, tokenObj.platformCode.id);
+        const token = await this.getNewToken(tokenObj.url, tokenObj.body);
         if (!token) throw new ApiException('获取登录token失败',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         tokenObj.token = token;
         return await saveToken(this.tokenRepository, tokenObj);
@@ -138,18 +137,18 @@ export class TokenService {
      * @param updateTokenDto
      */
     async updateTokenService(updateTokenDto: UpdateTokenDto) {
-        const tokenObj = await findTokenById(this.tokenRepository, updateTokenDto.id);
-        if (!tokenObj) throw new ApiException(`token id ${updateTokenDto.id}未找到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        const tObj = await findTokenById(this.tokenRepository, updateTokenDto.id);
+        if (!tObj) throw new ApiException(`token id ${updateTokenDto.id}未找到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        const tokenObj = new TokenEntity();
         tokenObj.platformCode = updateTokenDto.platformCodeId != null ?
             await findPlatformCodeById(this.platformRepository, updateTokenDto.platformCodeId) : tokenObj.platformCode;
         tokenObj.env = updateTokenDto.envId != null ? await findEnvById(this.envRepository, updateTokenDto.envId) :
             tokenObj.env;
         tokenObj.body = updateTokenDto.body != null ? updateTokenDto.body : tokenObj.body;
         tokenObj.username = updateTokenDto.username != null ? updateTokenDto.username : tokenObj.username;
-        tokenObj.token = updateTokenDto.token != null ? updateTokenDto.token : tokenObj.token;
         tokenObj.url = updateTokenDto.url != null ? updateTokenDto.url.charAt(updateTokenDto.url.length - 1) == '/' ?
             updateTokenDto.url.substring(0, updateTokenDto.url.length - 1) : updateTokenDto.url : tokenObj.url;
-
+        tokenObj.token = await this.getNewToken(tokenObj.url, tokenObj.body);
         return await updateToken(this.tokenRepository, tokenObj, updateTokenDto.id);
     }
 
@@ -162,7 +161,7 @@ export class TokenService {
         Logger.access('-----------------执行token定时更新任务----------------------');
         const tokenList: TokenEntity[] = await findTokens(this.tokenRepository);
         for (let tokenObj of tokenList) {
-            const newToken = await this.getNewToken(tokenObj.url, tokenObj.body, tokenObj.platformCode.id);
+            const newToken = await this.getNewToken(tokenObj.url, tokenObj.body);
             await updateTokenByNewToken(this.tokenRepository, newToken, tokenObj.id);
             Logger.info(`token Id ${tokenObj.id} token更新完成`);
             Logger.access(`token Id ${tokenObj.id} token更新完成`);
@@ -176,7 +175,7 @@ export class TokenService {
      * @param body
      * @param platformCodeId
      */
-    private async getNewToken(url, body, platformCodeId) {
+    private async getNewToken(url, body) {
         const requestData = {
             url: url,
             method: getRequestMethodTypeString(1),
@@ -194,6 +193,7 @@ export class TokenService {
             throw new ApiException(`登录失败:code：${result.data.code}`,
                 ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
+        console.log(token)
         return token;
     }
 }

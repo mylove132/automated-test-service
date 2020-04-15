@@ -119,20 +119,17 @@ export const findAllTokenByPlatformCodeIdAndEnvId = async (tokenEntityRepository
  * @param username
  */
 export const findTokenByEnvIdAndPlatformCode = async (tokenEntityRepository: Repository<TokenEntity>, envId, platformCodeId) => {
-    return await tokenEntityRepository.createQueryBuilder('token').
-        leftJoinAndSelect('token.env','env').
-        leftJoinAndSelect('token.platformCode','platform').
-        where(qb => {
-            if (envId) {
-                qb.where('token.env = :env',{env:envId});
-                if (platformCodeId){
-                    qb.andWhere('token.platformCode = :platformCode',{platformCode: platformCodeId});
-                }
-            }else {
-                if (platformCodeId){
-                    qb.where('token.platformCode = :platformCode',{platformCode: platformCodeId});
-                }
+    return tokenEntityRepository.createQueryBuilder('token').leftJoinAndSelect('token.env', 'env').leftJoinAndSelect('token.platformCode', 'platform').where(qb => {
+        if (envId) {
+            qb.where('token.env = :env', {env: envId});
+            if (platformCodeId) {
+                qb.andWhere('token.platformCode = :platformCode', {platformCode: platformCodeId});
             }
+        } else {
+            if (platformCodeId) {
+                qb.where('token.platformCode = :platformCode', {platformCode: platformCodeId});
+            }
+        }
     }).orderBy('token.updateDate', 'DESC');
 };
 
@@ -182,14 +179,10 @@ export const deleteTokenByIds = async (tokenEntityRepository: Repository<TokenEn
  * 更新token
  * @param tokenEntityRepository
  * @param tokenObj
- * @param id
+ * @param tokenId
  */
-export const updateToken = async (tokenEntityRepository: Repository<TokenEntity>, tokenObj, id) => {
-    return await tokenEntityRepository.createQueryBuilder('token').
-    update(TokenEntity).
-    set(tokenObj).
-    where('id = :id',{id: id}).
-    execute().
+export const updateToken = async (tokenEntityRepository: Repository<TokenEntity>, tokenObj, tokenId) => {
+    return await tokenEntityRepository.update(tokenId, tokenObj).
     catch(
         err => {
             console.log(err);
@@ -200,13 +193,7 @@ export const updateToken = async (tokenEntityRepository: Repository<TokenEntity>
 
 
 export const updateTokenByNewToken = async (tokenEntityRepository: Repository<TokenEntity>, newToken, id) => {
-    return await tokenEntityRepository.createQueryBuilder().
-    update(TokenEntity).
-    set(
-        {token: newToken}
-    ).
-    where('id = :id',{id: id}).
-    execute().catch(
+    return await tokenEntityRepository.update(id,{token: newToken}).catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
