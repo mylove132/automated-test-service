@@ -4230,7 +4230,8 @@ envId				        |number		|R			|环境ID
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
 isRestart	                |bool		|O			|定时任务是否重启
-isSendMessage	                |bool		|O			|定时任务执行完成是否发送消息（默认不发送）
+caseGrade	                |number		|O			|定时任务状态
+isSendMessage	            |bool		|O			|定时任务执行完成是否发送消息（默认不发送）
 
 
 请求示例
@@ -4241,7 +4242,8 @@ isSendMessage	                |bool		|O			|定时任务执行完成是否发送�
 	"envId": 5,
 	"name":"测试定时任务修改1",
 	"cron":"* * * * * *",
-	"isRestart":true
+	"isRestart":true,
+    "caseGrade":0
 }
 ```
 
