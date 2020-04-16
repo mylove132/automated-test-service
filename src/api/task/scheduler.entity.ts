@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import {EnvEntity} from '../env/env.entity';
 import {CaseEntity} from "../case/case.entity";
-import {RunStatus} from "../../config/base.enum";
+import {CaseGrade, RunStatus} from "../../config/base.enum";
 import { TaskResultEntity } from "./task_result.entity";
 
 @Unique(['md5','name'])
@@ -39,6 +39,9 @@ export class SchedulerEntity {
     })
     @JoinTable()
     cases: CaseEntity[];
+
+    @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '用例等级'})
+    caseGrade: CaseGrade;
 
     @ManyToOne(type => EnvEntity, env => env.sechedulers, {cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     @JoinColumn()

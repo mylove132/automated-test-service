@@ -42,6 +42,10 @@ class UpdateTaskDto {
     @IsOptional()
     cron: string;
 
+    //任务类型
+    @Optional()
+    caseGrade: CaseGrade;
+
     @IsOptional()
     name: string;
 

@@ -191,6 +191,7 @@ export class SchedulerService {
       throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
     }
     if (singleTaskDto.isSendMessage != null) scheduler.isSendMessage = singleTaskDto.isSendMessage;
+    scheduler.caseGrade = caseGrade;
     scheduler.name = singleTaskDto.name;
     scheduler.md5 = md5;
     scheduler.createDate = createDate;
@@ -212,6 +213,7 @@ export class SchedulerService {
     const schObj = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
     if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
     const sObj = new SchedulerEntity();
+    if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
     if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
     sObj.name = updateTaskDto.name != null ? updateTaskDto.name : schObj.name;
     sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
@@ -226,10 +228,12 @@ export class SchedulerService {
           if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
         } else {
-          let caseIds = schObj.cases.map(cas => {
+          const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
+          CommonUtil.printLog1(JSON.stringify(newSecheduler))
+          let caseIds = newSecheduler.cases.map(cas => {
             return cas.id;
           });
-          await this.runSingleTask(caseIds, schObj.env.id, schObj.cron, schObj.md5);
+          await this.runSingleTask(caseIds, newSecheduler.env.id, newSecheduler.cron, newSecheduler.md5);
           if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
         }
@@ -245,6 +249,7 @@ export class SchedulerService {
   }
 
   /**
+   *
    * 检查cron表达式
    * @param cron
    */

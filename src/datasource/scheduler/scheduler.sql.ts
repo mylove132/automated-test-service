@@ -42,13 +42,17 @@ export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Reposi
     );
 };
 
+
+
 /**
  * 根据状态查询定时任务
  * @param schedulerRepository
  * @param runStatus
  */
 export const findScheduleByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
-    return schedulerRepository.createQueryBuilder("sch").where(qb => {
+    return schedulerRepository.createQueryBuilder("sch").
+    leftJoinAndSelect('sch.env','env').
+    where(qb => {
         if (runStatus != null) {
             qb.where("sch.status = :status", {status: runStatus});
         }
@@ -70,6 +74,7 @@ export const findScheduleById = async (schedulerRepository: Repository<Scheduler
         }
     )
 };
+
 
 /**
  * 通过md5查询
