@@ -171,7 +171,9 @@ export const saveTaskResult = async (taskResultRepository: Repository<TaskResult
  * @param taskResultRepository
  */
 export const findAllTaskResult = async (taskResultRepository: Repository<TaskResultEntity>) => {
-    return taskResultRepository.createQueryBuilder('taskResult').orderBy("taskResult.createDate", "DESC");
+    return taskResultRepository.createQueryBuilder('taskResult').
+    leftJoinAndSelect('taskResult.scheduler','scheduler').
+    orderBy("taskResult.createDate", "DESC");
 };
 
 /**

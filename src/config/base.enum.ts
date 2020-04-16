@@ -38,6 +38,12 @@ export enum OperateModule {
 
 //定时任务状态
 export enum RunStatus {
-     RUNNING = 1, STOP = 2, DELETE = 3
+    RUNNING = 1, STOP = 2, DELETE = 3
+}
+
+
+//定时任务状态
+export enum TaskType {
+   INTERFACE = 1, JMETER = 2
 }
 

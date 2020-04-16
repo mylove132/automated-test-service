@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import {EnvEntity} from '../env/env.entity';
 import {CaseEntity} from "../case/case.entity";
-import {CaseGrade, RunStatus} from "../../config/base.enum";
+import {CaseGrade, RunStatus, TaskType} from "../../config/base.enum";
 import { TaskResultEntity } from "./task_result.entity";
 
 @Unique(['md5','name'])
@@ -50,6 +50,9 @@ export class SchedulerEntity {
     @Column('enum', {default: RunStatus.STOP, nullable: false, comment: '定时任务状态', enum: RunStatus})
     status: RunStatus;
 
+    @Column('enum', {default: TaskType.INTERFACE, nullable: false, comment: '定时任务类型', enum: TaskType})
+    taskType: TaskType;
+
     @Column({nullable: false})
     cron: string;
 
@@ -58,4 +61,6 @@ export class SchedulerEntity {
 
     @Column({default: false})
     isSendMessage: boolean;
+
+
 }

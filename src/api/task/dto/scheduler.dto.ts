@@ -1,6 +1,6 @@
 import {ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional} from 'class-validator';
 import {Optional} from "@nestjs/common";
-import {CaseGrade, Executor} from "../../../config/base.enum";
+import {CaseGrade, Executor, TaskType} from "../../../config/base.enum";
 import {IRunCaseById} from "../../run/run.interface";
 
 
@@ -22,9 +22,13 @@ class SingleTaskDto {
     @IsNotEmpty()
     name: string;
 
-    //任务类型
+    //接口等级
     @Optional()
     caseGrade: CaseGrade;
+
+    //任务类型
+    @Optional()
+    taskType: TaskType;
 
     @Optional()
     isSendMessage: boolean;
@@ -54,6 +58,10 @@ class UpdateTaskDto {
 
     @IsOptional()
     isRestart: boolean = false;
+
+    //任务类型
+    @Optional()
+    taskType: TaskType;
 
 }
 

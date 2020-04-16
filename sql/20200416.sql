@@ -3,3 +3,5 @@ ALTER TABLE "task_result" ADD CONSTRAINT "FK_b45df38118257e497e6792c6a1a" FOREIG
 ALTER TABLE "secheduler" ADD "isSendMessage" boolean NOT NULL DEFAULT false;
 CREATE TYPE "secheduler_casegrade_enum" AS ENUM('0', '1', '2');
 ALTER TABLE "secheduler" ADD "caseGrade" "secheduler_casegrade_enum" NOT NULL DEFAULT '2';
+CREATE TYPE "secheduler_tasktype_enum" AS ENUM('1', '2');
+ALTER TABLE "secheduler" ADD "taskType" "secheduler_tasktype_enum" NOT NULL DEFAULT '1';
