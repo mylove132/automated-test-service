@@ -30,7 +30,6 @@ export class SchedulerController {
     return await this.schedulerService.updateRunSingleTask(updateTaskDto);
   }
 
-  @OperateDesc("")
   @Get("")
   async getAllJobs(@Query("status")status?: number, @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
@@ -86,5 +85,10 @@ export class SchedulerController {
     return await this.schedulerService.checkCron(cron);
   }
 
+  @Get("/taskResult")
+  async getTaskResult( @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
+    limit = limit > 100 ? 100 : limit;
+    return this.schedulerService.getAllTaskResult( { page, limit });
+  }
 
 }

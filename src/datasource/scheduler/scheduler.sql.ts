@@ -147,3 +147,10 @@ export const saveTaskResult = async (taskResultRepository: Repository<TaskResult
   );
 };
 
+/**
+ * 查询所有的定时任务执行记录
+ * @param taskResultRepository
+ */
+export const findAllTaskResult = async (taskResultRepository: Repository<TaskResultEntity>) => {
+    return taskResultRepository.createQueryBuilder('taskResult').orderBy("taskResult.createDate", "DESC");
+};

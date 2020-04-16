@@ -16,6 +16,7 @@ import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginat
 import { CaseGrade, Executor, RunStatus } from "../../config/base.enum";
 import { findCaseByCaseGrade } from "../../datasource/case/case.sql";
 import {
+  findAllTaskResult,
   findScheduleById,
   findScheduleByMd5,
   findScheduleByStatus,
@@ -316,19 +317,6 @@ export class SchedulerService {
     job.start();
   }
 
-  /**
-   * 运行场景任务
-   * @param sch
-   */
-  private async runSceneTask(sch: SchedulerEntity) {
-    // let caseIds = sch.cases.map(cas => {cas.id});
-    // //const caseListDto = new RunCaseListDto(caseIds, sch.env.id, Executor.SCHEDULER);
-    // const job = new CronJob(sch.cron, () => {
-    //   this.runService.runCaseById(caseListDto);
-    // });
-    // this.schedulerRegistry.addCronJob(sch.md5, job);
-    // job.start();
-  }
 
   private isExistTask(md5) {
     try {
@@ -338,4 +326,11 @@ export class SchedulerService {
       return false;
     }
   }
+
+
+  async getAllTaskResult(options: IPaginationOptions) {
+    let queryBuilder = await findAllTaskResult(this.taskResultRepository);
+    return await paginate<TaskResultEntity>(queryBuilder, options);
+  }
+
 }
