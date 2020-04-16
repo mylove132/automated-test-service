@@ -138,6 +138,20 @@ export const updateSchedulerRunStatus = async (schedulerRepository: Repository<S
   );
 };
 
+/**
+ * 通过ID删除
+ * @param schedulerRepository
+ * @param runStatus
+ * @param id
+ */
+export const deleteSchedulerById = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus, id) => {
+    return await schedulerRepository.delete(id).catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
 
 /**
  * 保存定时任务执行结果

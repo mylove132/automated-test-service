@@ -16,6 +16,7 @@ import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginat
 import { CaseGrade, Executor, RunStatus } from "../../config/base.enum";
 import { findCaseByCaseGrade } from "../../datasource/case/case.sql";
 import {
+  deleteSchedulerById,
   findAllTaskResult,
   findScheduleById,
   findScheduleByMd5,
@@ -75,7 +76,7 @@ export class SchedulerService {
       for (const id of taskIdsDto.ids) {
         const schObj = await findScheduleById(this.scheRepository, id);
         if (schObj.status == RunStatus.RUNNING) await this.schedulerRegistry.deleteCronJob(schObj.md5);
-        const delSchedulerObj = await updateSchedulerRunStatus(this.scheRepository, RunStatus.DELETE, id);
+        const delSchedulerObj = await deleteSchedulerById(this.scheRepository, RunStatus.DELETE, id);
       }
     } catch (e) {
       throw new HttpException("定时任务删除异常", HttpStatus.BAD_REQUEST);
