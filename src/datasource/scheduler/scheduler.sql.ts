@@ -15,6 +15,7 @@ export const findSchedulerOfCaseAndEnvById = async (schedulerRepository: Reposit
   return await schedulerRepository.createQueryBuilder("sch").
   leftJoinAndSelect("sch.cases", "cases").
   leftJoinAndSelect("sch.env", "env").
+  leftJoinAndSelect("sch.catalogs", "catalogs").
   where("sch.id = :id", { id: id }).
   getOne().
   catch(
@@ -33,6 +34,7 @@ export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Reposi
     return await schedulerRepository.createQueryBuilder("sch").
     leftJoinAndSelect("sch.cases", "cases").
     leftJoinAndSelect("sch.env", "env").
+    leftJoinAndSelect("sch.catalogs", "catalogs").
     where("sch.id IN (:...ids)", { ids: ids }).
     getMany().
     catch(

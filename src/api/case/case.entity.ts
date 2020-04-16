@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity, Index,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn, Unique,
@@ -13,7 +12,6 @@ import {CatalogEntity} from '../catalog/catalog.entity';
 import {HistoryEntity} from '../history/history.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
-import {SchedulerEntity} from "../task/scheduler.entity";
 import {TokenEntity} from "../token/token.entity";
 
 @Unique(['alias'])
@@ -87,9 +85,6 @@ export class CaseEntity {
     //返回值别名
     @Column({nullable: true})
     alias: string;
-
-    @ManyToMany(type => SchedulerEntity, secheduler => secheduler.cases)
-    sechedulers: SchedulerEntity[];
 
 
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})

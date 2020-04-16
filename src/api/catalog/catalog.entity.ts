@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import {CaseEntity} from '../case/case.entity';
 import {PlatformCodeEntity} from "./platformCode.entity";
+import {SchedulerEntity} from "../task/scheduler.entity";
 
 @Entity('catalog')
 export class CatalogEntity {
@@ -35,6 +36,9 @@ export class CatalogEntity {
     cases: CaseEntity[];
 
 
-    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.catalog)
+    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.catalog,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     platformCode: PlatformCodeEntity;
+
+    @ManyToOne(type => SchedulerEntity, scheduler => scheduler.catalogs)
+    schedulers: SchedulerEntity[];
 }

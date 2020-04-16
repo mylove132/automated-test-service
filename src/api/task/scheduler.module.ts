@@ -9,10 +9,11 @@ import {RunModule} from "../run/run.module";
 import {CaseEntity} from "../case/case.entity";
 import { QueueModule } from "../queue/queue.module";
 import { TaskResultEntity } from "./task_result.entity";
+import {CatalogEntity} from "../catalog/catalog.entity";
 
 
 @Module({
-    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity]),QueueModule, RunModule],
+    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity, CatalogEntity]),QueueModule, RunModule],
     providers: [SchedulerService],
     controllers: [
         SchedulerController

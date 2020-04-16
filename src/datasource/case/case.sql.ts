@@ -122,11 +122,13 @@ export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repos
  * 通过caseType查询case
  * @param caseEntityRepository
  * @param caseGrade
+ * @param catalogIds
  */
-export const findCaseByCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade) => {
+export const findCaseByCaseGradeAndCatalogs = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, catalogIds) => {
   return await caseEntityRepository
     .createQueryBuilder("cas").where
       ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
+      andWhere('cas.catalog IN (:...catalogs)',{catalogs: catalogIds}).
       getMany().
       catch(
       err => {

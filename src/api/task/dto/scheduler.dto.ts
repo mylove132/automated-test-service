@@ -26,6 +26,9 @@ class SingleTaskDto {
     @Optional()
     caseGrade: CaseGrade;
 
+    @IsArray()
+    catalogIds: number[];
+
     //任务类型
     @Optional()
     taskType: TaskType;
@@ -62,6 +65,10 @@ class UpdateTaskDto {
     //任务类型
     @Optional()
     taskType: TaskType;
+
+    @IsOptional()
+    @IsArray()
+    catalogIds: number[];
 
 }
 

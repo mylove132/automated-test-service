@@ -1,10 +1,11 @@
 import {
     Entity,
     PrimaryGeneratedColumn,
-    Column, OneToMany
+    Column, OneToMany, ManyToOne
 } from 'typeorm';
 import {CatalogEntity} from "./catalog.entity";
 import {TokenEntity} from "../token/token.entity";
+import {SchedulerEntity} from "../task/scheduler.entity";
 
 @Entity('platform_code')
 export class PlatformCodeEntity {

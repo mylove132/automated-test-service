@@ -9,9 +9,9 @@ import {
   UpdateDateColumn
 } from "typeorm";
 import {EnvEntity} from '../env/env.entity';
-import {CaseEntity} from "../case/case.entity";
 import {CaseGrade, RunStatus, TaskType} from "../../config/base.enum";
 import { TaskResultEntity } from "./task_result.entity";
+import {CatalogEntity} from "../catalog/catalog.entity";
 
 @Unique(['md5','name'])
 @Entity('secheduler')
@@ -32,13 +32,6 @@ export class SchedulerEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
-    @ManyToMany(type => CaseEntity, cases => cases.sechedulers, {
-        cascade: true,
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-    })
-    @JoinTable()
-    cases: CaseEntity[];
 
     @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '用例等级'})
     caseGrade: CaseGrade;
@@ -62,5 +55,8 @@ export class SchedulerEntity {
     @Column({default: false})
     isSendMessage: boolean;
 
+   @ManyToMany(type => CatalogEntity, catalogs => catalogs.schedulers,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+   @JoinTable()
+   catalogs: CatalogEntity[];
 
 }
