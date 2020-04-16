@@ -34,9 +34,8 @@ import {InjectQueue} from "@nestjs/bull";
 import {Queue} from "bull";
 import {TaskResultEntity} from "./task_result.entity";
 import {ConfigService} from "../../config/config.service";
-import {findCatalogByIds, findCatalogByPlatformCodes} from "../../datasource/catalog/catalog.sql";
+import {findCatalogByIds} from "../../datasource/catalog/catalog.sql";
 import {CatalogEntity} from "../catalog/catalog.entity";
-import {findPlatformCodeByCodeList} from "../../datasource/platformCode/platform.sql";
 
 
 var parser = require("cron-parser");
