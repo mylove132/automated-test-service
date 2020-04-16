@@ -4312,12 +4312,12 @@ data						|any		|R			|&nbsp;返回历史记录值
 }
 ```
 
-### 8.7  获取定时任务执行结果
+### 8.7  获取所有定时任务执行结果
 - **接口说明：** 获取定时任务执行结果
 - **请求方式：** GET
 - **接口地址：** /api/scheduler/taskResult
 
-#### 8.6.1 请求参数
+#### 8.7.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
@@ -4362,6 +4362,48 @@ data						|any		|R			|&nbsp;返回历史记录值
 }
 ```
 
+### 8.8  获取定时任务执行结果
+- **接口说明：** 获取定时任务执行结果
+- **请求方式：** GET
+- **接口地址：** /api/scheduler/taskResult/:id
+
+#### 8.8.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---
+id				        |number		|R			|定时任务执行结果ID
+
+
+请求示例
+```
+/api/scheduler/taskResult/1
+```
+
+##### 返回结果
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|any		|R			|&nbsp;返回历史记录值
+&nbsp;&nbsp;&nbsp;&nbsp;items|any	|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number	|R			|&nbsp;任务执行记录ID
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result|string	|R			|&nbsp;任务执行结果
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;createDate|date	|R			|&nbsp;任务执行完成时间
+
+
+返回示例
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "id": 1,
+        "result": "[{\"startTime\":\"2020-04-15T23:10:00.013Z\",\"endTime\":\"2020-04-15T23:10:00.636Z\",\"rumTime\":623,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null},{\"startTime\":\"2020-04-15T23:10:01.156Z\",\"endTime\":\"2020-04-15T23:10:02.117Z\",\"rumTime\":961,\"result\":{\"code\":190004,\"msg\":\"签名错误\"},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\" 10000\",\"actual\":190004,\"result\":false},\"errMsg\":null},{\"startTime\":\"2020-04-15T23:10:02.662Z\",\"endTime\":\"2020-04-15T23:10:03.041Z\",\"rumTime\":379,\"result\":{\"code\":10000,\"msg\":\"操作成功\",\"data\":{\"total\":0,\"list\":[],\"pageNum\":1,\"pageSize\":0,\"size\":0,\"startRow\":0,\"endRow\":0,\"pages\":0,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0}},\"status\":false,\"assert\":{\"assertKey\":\"data.code\",\"relation\":\"等于\",\"expect\":\"10001\",\"actual\":10000,\"result\":false},\"errMsg\":null},{\"startTime\":\"2020-04-15T23:10:03.574Z\",\"endTime\":\"2020-04-15T23:10:03.825Z\",\"rumTime\":251,\"status\":false,\"result\":null,\"errMsg\":\"status：404 statusText：Not Found\\n\\t\\t\\t  \"}]",
+        "createDate": "2020-04-15T23:10:04.717Z"
+    }
+}
+```
 
 ### 9.0  添加token
 - **接口说明：** 添加token

@@ -154,3 +154,16 @@ export const saveTaskResult = async (taskResultRepository: Repository<TaskResult
 export const findAllTaskResult = async (taskResultRepository: Repository<TaskResultEntity>) => {
     return taskResultRepository.createQueryBuilder('taskResult').orderBy("taskResult.createDate", "DESC");
 };
+
+/**
+ * 通过ID查询定时任务执行结果
+ * @param taskResultRepository
+ * @param id
+ */
+export const findTaskResultById = async (taskResultRepository: Repository<TaskResultEntity>, id) => {
+    return await taskResultRepository.findOne(id).catch(
+        err => {
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};

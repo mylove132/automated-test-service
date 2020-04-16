@@ -1,5 +1,5 @@
 import { ApiBearerAuth, ApiUseTags } from "@nestjs/swagger";
-import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put, Query} from "@nestjs/common";
 import { TaskIdsDto, SingleTaskDto, UpdateTaskDto } from "./dto/scheduler.dto";
 import { SchedulerService } from "./scheduler.service";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
@@ -89,6 +89,11 @@ export class SchedulerController {
   async getTaskResult( @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
     return this.schedulerService.getAllTaskResult( { page, limit });
+  }
+
+  @Get("/taskResult/:id")
+  async getTaskResultById(@Param('id') id) {
+    return this.schedulerService.getTaskResultByIdService( id);
   }
 
 }

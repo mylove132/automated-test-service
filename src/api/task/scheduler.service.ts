@@ -21,7 +21,7 @@ import {
   findScheduleByMd5,
   findScheduleByStatus,
   findSchedulerOfCaseAndEnvById,
-  findSchedulerOfCaseAndEnvByIds,
+  findSchedulerOfCaseAndEnvByIds, findTaskResultById,
   saveScheduler, saveTaskResult,
   updateScheduler,
   updateSchedulerRunStatus
@@ -331,6 +331,14 @@ export class SchedulerService {
   async getAllTaskResult(options: IPaginationOptions) {
     let queryBuilder = await findAllTaskResult(this.taskResultRepository);
     return await paginate<TaskResultEntity>(queryBuilder, options);
+  }
+
+  /**
+   * 通过taskResultId查询定时任务执行结果
+   * @param taskResultId
+   */
+  async getTaskResultByIdService(taskResultId: number) {
+    return await findTaskResultById(this.taskResultRepository, taskResultId);
   }
 
 }
