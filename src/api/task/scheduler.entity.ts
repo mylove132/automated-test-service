@@ -50,7 +50,9 @@ export class SchedulerEntity {
     @Column({nullable: false})
     cron: string;
 
-
     @OneToMany(type => TaskResultEntity, taskResults => taskResults.scheduler)
     taskResults: TaskResultEntity[];
+
+    @Column({default: false})
+    isSendMessage: boolean;
 }

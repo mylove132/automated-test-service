@@ -26,6 +26,9 @@ class SingleTaskDto {
     @Optional()
     caseGrade: CaseGrade;
 
+    @Optional()
+    isSendMessage: boolean;
+
 }
 
 class UpdateTaskDto {
@@ -41,6 +44,9 @@ class UpdateTaskDto {
 
     @IsOptional()
     name: string;
+
+    @Optional()
+    isSendMessage: boolean;
 
     @IsOptional()
     isRestart: boolean = false;

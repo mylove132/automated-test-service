@@ -4230,6 +4230,7 @@ envId				        |number		|R			|环境ID
 name	                    |string		|R			|定时任务名称
 cron	                    |string		|R			|定时任务cron表达式
 isRestart	                |bool		|O			|定时任务是否重启
+isSendMessage	                |bool		|O			|定时任务执行完成是否发送消息（默认不发送）
 
 
 请求示例
@@ -4266,7 +4267,7 @@ data						|any		|R			|&nbsp;返回历史记录值
 ```
 
 ### 8.6  添加接口定时任务
-- **接口说明：** 更改定时任务
+- **接口说明：** 添加接口定时任务
 - **请求方式：** POST
 - **接口地址：** /api/scheduler
 
@@ -4278,7 +4279,7 @@ caseGrade				        |number		|R			|接口等级
 envId	                    |number		|R			|环境ID
 cron	                    |string		|R			|定时任务cron表达式
 name	                |string		|O			|定时任务名称
-
+isSendMessage	                |bool		|O			|定时任务执行完成是否发送消息（默认不发送）
 
 请求示例
 

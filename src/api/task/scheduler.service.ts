@@ -190,6 +190,7 @@ export class SchedulerService {
     if (scheObj) {
       throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
     }
+    if (singleTaskDto.isSendMessage != null) scheduler.isSendMessage = singleTaskDto.isSendMessage;
     scheduler.name = singleTaskDto.name;
     scheduler.md5 = md5;
     scheduler.createDate = createDate;
@@ -211,6 +212,7 @@ export class SchedulerService {
     const schObj = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
     if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
     const sObj = new SchedulerEntity();
+    if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
     sObj.name = updateTaskDto.name != null ? updateTaskDto.name : schObj.name;
     sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
     sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
@@ -304,14 +306,17 @@ export class SchedulerService {
   private async runSingleTask(caseIds: number[], envId, cron, md5) {
     const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
     const job = new CronJob(cron, async () => {
+      CommonUtil.printLog1('定时任务开始执行')
        const result = await this.runService.runCaseById(caseListDto);
        const taskResult = new TaskResultEntity();
-       taskResult.result = JSON.stringify(result);
+       taskResult.result = result;
        taskResult.scheduler = await findScheduleByMd5(this.scheRepository, md5);
-       if (!taskResult.scheduler) throw new ApiException(`m定时任务md5:${md5}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+       if (!taskResult.scheduler) throw new ApiException(`定时任务md5:${md5}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
        const saveResult:TaskResultEntity = await saveTaskResult(this.taskResultRepository, taskResult);
-      const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-       this.sendMessageQueue.add('sendMessage', config.taskResultUrl + saveResult.id);
+       if (taskResult.scheduler.isSendMessage){
+         const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
+         this.sendMessageQueue.add('sendMessage', config.taskResultUrl + saveResult.id);
+       }
     });
     this.schedulerRegistry.addCronJob(md5, job);
     job.start();
