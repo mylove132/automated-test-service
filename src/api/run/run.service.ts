@@ -13,13 +13,17 @@ import {HistoryService} from "../history/history.service";
 import * as FormData from "form-data";
 import * as request from "request";
 import {IRunCaseById} from "./run.interface";
-import {CommonUtil} from "../../utils/common.util";
 import {TokenEntity} from "../token/token.entity";
 import {findTokenById} from "../../datasource/token/token.sql";
-import {findCaseByAlias, findCaseOfEndpointAndTokenById} from "../../datasource/case/case.sql";
+import {
+  findCaseByAlias,
+  findCaseOfAssertTypeAndAssertJudgeById,
+  findCaseOfEndpointAndTokenById
+} from "../../datasource/case/case.sql";
 import {InjectQueue} from "@nestjs/bull";
 import {Queue} from "bull";
 import {ParamType} from "../../config/base.enum";
+import { CommonUtil } from "../../utils/common.util";
 
 
 @Injectable()
@@ -35,7 +39,7 @@ export class RunService {
     @InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue
   ) {
   }
-
+  private tmpResult = {};
   /**
    * 执行临时的case用例请求
    * @return {Promise<any>}: 发起请求后的响应结果
@@ -90,9 +94,8 @@ export class RunService {
       requestData.method = this.parseRequestMethod(runCaseDto);
       requestData.headers = headers;
       requestData.url = url;
-      CommonUtil.printLog1(JSON.stringify(requestData));
+      CommonUtil.printLog2('接口请求参数:'+JSON.stringify(requestData))
       const result = await this.curlService.makeRequest(requestData).toPromise();
-
       const endTime = new Date();
       resultObj["endTime"] = endTime;
       const rumTime = endTime.getTime() - startTime.getTime();
@@ -258,9 +261,14 @@ export class RunService {
         if (!caseInstance) {
           throw new ApiException(`别名:${alias}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
-        const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
+        if (!this.tmpResult[alias]) {
+          const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
+          this.tmpResult[alias] = runResult;
+        }
+        CommonUtil.printLog2('执行别名结果集合:'+JSON.stringify(this.tmpResult))
         const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
-        const paramValue = getAssertObjectValue(runResult, newVal);
+        const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
+        CommonUtil.printLog2('alias:'+alias+"-------"+paramValue)
         param[paramsKey] = paramValue;
       }
       else {
@@ -272,7 +280,6 @@ export class RunService {
 
 
   private async runCaseByCaseInstance(caseInstance: CaseEntity, endpoint) {
-    console.log(JSON.stringify(caseInstance))
     const runCaseDto: RunCaseDto = Object.assign({}, caseInstance, {
       endpoint: endpoint,
       type: String(caseInstance.type),
@@ -287,7 +294,6 @@ export class RunService {
     requestData.headers = headers;
     requestData.url = url;
     const result = await this.curlService.makeRequest(requestData).toPromise();
-    CommonUtil.printLog1("运行结果:"+JSON.stringify(result));
     if (result.result){
       return result.data;
     } else {
@@ -351,18 +357,9 @@ export class RunService {
    */
   private async execAssert(caseId, result) {
 
-    const caseObj = await this.caseRepository.createQueryBuilder("case").where("case.id = :id", { id: caseId }).leftJoinAndSelect("case.assertType", "assertType").leftJoinAndSelect("case.assertJudge", "assertJudge").getOne().catch(
-      err => {
-        console.log(err);
-        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    );
-    if (!caseObj) {
+    const caseObj = await findCaseOfAssertTypeAndAssertJudgeById(this.caseRepository, caseId);
+    if (!caseObj)
       throw new ApiException(`caseId: ${caseId} 不存在`, ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
-    }
-    /**
-     * 处理请求结果
-     */
     let assertResult = {};
     let execResult;
     try {
@@ -433,7 +430,6 @@ export class RunService {
             assertResult["relation"] = caseObj.assertJudge.name;
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
-            console.log(execResult);
             assertResult["result"] = (execResult.toString().indexOf(caseObj.assertText) == -1);
             break;
           case 9:

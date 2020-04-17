@@ -3,7 +3,6 @@ import { ConfigService } from "../config/config.service";
 
 export class CommonUtil {
 
-  private static token: any;
 
   /**
    * 判断参数是否是数字
@@ -135,23 +134,24 @@ export class CommonUtil {
 
 
   static getTokenFromResult(data) {
+    let token;
       for (var key in data) {
-        if (this.token) {
+        if (token) {
           break
         }
         if (data.hasOwnProperty(key) === true) {
           if (key === "token") {
-            this.token = data[key];
+            token = data[key];
             break
           } else {
             if (data[key] instanceof Object) {
-              this.token = this.getTokenFromResult(data[key]);
+              token = this.getTokenFromResult(data[key]);
             }
           }
         }
     }
-    if (this.token) {
-      return this.token;
+    if (token) {
+      return token;
     } else {
       return null
     }

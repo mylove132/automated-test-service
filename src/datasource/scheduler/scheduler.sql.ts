@@ -62,6 +62,22 @@ export const findScheduleByStatus = async (schedulerRepository: Repository<Sched
 };
 
 
+export const findScheduleListByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
+  return schedulerRepository.createQueryBuilder("sch").
+  leftJoinAndSelect('sch.env','env').
+  where(qb => {
+    if (runStatus != null) {
+      qb.where("sch.status = :status", {status: runStatus});
+    }
+  }).getMany().catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};
+
+
 
 /**
  * 通过ID查询

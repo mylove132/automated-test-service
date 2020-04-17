@@ -118,6 +118,22 @@ export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repos
 };
 
 
+export const findCaseOfAssertTypeAndAssertJudgeById = async (caseEntityRepository: Repository<CaseEntity>, caseId) => {
+  return await caseEntityRepository.createQueryBuilder("case")
+    .select()
+    .leftJoinAndSelect("case.assertType", "assertType")
+    .leftJoinAndSelect("case.assertJudge", "assertJudge")
+    .where("case.id = :id", { id: caseId })
+    .getOne()
+    .catch(
+      err => {
+        console.log(err);
+        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      }
+    );
+};
+
+
 /**
  * 通过caseType查询case
  * @param caseEntityRepository

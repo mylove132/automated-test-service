@@ -1,26 +1,26 @@
-import {Cron, SchedulerRegistry} from "@nestjs/schedule";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
-import {ApiException} from "../../shared/exceptions/api.exception";
-import {ApiErrorCode} from "../../shared/enums/api.error.code";
-import {HttpException, HttpStatus} from "@nestjs/common";
+import { Cron, SchedulerRegistry } from "@nestjs/schedule";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ApiException } from "../../shared/exceptions/api.exception";
+import { ApiErrorCode } from "../../shared/enums/api.error.code";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import * as crypto from "crypto";
-import {CronJob} from "cron";
-import {SchedulerEntity} from "./scheduler.entity";
-import {EnvEntity} from "../env/env.entity";
-import {RunCaseListDto, SingleTaskDto, TaskIdsDto, UpdateTaskDto} from "./dto/scheduler.dto";
-import {CommonUtil} from "../../utils/common.util";
-import {RunService} from "../run/run.service";
-import {CaseEntity} from "../case/case.entity";
-import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
-import {CaseGrade, Executor, RunStatus, TaskType} from "../../config/base.enum";
-import {findCaseByCaseGradeAndCatalogs} from "../../datasource/case/case.sql";
+import { CronJob } from "cron";
+import { SchedulerEntity } from "./scheduler.entity";
+import { EnvEntity } from "../env/env.entity";
+import { RunCaseListDto, SingleTaskDto, TaskIdsDto, UpdateTaskDto } from "./dto/scheduler.dto";
+import { CommonUtil } from "../../utils/common.util";
+import { RunService } from "../run/run.service";
+import { CaseEntity } from "../case/case.entity";
+import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
+import { CaseGrade, Executor, RunStatus, TaskType } from "../../config/base.enum";
+import { findCaseByCaseGradeAndCatalogs } from "../../datasource/case/case.sql";
 import {
   deleteSchedulerById,
   findAllTaskResult,
   findScheduleById,
   findScheduleByMd5,
-  findScheduleByStatus,
+  findScheduleByStatus, findScheduleListByStatus,
   findSchedulerOfCaseAndEnvById,
   findSchedulerOfCaseAndEnvByIds,
   findTaskResultById,
@@ -29,13 +29,13 @@ import {
   updateScheduler,
   updateSchedulerRunStatus
 } from "../../datasource/scheduler/scheduler.sql";
-import {findEnvById} from "../../datasource/env/env.sql";
-import {InjectQueue} from "@nestjs/bull";
-import {Queue} from "bull";
-import {TaskResultEntity} from "./task_result.entity";
-import {ConfigService} from "../../config/config.service";
-import {findCatalogByIds} from "../../datasource/catalog/catalog.sql";
-import {CatalogEntity} from "../catalog/catalog.entity";
+import { findEnvById } from "../../datasource/env/env.sql";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
+import { TaskResultEntity } from "./task_result.entity";
+import { ConfigService } from "../../config/config.service";
+import { findCatalogByIds } from "../../datasource/catalog/catalog.sql";
+import { CatalogEntity } from "../catalog/catalog.entity";
 
 
 var parser = require("cron-parser");
@@ -158,9 +158,9 @@ export class SchedulerService {
         let caseIds = caseList.map(cas => {
           return cas.id;
         });
-        if (schedulerEntity.taskType == TaskType.INTERFACE){
+        if (schedulerEntity.taskType == TaskType.INTERFACE) {
           await this.runSingleTask(caseIds, schedulerEntity.env.id, schedulerEntity.cron, schedulerEntity.md5);
-        }else if (schedulerEntity.taskType == TaskType.JMETER){
+        } else if (schedulerEntity.taskType == TaskType.JMETER) {
           await SchedulerService.runJmeterTask(caseIds, schedulerEntity.env.id, schedulerEntity.cron, schedulerEntity.md5);
         }
         if (!this.isExistTask(schedulerEntity.md5)) {
@@ -205,13 +205,12 @@ export class SchedulerService {
     scheduler.env = await this.envRepository.findOne(envId);
     scheduler.cron = singleTaskDto.cron;
     scheduler.status = RunStatus.RUNNING;
-    const result = await saveScheduler(this.scheRepository, scheduler);
-    if (scheduler.taskType == TaskType.INTERFACE){
+    if (scheduler.taskType == TaskType.INTERFACE) {
       await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
-    }else if (scheduler.taskType == TaskType.JMETER){
+    } else if (scheduler.taskType == TaskType.JMETER) {
       await SchedulerService.runJmeterTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
     }
-
+    const result = await saveScheduler(this.scheRepository, scheduler);
     return { id: result.id };
   }
 
@@ -225,7 +224,7 @@ export class SchedulerService {
     if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
     const sObj = new SchedulerEntity();
     if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
-    CommonUtil.printLog1(JSON.stringify(sObj.catalogs))
+    CommonUtil.printLog1(JSON.stringify(sObj.catalogs));
     if (updateTaskDto.taskType != null) sObj.taskType = updateTaskDto.taskType;
     if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
     if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
@@ -233,9 +232,8 @@ export class SchedulerService {
     sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
     sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
     sObj.status = RunStatus.RUNNING;
-      CommonUtil.printLog1(JSON.stringify(sObj))
+    CommonUtil.printLog1(JSON.stringify(sObj));
     const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
-      CommonUtil.printLog2(result)
     if (updateTaskDto.isRestart) {
       try {
         if (this.isExistTask(schObj.md5)) {
@@ -244,18 +242,19 @@ export class SchedulerService {
           if (!this.isExistTask(schObj.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
         } else {
-            CommonUtil.printLog2('---------')
           const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
-            CommonUtil.printLog1(JSON.stringify(newSecheduler))
-          const catalogIds = newSecheduler.catalogs.map(catalog => {return catalog.id});
+          CommonUtil.printLog1(JSON.stringify(newSecheduler));
+          const catalogIds = newSecheduler.catalogs.map(catalog => {
+            return catalog.id;
+          });
           let caseList: CaseEntity[] = await findCaseByCaseGradeAndCatalogs(this.caseRepository, newSecheduler.caseGrade, catalogIds);
-          CommonUtil.printLog1(JSON.stringify(caseList))
+          CommonUtil.printLog1(JSON.stringify(caseList));
           let caseIds = caseList.map(cas => {
             return cas.id;
           });
-          if (newSecheduler.taskType == TaskType.INTERFACE){
+          if (newSecheduler.taskType == TaskType.INTERFACE) {
             await this.runSingleTask(caseIds, newSecheduler.env.id, newSecheduler.cron, newSecheduler.md5);
-          }else if (newSecheduler.taskType == TaskType.JMETER){
+          } else if (newSecheduler.taskType == TaskType.JMETER) {
             await SchedulerService.runJmeterTask(caseIds, newSecheduler.env.id, newSecheduler.cron, newSecheduler.md5);
           }
           if (!this.isExistTask(newSecheduler.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -293,14 +292,10 @@ export class SchedulerService {
    * 排查定时任务库，确认定时任务是否存活
    *
    */
-  @Cron("0 * * * * *", { name: "checkStatus" })
+  //@Cron("0 0 0 * * *", { name: "checkStatus" })
   async checkJobRunStatus() {
     //console.log('------------------------排查定时任务--------------------')
-    const runningSchObj: SchedulerEntity[] = await this.scheRepository.createQueryBuilder("sch").where("sch.status = :status", { status: RunStatus.RUNNING }).getMany().catch(
-      err => {
-        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-      }
-    );
+    const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);
     let md5List = [];
     const jobs = this.schedulerRegistry.getCronJobs();
     jobs.forEach((value, key, map) => {
@@ -312,7 +307,7 @@ export class SchedulerService {
       }
       md5List.push(key);
     });
-    // console.log('定时任务中的md5列表'+JSON.stringify(runningSchObj))
+    console.log("定时任务中的md5列表" + JSON.stringify(runningSchObj));
     for (let runningSch of runningSchObj) {
       if (md5List.indexOf(runningSch.md5) == -1) {
         await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.STOP }).where("id = :id", { id: runningSch.id }).execute().catch(
@@ -335,17 +330,16 @@ export class SchedulerService {
   private async runSingleTask(caseIds: number[], envId, cron, md5) {
     const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
     const job = new CronJob(cron, async () => {
-      CommonUtil.printLog1('定时任务开始执行')
-       const result = await this.runService.runCaseById(caseListDto);
-       const taskResult = new TaskResultEntity();
-       taskResult.result = result;
-       taskResult.scheduler = await findScheduleByMd5(this.scheRepository, md5);
-       if (!taskResult.scheduler) throw new ApiException(`定时任务md5:${md5}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-       const saveResult:TaskResultEntity = await saveTaskResult(this.taskResultRepository, taskResult);
-       if (taskResult.scheduler.isSendMessage){
-         const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-         this.sendMessageQueue.add('sendMessage', config.taskResultUrl + saveResult.id);
-       }
+      let result = await this.runService.runCaseById(caseListDto);
+      const taskResult = new TaskResultEntity();
+      taskResult.result = result;
+      taskResult.scheduler = await findScheduleByMd5(this.scheRepository, md5);
+      if (!taskResult.scheduler) throw new ApiException(`定时任务md5:${md5}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+      const saveResult: TaskResultEntity = await saveTaskResult(this.taskResultRepository, taskResult);
+      if (taskResult.scheduler.isSendMessage) {
+        const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
+        this.sendMessageQueue.add("sendMessage", config.taskResultUrl + saveResult.id);
+      }
     });
     this.schedulerRegistry.addCronJob(md5, job);
     job.start();
@@ -359,7 +353,7 @@ export class SchedulerService {
    * @param md5
    */
   private static async runJmeterTask(caseIds: number[], envId, cron, md5) {
-    console.log('运行jmeter定时任务')
+    console.log("运行jmeter定时任务");
   }
 
 

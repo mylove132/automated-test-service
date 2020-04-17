@@ -14,7 +14,7 @@ export class TaskResultEntity {
     id: number;
 
     @Column('text',{comment: '执行结果'})
-    result: string;
+    result: object;
 
     @CreateDateColumn()
     createDate: Date;

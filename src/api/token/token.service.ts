@@ -69,6 +69,7 @@ export class TokenService {
         tokenObj.url = url;
         tokenObj.body = createTokenDto.body;
         tokenObj.platformCode = await findPlatformCodeById(this.platformRepository, createTokenDto.platformCodeId);
+        CommonUtil.printLog2(JSON.stringify(tokenObj))
         const token = await this.getNewToken(tokenObj.url, tokenObj.body);
         if (!token) throw new ApiException('获取登录token失败',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         tokenObj.token = token;
@@ -181,6 +182,7 @@ export class TokenService {
             method: getRequestMethodTypeString(1),
             data: JSON.parse(body)
         };
+        CommonUtil.printLog2('token请求体:'+JSON.stringify(requestData))
         const result = await this.curlService.makeRequest(requestData).toPromise();
         if (!result) {
             throw new ApiException(`登录URL：${url}，登录body：${body},登录失败`,

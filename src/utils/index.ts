@@ -33,7 +33,6 @@ export function getAssertObjectValue(obj: any, keys: string): any {
   }else {
     return JSON.stringify(obj);
   }
-  console.log(keyList)
 	keyList.shift();
 	const haveArray = new RegExp('\[[0-9]+\]');
 	return keyList.reduce((preValue, currentValue, currentIndex) => {
