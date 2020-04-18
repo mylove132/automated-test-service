@@ -154,7 +154,8 @@ export class SchedulerService {
         if (!this.isExistTask(schedulerEntity.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
       } else {
-        const caseList = await findCaseByCaseGradeAndCatalogs(this.caseRepository, schedulerEntity.caseGrade, schedulerEntity.catalogs);
+        const caseList = await findCaseByCaseGradeAndCatalogs(this.caseRepository, schedulerEntity.caseGrade,
+          schedulerEntity.catalogs.map(catalog => {return catalog.id}));
         let caseIds = caseList.map(cas => {
           return cas.id;
         });
@@ -210,6 +211,7 @@ export class SchedulerService {
     } else if (scheduler.taskType == TaskType.JMETER) {
       await SchedulerService.runJmeterTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
     }
+    CommonUtil.printLog2(JSON.stringify(scheduler))
     const result = await saveScheduler(this.scheRepository, scheduler);
     return { id: result.id };
   }
@@ -224,7 +226,6 @@ export class SchedulerService {
     if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
     const sObj = new SchedulerEntity();
     if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
-    CommonUtil.printLog1(JSON.stringify(sObj.catalogs));
     if (updateTaskDto.taskType != null) sObj.taskType = updateTaskDto.taskType;
     if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
     if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
@@ -232,8 +233,7 @@ export class SchedulerService {
     sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
     sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
     sObj.status = RunStatus.RUNNING;
-    CommonUtil.printLog1(JSON.stringify(sObj));
-    const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
+    sObj.id = updateTaskDto.id;
     if (updateTaskDto.isRestart) {
       try {
         if (this.isExistTask(schObj.md5)) {
@@ -243,12 +243,10 @@ export class SchedulerService {
           await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
         } else {
           const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
-          CommonUtil.printLog1(JSON.stringify(newSecheduler));
           const catalogIds = newSecheduler.catalogs.map(catalog => {
             return catalog.id;
           });
           let caseList: CaseEntity[] = await findCaseByCaseGradeAndCatalogs(this.caseRepository, newSecheduler.caseGrade, catalogIds);
-          CommonUtil.printLog1(JSON.stringify(caseList));
           let caseIds = caseList.map(cas => {
             return cas.id;
           });
@@ -264,6 +262,9 @@ export class SchedulerService {
         throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
       }
     }
+
+    CommonUtil.printLog2(JSON.stringify(sObj))
+    const result = await updateScheduler(this.scheRepository, sObj);
     if (result.affected == 1) {
       return { status: true };
     } else {

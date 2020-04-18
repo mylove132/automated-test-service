@@ -13,7 +13,6 @@ import { TaskResultEntity } from "../../api/task/task_result.entity";
  */
 export const findSchedulerOfCaseAndEnvById = async (schedulerRepository: Repository<SchedulerEntity>, id) => {
   return await schedulerRepository.createQueryBuilder("sch").
-  leftJoinAndSelect("sch.cases", "cases").
   leftJoinAndSelect("sch.env", "env").
   leftJoinAndSelect("sch.catalogs", "catalogs").
   where("sch.id = :id", { id: id }).
@@ -32,7 +31,6 @@ export const findSchedulerOfCaseAndEnvById = async (schedulerRepository: Reposit
  */
 export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Repository<SchedulerEntity>, ids) => {
     return await schedulerRepository.createQueryBuilder("sch").
-    leftJoinAndSelect("sch.cases", "cases").
     leftJoinAndSelect("sch.env", "env").
     leftJoinAndSelect("sch.catalogs", "catalogs").
     where("sch.id IN (:...ids)", { ids: ids }).
@@ -129,8 +127,8 @@ export const saveScheduler = async (schedulerRepository: Repository<SchedulerEnt
  * @param schedulerObj
  * @param id
  */
-export const updateScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj, id) => {
-  return await schedulerRepository.update(id, schedulerObj).catch(
+export const updateScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj) => {
+  return await schedulerRepository.update(schedulerObj.id, schedulerObj).catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);

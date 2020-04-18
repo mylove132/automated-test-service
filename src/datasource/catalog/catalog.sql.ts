@@ -25,7 +25,8 @@ export const findCatalogById = async (catalogEntityRepository: Repository<Catalo
  */
 export const findCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids) => {
     return await catalogEntityRepository.createQueryBuilder('catalog').
-    where('catalog.id IN (:...ids)',{ids: ids}).
+      leftJoinAndSelect('catalog.schedulers','scheduler').
+      where('catalog.id IN (:...ids)',{ids: ids}).
     getMany().catch(
         err => {
             console.log(err);
