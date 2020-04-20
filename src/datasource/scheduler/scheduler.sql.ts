@@ -127,8 +127,8 @@ export const saveScheduler = async (schedulerRepository: Repository<SchedulerEnt
  * @param schedulerObj
  * @param id
  */
-export const updateScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj) => {
-  return await schedulerRepository.update(schedulerObj.id, schedulerObj).catch(
+export const updateScheduler = async (schedulerRepository: Repository<SchedulerEntity>, schedulerObj, id) => {
+  return await schedulerRepository.update(id, schedulerObj).catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);

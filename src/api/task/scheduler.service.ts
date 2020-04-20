@@ -227,13 +227,13 @@ export class SchedulerService {
     const sObj = new SchedulerEntity();
     if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
     if (updateTaskDto.taskType != null) sObj.taskType = updateTaskDto.taskType;
+    if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
     if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
     if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
     sObj.name = updateTaskDto.name != null ? updateTaskDto.name : schObj.name;
     sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
     sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
     sObj.status = RunStatus.RUNNING;
-    sObj.id = updateTaskDto.id;
     if (updateTaskDto.isRestart) {
       try {
         if (this.isExistTask(schObj.md5)) {
@@ -264,7 +264,7 @@ export class SchedulerService {
     }
 
     CommonUtil.printLog2(JSON.stringify(sObj))
-    const result = await updateScheduler(this.scheRepository, sObj);
+    const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
     if (result.affected == 1) {
       return { status: true };
     } else {
@@ -293,7 +293,7 @@ export class SchedulerService {
    * 排查定时任务库，确认定时任务是否存活
    *
    */
-  //@Cron("0 0 0 * * *", { name: "checkStatus" })
+  @Cron("* * * * * *", { name: "checkStatus" })
   async checkJobRunStatus() {
     //console.log('------------------------排查定时任务--------------------')
     const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);

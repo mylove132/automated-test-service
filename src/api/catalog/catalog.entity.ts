@@ -39,6 +39,4 @@ export class CatalogEntity {
     @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.catalog,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     platformCode: PlatformCodeEntity;
 
-    @ManyToOne(type => SchedulerEntity, scheduler => scheduler.catalogs)
-    schedulers: SchedulerEntity[];
 }

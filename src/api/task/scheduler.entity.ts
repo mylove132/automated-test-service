@@ -55,8 +55,7 @@ export class SchedulerEntity {
     @Column({default: false})
     isSendMessage: boolean;
 
-   @ManyToMany(type => CatalogEntity, catalogs => catalogs.schedulers,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
-   @JoinTable()
+   @ManyToMany(type => CatalogEntity, {cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
    catalogs: CatalogEntity[];
 
 }
