@@ -52,6 +52,7 @@ export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Reposi
 export const findScheduleByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
     return schedulerRepository.createQueryBuilder("sch").
     leftJoinAndSelect('sch.env','env').
+    leftJoinAndSelect('sch.catalogs','catalogs').
     where(qb => {
         if (runStatus != null) {
             qb.where("sch.status = :status", {status: runStatus});
