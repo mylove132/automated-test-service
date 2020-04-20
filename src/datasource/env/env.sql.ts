@@ -180,10 +180,7 @@ export const deleteEnvByIds = async (entityRepository: Repository<EnvEntity>, en
  * @param endpointIds
  */
 export const deleteEndpointByIds = async (endpointRepository: Repository<EndpointEntity>, endpointIds) => {
-    return await endpointRepository.createQueryBuilder().
-    delete().
-    where('id IN (:...ids)',{ids: endpointIds}).
-    execute().
+    return await endpointRepository.delete(endpointIds).
     catch(
         err => {
             console.log(err);
