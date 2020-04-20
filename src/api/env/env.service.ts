@@ -8,12 +8,12 @@ import {HttpStatus} from '@nestjs/common';
 import {AddEndpointDto, DeleteEndpointDto, DeleteEnvDto, QueryEndpointDto} from './dto/env.dto';
 import {CommonUtil} from '../../utils/common.util';
 import {
-    addEnv,
-    deleteEndpointByIds,
-    deleteEnvByIds,
-    findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
-    findEnvById, saveEndpoint,
-    updateEnv
+  addEnv,
+  deleteEndpointByIds,
+  deleteEnvByIds, findAllEndpoints,
+  findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
+  findEnvById, saveEndpoint,
+  updateEnv
 } from "../../datasource/env/env.sql";
 
 export class EnvService {
@@ -92,6 +92,13 @@ export class EnvService {
       return await saveEndpoint(this.endpointgRepository, addPoint);
     }
 
+
+  /**
+   * 查询所有的endpoint
+   */
+  async findAllEndpointService(){
+      return await findAllEndpoints(this.endpointgRepository);
+    }
 
     /**
      * 通过环境ID查询endpoint

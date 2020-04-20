@@ -67,6 +67,14 @@ export class EnvController {
         return this.envService.findEndpointByEnv(envIds);
     }
 
+
+  @ApiOperation({ title: 'find endpoint' })
+  @ApiResponse({ status: 200, description: 'find endpoint success.'})
+  @Get('/all_endpoint')
+  async findEndpoint(){
+    return this.envService.findAllEndpointService();
+  }
+
     @OpeModule(OperateModule.ENDPOINT)
     @OpeType(OperateType.DELETE)
     @OperateDesc('')

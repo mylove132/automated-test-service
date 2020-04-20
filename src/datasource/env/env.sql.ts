@@ -188,3 +188,13 @@ export const deleteEndpointByIds = async (endpointRepository: Repository<Endpoin
         }
     )
 };
+
+export const findAllEndpoints = async (endpointRepository: Repository<EndpointEntity>) => {
+  return await endpointRepository.createQueryBuilder().getMany().
+  catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};
