@@ -98,7 +98,7 @@ export class CommonUtil {
    * @param url
    */
   static handleUrl(url) {
-    url = url.lastIndexOf("/") ? url.substr(0, url.length - 1) : url;
+    url = url.charAt(url.length - 1) == "/" ? url.substr(0, url.length - 1) : url;
     return url;
   }
 

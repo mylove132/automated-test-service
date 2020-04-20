@@ -79,17 +79,15 @@ export class EnvService {
      */
     async addEndpoint(addEndpointDto: AddEndpointDto){
         const addPoint = new EndpointEntity();
-        CommonUtil.printLog2(JSON.stringify(addEndpointDto))
-        const endpoint = addEndpointDto.endpoint.charAt(addEndpointDto.endpoint.length - 1) == "/" ? addEndpointDto.endpoint.substr(0, addEndpointDto.endpoint.length - 1) : addEndpointDto.endpoint;
-        CommonUtil.printLog2(endpoint);
+        const endpoint = CommonUtil.handleUrl(addEndpointDto.endpoint);
         const endpointObj = await findEndpointInstanceByEndpoint(this.endpointgRepository, endpoint);
         if (endpointObj) throw new ApiException(`endpoint:${addEndpointDto.endpoint}已存在`,ApiErrorCode.ENDPOINT_NAME_REPEAT, HttpStatus.BAD_REQUEST);
         let envList = [];
-        addEndpointDto.envs.map(async envId => {
-            return envList.push(await findEnvById(this.envRepository, envId));
-        });
+        for (let envId of addEndpointDto.envs){
+          envList.push(await findEnvById(this.envRepository, envId));
+        }
        addPoint.name = addEndpointDto.name;
-       addPoint.endpoint = CommonUtil.handleUrl(addEndpointDto.endpoint);
+       addPoint.endpoint = endpoint;
        addPoint.envs = envList;
       return await saveEndpoint(this.endpointgRepository, addPoint);
     }
