@@ -97,6 +97,7 @@ export class RunService {
       CommonUtil.printLog2('接口请求参数:'+JSON.stringify(requestData))
       const result = await this.curlService.makeRequest(requestData).toPromise();
       const endTime = new Date();
+      resultObj['cas'] = {caseName: caseObj.name,catalogName: caseObj.catalog.name};
       resultObj["endTime"] = endTime;
       const rumTime = endTime.getTime() - startTime.getTime();
       resultObj["rumTime"] = rumTime;

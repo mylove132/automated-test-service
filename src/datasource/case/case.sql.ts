@@ -5,7 +5,6 @@ import { HttpStatus } from "@nestjs/common";
 import { CaseEntity } from "../../api/case/case.entity";
 import { AssertJudgeEntity, AssertTypeEntity } from "../../api/case/assert.entity";
 import { CaseGrade} from "../../config/base.enum";
-import {findCatalogById} from "../catalog/catalog.sql";
 import {CatalogEntity} from "../../api/catalog/catalog.entity";
 
 
@@ -107,6 +106,7 @@ export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repos
     .select()
     .leftJoinAndSelect("case.endpointObject", "endpointObj")
     .leftJoinAndSelect("case.token", "token")
+    .leftJoinAndSelect("case.catalog", "catalog")
     .where("case.id = :id", { id: caseId })
     .getOne()
     .catch(

@@ -331,10 +331,12 @@ export class SchedulerService {
         const job = new CronJob(cron, async () => {
             let result = await this.runService.runCaseById(caseListDto);
             const taskResult = new TaskResultEntity();
-            taskResult.result = result;
+            taskResult.result = JSON.stringify(result);
             taskResult.scheduler = await findScheduleByMd5(this.scheRepository, md5);
+
             if (!taskResult.scheduler) throw new ApiException(`定时任务md5:${md5}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             const saveResult: TaskResultEntity = await saveTaskResult(this.taskResultRepository, taskResult);
+            CommonUtil.printLog2(JSON.stringify(saveResult))
             if (taskResult.scheduler.isSendMessage) {
                 const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
                 this.sendMessageQueue.add("sendMessage", config.taskResultUrl + saveResult.id);
@@ -368,7 +370,7 @@ export class SchedulerService {
 
     async getAllTaskResult(options: IPaginationOptions) {
         let queryBuilder = await findAllTaskResult(this.taskResultRepository);
-        return await paginate<TaskResultEntity>(queryBuilder, options);
+        return (await paginate<TaskResultEntity>(queryBuilder, options)).items.map(obj => {return JSON.parse(obj.result)});
     }
 
     /**
@@ -376,7 +378,9 @@ export class SchedulerService {
      * @param taskResultId
      */
     async getTaskResultByIdService(taskResultId: number) {
-        return await findTaskResultById(this.taskResultRepository, taskResultId);
+        const resultObj =  await findTaskResultById(this.taskResultRepository, taskResultId);
+        resultObj.result = JSON.parse(resultObj.result);
+        return resultObj;
     }
 
 }
