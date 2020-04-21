@@ -18,7 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest();
     const exceptionObj = new ExceptionEntity();
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    this.doLog(request, exception.toString());
+    this.doLog(request, exception);
     exceptionObj.excName = exception instanceof ApiException ? "ApiException" : exception.name;
     exceptionObj.exceptionMsg = exception instanceof ApiException ? exception.getErrorMessage() : exception.message;
     exceptionObj.errorCode = exception instanceof ApiException ? exception.getErrorCode() : status;
@@ -31,7 +31,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       .status(status)
       .json({
         errorCode: exceptionObj.errorCode,
-        errorMessage: exceptionObj.exceptionMsg,
+        errorMessage: exception.stack,
         date: new Date().toLocaleDateString(),
         path: request.url
       });
@@ -41,9 +41,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
   doLog(request, data): void {
     const { url, headers, method, body } = request;
     const ua = headers["user-agent"];
-
+    console.log(data.stack);
     Logger.error(
-      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(data)}`
+      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${data.stack}`
     );
   }
 }

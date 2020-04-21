@@ -256,7 +256,7 @@ export class RunService {
         }
         //匹配参数中的级联调用
         else if (regData.startsWith("alias") != -1) {
-            const regData = value.toString().replace(regex2, "$1");
+            const regData = value.toString().replace(paramReg, "$1");
             const alias = regData.split(".")[0];
             const dataName = regData.split(".")[1];
 
