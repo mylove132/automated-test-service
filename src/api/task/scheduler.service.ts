@@ -293,7 +293,7 @@ export class SchedulerService {
    * 排查定时任务库，确认定时任务是否存活
    *
    */
-  @Cron("* * * * * *", { name: "checkStatus" })
+  //@Cron("* * * * * *", { name: "checkStatus" })
   async checkJobRunStatus() {
     //console.log('------------------------排查定时任务--------------------')
     const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);
