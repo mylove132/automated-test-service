@@ -5,7 +5,7 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToMany
+    OneToMany, ManyToMany
 } from 'typeorm';
 import {CaseEntity} from '../case/case.entity';
 import {PlatformCodeEntity} from "./platformCode.entity";
@@ -39,6 +39,6 @@ export class CatalogEntity {
     @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.catalog,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     platformCode: PlatformCodeEntity;
 
-    @ManyToOne(type => SchedulerEntity, scheduler => scheduler.catalogs)
-    schedulers: SchedulerEntity[];
+    @ManyToMany(type => SchedulerEntity, scheduler => scheduler.catalogs)
+    scheduler: SchedulerEntity[];
 }
