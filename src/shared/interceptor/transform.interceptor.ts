@@ -63,7 +63,7 @@ export class TransformInterceptor implements NestInterceptor {
       req.connection.remoteAddress ||
       req.socket.remoteAddress ||
       req.connection.socket.remoteAddress;
-    return ip.match(/\d+\.\d+\.\d+\.\d+/)[0];
+    return ip;
   };
 
 }
