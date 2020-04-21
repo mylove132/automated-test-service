@@ -229,6 +229,7 @@ export class RunService {
       const value = param[paramsKey];
       if (paramReg.test(value)) {
         const regData = value.replace(paramReg, "$1");
+        //匹配参数中的随机数
         if (regData.indexOf("$randomint") != -1) {
           if (regData.indexOf("-") != -1) {
             const limit = regData.split("-")[1];
@@ -243,7 +244,9 @@ export class RunService {
           } else {
             param[paramsKey] = Math.random();
           }
-        } else if (regData.indexOf("$randomstring") != -1) {
+        }
+        //匹配参数中随机数
+        else if (regData.indexOf("$randomstring") != -1) {
           if (regData.indexOf("-") != -1) {
             const length = regData.split("-")[1];
             param[paramsKey] = CommonUtil.randomChar(Number(length));
@@ -251,25 +254,26 @@ export class RunService {
             param[paramsKey] = CommonUtil.randomChar(6);
           }
         }
-      }
-      else if (regex2.test(param[paramsKey])) {
-        const regData = value.toString().replace(regex2, "$1");
-        const alias = regData.split(".")[0];
-        const dataName = regData.split(".")[1];
+        //匹配参数中的级联调用
+        else if (regData.startsWith("alias") != -1) {
+            const regData = value.toString().replace(regex2, "$1");
+            const alias = regData.split(".")[0];
+            const dataName = regData.split(".")[1];
 
-        const caseInstance = await findCaseByAlias(this.caseRepository, alias);
-        if (!caseInstance) {
-          throw new ApiException(`别名:${alias}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-        }
-        if (!this.tmpResult[alias]) {
-          const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
-          this.tmpResult[alias] = runResult;
-        }
-        CommonUtil.printLog2('执行别名结果集合:'+JSON.stringify(this.tmpResult))
-        const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
-        const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
-        CommonUtil.printLog2('alias:'+alias+"-------"+paramValue)
-        param[paramsKey] = paramValue;
+            const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+            if (!caseInstance) {
+              throw new ApiException(`别名:${alias}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+            if (!this.tmpResult[alias]) {
+              const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
+              this.tmpResult[alias] = runResult;
+            }
+            CommonUtil.printLog2('执行别名结果集合:'+JSON.stringify(this.tmpResult))
+            const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
+            const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
+            CommonUtil.printLog2('alias:'+alias+"-------"+paramValue)
+            param[paramsKey] = paramValue;
+          }
       }
       else {
         return param;
