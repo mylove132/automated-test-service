@@ -1,4 +1,4 @@
-import {Cron, SchedulerRegistry} from "@nestjs/schedule";
+import {SchedulerRegistry} from "@nestjs/schedule";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {ApiException} from "../../shared/exceptions/api.exception";
@@ -20,7 +20,8 @@ import {
     findAllTaskResult,
     findScheduleById,
     findScheduleByMd5,
-    findScheduleByStatus, findScheduleListByStatus,
+    findScheduleByStatus,
+    findScheduleListByStatus,
     findSchedulerOfCaseAndEnvById,
     findSchedulerOfCaseAndEnvByIds,
     findTaskResultById,
@@ -81,7 +82,7 @@ export class SchedulerService {
         try {
             for (const id of taskIdsDto.ids) {
                 const schObj = await findScheduleById(this.scheRepository, id);
-                if (schObj.status == RunStatus.RUNNING) await this.schedulerRegistry.deleteCronJob(schObj.md5);
+                if (schObj.status == RunStatus.RUNNING) this.schedulerRegistry.deleteCronJob(schObj.md5);
                 const delSchedulerObj = await deleteSchedulerById(this.scheRepository, RunStatus.DELETE, id);
             }
         } catch (e) {
@@ -103,7 +104,7 @@ export class SchedulerService {
             if (!task) throw new ApiException(`停止的任务id:${id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
             if (this.isExistTask(task.md5)) {
                 try {
-                    await this.schedulerRegistry.getCronJob(task.md5).stop();
+                    this.schedulerRegistry.getCronJob(task.md5).stop();
                     await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, id);
                     stopSuccess.push(task.id);
                 } catch (e) {
@@ -120,9 +121,9 @@ export class SchedulerService {
     /**
      * 删除系统定时任务
      */
-    async delCheckJobTask() {
+    delCheckJobTask() {
         try {
-            await this.schedulerRegistry.getCronJob("checkStatus").stop();
+            this.schedulerRegistry.getCronJob("checkStatus").stop();
         } catch (e) {
             return {status: false};
         }
@@ -132,9 +133,9 @@ export class SchedulerService {
     /**
      * 删除系统定时任务
      */
-    async restartSystemCheckJobTask() {
+    restartSystemCheckJobTask() {
         try {
-            await this.schedulerRegistry.getCronJob("checkStatus").start();
+            this.schedulerRegistry.getCronJob("checkStatus").start();
         } catch (e) {
             return {status: false};
         }
@@ -149,8 +150,8 @@ export class SchedulerService {
         const schObjList: SchedulerEntity[] = await findSchedulerOfCaseAndEnvByIds(this.scheRepository, taskIdsDto.ids);
         for (let schedulerEntity of schObjList) {
             if (this.isExistTask(schedulerEntity.md5)) {
-                await this.schedulerRegistry.getCronJob(schedulerEntity.md5).stop();
-                await this.schedulerRegistry.getCronJob(schedulerEntity.md5).start();
+                this.schedulerRegistry.deleteCronJob(schedulerEntity.md5);
+                this.schedulerRegistry.getCronJob(schedulerEntity.md5).start();
                 if (!this.isExistTask(schedulerEntity.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                 await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
             } else {
@@ -227,7 +228,7 @@ export class SchedulerService {
         const schObj = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
         if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
         const sObj = new SchedulerEntity();
-        if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
+        //if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
         if (updateTaskDto.taskType != null) sObj.taskType = updateTaskDto.taskType;
         if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
         if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
@@ -236,12 +237,18 @@ export class SchedulerService {
         sObj.cron = updateTaskDto.cron != null ? updateTaskDto.cron : schObj.cron;
         sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
         sObj.status = RunStatus.RUNNING;
+        CommonUtil.printLog2(JSON.stringify(sObj))
+        const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
         if (updateTaskDto.isRestart) {
+            const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
             try {
-                if (this.isExistTask(schObj.md5)) {
-                    await this.schedulerRegistry.getCronJob(schObj.md5).stop();
+                if (this.isExistTask(newSecheduler.md5)) {
+                    console.log('存在旧的md5'+newSecheduler.md5)
+                    this.schedulerRegistry.deleteCronJob(newSecheduler.md5);
+                    if (this.isExistTask(newSecheduler.md5)){
+                        throw new ApiException('定时任务失败',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                    }
                 }
-                const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
                 const catalogIds = newSecheduler.catalogs.map(catalog => {
                     return catalog.id;
                 });
@@ -257,11 +264,11 @@ export class SchedulerService {
                 if (!this.isExistTask(newSecheduler.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                 await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
             } catch (e) {
+                console.log(e.stack)
+                await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, updateTaskDto.id);
                 throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
             }
         }
-        CommonUtil.printLog2(JSON.stringify(sObj))
-        const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
         if (result.affected == 1) {
             return {status: true};
         } else {

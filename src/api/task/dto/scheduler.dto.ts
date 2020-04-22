@@ -66,9 +66,9 @@ class UpdateTaskDto {
     @Optional()
     taskType: TaskType;
 
-    @IsOptional()
-    @IsArray()
-    catalogIds: number[];
+    // @IsOptional()
+    // @IsArray()
+    // catalogIds: number[];
 
 }
 
