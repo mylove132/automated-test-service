@@ -13,6 +13,7 @@ import {HistoryEntity} from '../history/history.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {TokenEntity} from "../token/token.entity";
+import {JmeterEntity} from "../jmeter/jmeter.entity";
 
 @Unique(['alias'])
 @Entity('case')
@@ -86,6 +87,8 @@ export class CaseEntity {
     @Column({nullable: true})
     alias: string;
 
+    @ManyToOne(type => JmeterEntity, jmeter => jmeter.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    jmeter: JmeterEntity;
 
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
     token: TokenEntity;

@@ -1,5 +1,5 @@
 import { ApiBearerAuth, ApiUseTags } from "@nestjs/swagger";
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, SetMetadata} from "@nestjs/common";
 import { TaskIdsDto, SingleTaskDto, UpdateTaskDto } from "./dto/scheduler.dto";
 import { SchedulerService } from "./scheduler.service";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
@@ -92,8 +92,9 @@ export class SchedulerController {
   }
 
   @Get("/taskResult/:id")
+  @SetMetadata('isOpen', true)
   async getTaskResultById(@Param('id') id) {
-    return this.schedulerService.getTaskResultByIdService( id);
+    return this.schedulerService.getTaskResultByIdService(id);
   }
 
 }

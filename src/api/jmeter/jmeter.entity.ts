@@ -1,5 +1,7 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn} from 'typeorm';
+import {CaseEntity} from "../case/case.entity";
 
+@Unique(['md5'])
 @Entity('jmeter')
 export class JmeterEntity {
 
@@ -23,6 +25,12 @@ export class JmeterEntity {
     //压测结果ID
     @Column()
     preResultId: string;
+
+    @Column()
+    md5: string;
+
+    @OneToMany(type => CaseEntity, cases => cases.jmeter)
+    cases: CaseEntity[];
 
 }
 

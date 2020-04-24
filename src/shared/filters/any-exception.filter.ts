@@ -43,7 +43,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ua = headers["user-agent"];
     console.log(data.stack);
     Logger.error(
-      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${data.stack} [${request.user.username}]`
+      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${data.stack} [${request.user == null ? '' : request.user.username}]`
     );
   }
 }
