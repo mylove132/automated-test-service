@@ -22,6 +22,19 @@ export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>,
   );
 };
 
+export const finCaseNamesByIds = async (caseEntityRepository: Repository<CaseEntity>, ids) => {
+    return await caseEntityRepository.createQueryBuilder().select().
+    where("id IN (:...ids)",{ids: ids}).
+    getMany().catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    );
+};
+
+
+
 /**
  * 通过id查询case
  * @param caseEntityRepository

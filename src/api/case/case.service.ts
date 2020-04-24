@@ -10,6 +10,7 @@ import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate"
 import {EndpointEntity} from "../env/endpoint.entity";
 import {CommonUtil} from "../../utils/common.util";
 import {EnvService} from "../env/env.service";
+import { Logger } from "../../utils/log4js";
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {findCatalogById} from "../../datasource/catalog/catalog.sql";
 import {findEndpointById} from "../../datasource/env/env.sql";
@@ -26,7 +27,7 @@ import {
     updateCase,
     findCaseUnionEndpoint,
     searchCaseByName,
-    batchUpdateCaseOfCatalogId
+    batchUpdateCaseOfCatalogId, finCaseNamesByIds
 } from "../../datasource/case/case.sql";
 import {findTokenById} from "../../datasource/token/token.sql";
 import {TokenEntity} from "../token/token.entity";
@@ -63,7 +64,7 @@ export class CaseService {
      */
     async addCase(createCaseDto: CreateCaseDto) {
 
-        console.info(JSON.stringify(createCaseDto));
+        Logger.info(`添加目录:${createCaseDto.name}`);
         const caseObj = new CaseEntity();
 
         if (createCaseDto.isNeedSign != null) caseObj.isNeedSign = createCaseDto.isNeedSign;
@@ -124,6 +125,8 @@ export class CaseService {
      * @param deleteCaseDto
      */
     async deleteById(deleteCaseDto: DeleteCaseDto) {
+        const caseNames = await finCaseNamesByIds(this.caseRepository, deleteCaseDto.ids);
+        Logger.info(`删除的用例：${caseNames.map(cas => {return cas.name})}`);
         return await deleteCase(this.caseRepository, deleteCaseDto.ids);
     }
 

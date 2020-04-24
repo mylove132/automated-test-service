@@ -10,8 +10,8 @@ import {CommonUtil} from '../../utils/common.util';
 import {PlatformCodeEntity} from "./platformCode.entity";
 import {
     deleteCatalogByIds,
-    findCatalogById,
-    findCatalogByPlatformCodes,
+    findCatalogById, findCatalogByIds,
+    findCatalogByPlatformCodes, findCatalogOfCaseByIds,
     saveCatalog, updateCatalog
 } from '../../datasource/catalog/catalog.sql';
 import {
@@ -19,6 +19,7 @@ import {
     findPlatformCodeByCode,
     findPlatformCodeByCodeList
 } from "../../datasource/platformCode/platform.sql";
+import {Logger} from "../../utils/log4js";
 
 export class CatalogService {
     constructor(
@@ -67,9 +68,15 @@ export class CatalogService {
 
     /**
      * 删除目录
-     * @param queryCatalogDto
+     * @param deleteCatalogDto
      */
     async deleteById(deleteCatalogDto: DeleteCatalogDto) {
+        const catalogList = await findCatalogOfCaseByIds(this.catalogRepository, deleteCatalogDto.ids);
+        catalogList.map(
+            catalog => {
+                Logger.info(`删除目录：${catalog.name},所含用例：${catalog.cases == [] ? null:catalog.cases.map(cas => {return cas.name})}`)
+            }
+        );
         return  await deleteCatalogByIds(this.catalogRepository, deleteCatalogDto.ids);
     }
 

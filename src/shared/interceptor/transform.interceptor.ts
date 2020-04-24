@@ -54,7 +54,7 @@ export class TransformInterceptor implements NestInterceptor {
     const ua = headers["user-agent"];
 
     Logger.info(
-      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(res)}`
+      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(res)} [${request.user.username}]`
     );
   }
 

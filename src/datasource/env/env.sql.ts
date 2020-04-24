@@ -32,6 +32,22 @@ export const findEnvById = async (entityRepository: Repository<EnvEntity>, id) =
         }
     )
 };
+/**
+ * 查询所有的环境
+ * @param entityRepository
+ * @param ids
+ */
+export const findEnvByIds= async (entityRepository: Repository<EnvEntity>, ids) => {
+    return await entityRepository.createQueryBuilder('env').
+    select(['name']).where("id IN (:...ids)",{ids:ids}).
+    getMany().
+    catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+}
 
 
 /**

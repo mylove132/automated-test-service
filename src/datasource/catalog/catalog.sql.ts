@@ -34,6 +34,19 @@ export const findCatalogByIds = async (catalogEntityRepository: Repository<Catal
     )
 };
 
+export const findCatalogOfCaseByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids) => {
+    return await catalogEntityRepository.createQueryBuilder('catalog').
+        leftJoinAndSelect('catalog.cases','cases').
+    where('catalog.id IN (:...ids)',{ids: ids}).
+    getMany().catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
+
 /**
  *
  * 保存目录实体

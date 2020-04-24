@@ -37,6 +37,7 @@ import {TaskResultEntity} from "./task_result.entity";
 import {ConfigService} from "../../config/config.service";
 import {findCatalogByIds} from "../../datasource/catalog/catalog.sql";
 import {CatalogEntity} from "../catalog/catalog.entity";
+import { Logger } from "../../utils/log4js";
 
 
 var parser = require("cron-parser");

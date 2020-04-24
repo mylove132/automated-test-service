@@ -5,15 +5,17 @@ import {EndpointEntity} from './endpoint.entity';
 import {ApiException} from '../../shared/exceptions/api.exception';
 import {ApiErrorCode} from '../../shared/enums/api.error.code';
 import {HttpStatus} from '@nestjs/common';
-import {AddEndpointDto, DeleteEndpointDto, DeleteEnvDto, QueryEndpointDto} from './dto/env.dto';
+import {AddEndpointDto, DeleteEndpointDto, DeleteEnvDto} from './dto/env.dto';
 import {CommonUtil} from '../../utils/common.util';
+import { Logger } from "../../utils/log4js";
+
 import {
-  addEnv,
-  deleteEndpointByIds,
-  deleteEnvByIds, findAllEndpoints,
-  findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
-  findEnvById, saveEndpoint,
-  updateEnv
+    addEnv,
+    deleteEndpointByIds,
+    deleteEnvByIds, findAllEndpoints,
+    findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
+    findEnvById, findEnvByIds, saveEndpoint,
+    updateEnv
 } from "../../datasource/env/env.sql";
 
 export class EnvService {
@@ -62,6 +64,8 @@ export class EnvService {
      * @param deleteEnvDto
      */
     async deleteEnv(deleteEnvDto: DeleteEnvDto){
+        const envNames = await findEnvByIds(this.envRepository, deleteEnvDto.ids);
+        Logger.info(`删除的环境名称：${envNames}`);
         return await deleteEnvByIds(this.envRepository, deleteEnvDto.ids);
     }
 

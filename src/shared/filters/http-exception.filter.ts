@@ -45,7 +45,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ua = headers["user-agent"];
 
     Logger.error(
-      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(data)}`
+      `[${request.headers.requestid}] ${method} ${url} ${ua} ${JSON.stringify(body)} ${JSON.stringify(data)} [${request.user.username}]`
     );
   }
 }
