@@ -1,19 +1,13 @@
-import {BullModule} from '@nestjs/bull';
 import {Module} from '@nestjs/common';
 import {JmeterController} from './jmeter.controller';
-import {JmeterProcessor} from './jmeter.processor';
-import {CaseEntity} from "../case/case.entity";
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {JmeterService} from "./jmeter.service";
+import {JmeterEntity} from "./jmeter.entity";
 
 @Module({
-    imports: [
-        BullModule.registerQueue({
-            name: 'jmeter',
-        }),
-        TypeOrmModule.forFeature([CaseEntity])
-    ],
+    imports: [TypeOrmModule.forFeature([JmeterEntity])],
     controllers: [JmeterController],
-    providers: [JmeterProcessor],
+    providers: [JmeterService],
 })
 export class JmeterModule {
 }

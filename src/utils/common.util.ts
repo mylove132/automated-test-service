@@ -1,5 +1,6 @@
 import { Md5 } from "ts-md5";
 import { ConfigService } from "../config/config.service";
+import {exec} from 'child_process';
 
 export class CommonUtil {
 
@@ -155,6 +156,13 @@ export class CommonUtil {
     } else {
       return null
     }
+  }
+
+  static execCmd(cmd: string){
+    exec(cmd,(err, stdout, stderr)=>{
+      console.log(stdout);
+        }
+    )
   }
 
   static printLog2(meg) {

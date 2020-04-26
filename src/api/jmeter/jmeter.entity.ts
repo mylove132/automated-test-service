@@ -8,6 +8,9 @@ export class JmeterEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column()
+    name: string;
+
     @CreateDateColumn()
     createDate: Date;
 

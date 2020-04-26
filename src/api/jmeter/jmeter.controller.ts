@@ -1,7 +1,6 @@
-import { InjectQueue } from '@nestjs/bull';
-import {Body, Controller, Post} from '@nestjs/common';
-import { Queue } from 'bull';
+import {Controller, Get, Post, SetMetadata} from '@nestjs/common';
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
+import {JmeterService} from "./jmeter.service";
 
 
 
@@ -9,10 +8,11 @@ import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 @ApiUseTags('jmeter')
 @Controller('jmeter')
 export class JmeterController {
-  constructor(@InjectQueue('jmeter') private readonly jmeterQueue: Queue) {}
+  constructor(private jmeterService: JmeterService) {}
 
-  @Post('run')
-  async exec_jmeter(@Body() caseIds: number[]) {
-    await this.jmeterQueue.add('exec_jmeter', caseIds);
+  @Get('download')
+  @SetMetadata('isOpen', true)
+  async jmeter_download(){
+    return this.jmeterService.jmeterDownload();
   }
 }

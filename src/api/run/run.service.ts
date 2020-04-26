@@ -228,6 +228,7 @@ export class RunService {
     var regex2 = /\[(.+?)\]/g;
     for (let paramsKey in param) {
       const value = param[paramsKey];
+      console.log(value)
       if (paramReg.test(value)) {
         const regData = value.replace(paramReg, "$1");
         //匹配参数中的随机数
@@ -255,6 +256,7 @@ export class RunService {
             param[paramsKey] = CommonUtil.randomChar(6);
           }
         }
+
         //匹配参数中的级联调用
         else if (regData.startsWith("alias") != -1) {
             const regData = value.toString().replace(paramReg, "$1");
@@ -275,9 +277,6 @@ export class RunService {
             CommonUtil.printLog2('alias:'+alias+"-------"+paramValue)
             param[paramsKey] = paramValue;
           }
-      }
-      else {
-        return param;
       }
     }
     return param;
