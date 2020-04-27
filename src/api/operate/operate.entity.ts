@@ -16,7 +16,7 @@ export class OperateEntity {
     @CreateDateColumn()
     createDate: Date;
 
-    @ManyToOne(type => UserEntity, user => user.operates, {cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @ManyToOne(type => UserEntity, user => user.operates, {cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     user: UserEntity;
 
     //操作模块

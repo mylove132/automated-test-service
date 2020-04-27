@@ -36,7 +36,7 @@ export class SchedulerEntity {
     @Column('enum',{default: CaseGrade.LOW, nullable: false, enum: CaseGrade, comment: '用例等级'})
     caseGrade: CaseGrade;
 
-    @ManyToOne(type => EnvEntity, env => env.sechedulers, {cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+    @ManyToOne(type => EnvEntity, env => env.sechedulers, {cascade: true, onDelete: 'SET NULL', onUpdate: 'CASCADE'})
     @JoinColumn()
     env: EnvEntity;
 
@@ -55,7 +55,7 @@ export class SchedulerEntity {
     @Column({default: false})
     isSendMessage: boolean;
 
-   @ManyToMany(type => CatalogEntity, catalogs => catalogs.scheduler,{cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+   @ManyToMany(type => CatalogEntity, catalogs => catalogs.scheduler,{cascade: true, onDelete: 'SET NULL', onUpdate: 'CASCADE'})
    @JoinTable()
    catalogs: CatalogEntity[];
 

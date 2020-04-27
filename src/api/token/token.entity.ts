@@ -21,7 +21,7 @@ export class TokenEntity {
     @Column({comment: "用户名称",nullable: true})
     username: string;
 
-    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.tokens,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @ManyToOne(type => PlatformCodeEntity, platformCode => platformCode.tokens,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
    platformCode: PlatformCodeEntity;
 
     @Column({comment:"登录数据", nullable: true})
@@ -42,7 +42,7 @@ export class TokenEntity {
     @OneToMany(type => CaseEntity,cases => cases.token)
     cases: CaseEntity;
 
-    @ManyToOne(type => EnvEntity, env => env.tokens,{cascade: true,onDelete: 'CASCADE',onUpdate: 'CASCADE'})
+    @ManyToOne(type => EnvEntity, env => env.tokens,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     env: EnvEntity;
 
 

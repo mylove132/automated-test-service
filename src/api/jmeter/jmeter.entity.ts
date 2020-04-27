@@ -1,5 +1,6 @@
 import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn} from 'typeorm';
 import {CaseEntity} from "../case/case.entity";
+import {JmeterResultEntity} from "./jmeter_result.entity";
 
 @Unique(['md5'])
 @Entity('jmeter')
@@ -18,22 +19,24 @@ export class JmeterEntity {
     updateDate: Date;
 
     //压测时长（ms）
-    @Column()
+    @Column({comment: '压测时长'})
     preCountTime: number;
 
     //压测并发数
-    @Column()
+    @Column({comment: '压测线程数'})
     preCountNumber: number;
 
-    //压测结果ID
-    @Column()
-    preResultId: string;
+    @Column({default: -1,comment:'循环次数'})
+    loopNum: number;
 
     @Column()
     md5: string;
 
     @OneToMany(type => CaseEntity, cases => cases.jmeter)
     cases: CaseEntity[];
+
+    @OneToMany(type => JmeterResultEntity, jmeterResults => jmeterResults.jmeter)
+    jmeterResults: JmeterResultEntity[];
 
 }
 

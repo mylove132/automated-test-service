@@ -59,6 +59,16 @@ export class ConfigService {
 
       TASK_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com'),
 
+      JMETER_BIN_PATH: Joi.string().required().default(''),
+
+      JMETER_JTL_PATH: Joi.string().required().default(''),
+
+      JMETER_LOG_PATH: Joi.string().required().default(''),
+
+      JMETER_JMX_PATH: Joi.string().required().default(''),
+
+      JMETER_HTML_PATH: Joi.string().required().default(''),
+
       DINGTALK_ACCESS_TOKEN: Joi.string().required(),
     });
 
@@ -154,6 +164,26 @@ export class ConfigService {
 
   get dingtalkAccessToken(): string {
     return this.envConfig.DINGTALK_ACCESS_TOKEN;
+  }
+
+  get jmeterBinPath(): string {
+    return this.envConfig.JMETER_BIN_PATH;
+  }
+
+  get jmeterJtlPath(): string {
+    return this.envConfig.JMETER_JTL_PATH;
+  }
+
+  get jmeterLogPath(): string {
+    return this.envConfig.JMETER_LOG_PATH;
+  }
+
+  get jmeterHtmlPath(): string {
+    return this.envConfig.JMETER_HTML_PATH;
+  }
+
+  get jmeterJmxPath(): string {
+    return this.envConfig.JMETER_JMX_PATH;
   }
 
   getTypeOrmConfig(): Record<string, any> {
