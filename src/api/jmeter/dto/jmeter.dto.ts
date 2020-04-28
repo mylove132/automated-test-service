@@ -18,6 +18,9 @@ export class CreateJmeterDto {
     @IsNotEmpty()
     loopNum: number;
 
+    @IsOptional()
+    remote_address: string;
+
 }
 
 
@@ -38,6 +41,9 @@ export class UpdateJmeterDto {
 
     @IsOptional()
     loopNum: number;
+
+    @IsOptional()
+    remote_address: string;
 
 }
 

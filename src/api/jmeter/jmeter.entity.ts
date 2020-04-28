@@ -35,6 +35,9 @@ export class JmeterEntity {
     @OneToMany(type => CaseEntity, cases => cases.jmeter)
     cases: CaseEntity[];
 
+    @Column({nullable: true})
+    remote_address: string;
+
     @OneToMany(type => JmeterResultEntity, jmeterResults => jmeterResults.jmeter)
     jmeterResults: JmeterResultEntity[];
 

@@ -49,10 +49,11 @@ export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEn
 /**
  * 通过id查找jmeter
  * @param jmeterEntityRepository
- * @param id
+ * @param ids
  */
-export const findJmeterOfMd5s = async (jmeterEntityRepository: Repository<JmeterEntity>, id) => {
-    return await jmeterEntityRepository.findOne(id).catch(
+export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids) => {
+    return await jmeterEntityRepository.find(ids).
+    catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
