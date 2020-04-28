@@ -3,21 +3,22 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import * as fs from 'fs';
 import {ConfigService} from "../../config/config.service";
-import {IPaginationOptions, Pagination} from 'nestjs-typeorm-paginate';
 import {JmeterEntity} from "./jmeter.entity";
 import * as crypto from "crypto";
 import {CommonUtil} from "../../utils/common.util";
-import {CreateJmeterDto, DeleteJmeterDto, UpdateJmeterDto} from "./dto/jmeter.dto";
+import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto, JmeterIdDto} from "./dto/jmeter.dto";
 import {
-  createJmeter,
-  findJmeterById,
-  findJmeterByMd5,
-  findJmeterByIds,
-  updateJmeterById,
-    deleteJmeterByIds
+    createJmeter,
+    deleteJmeterByIds,
+    findJmeterById,
+    findJmeterByIds,
+    findJmeterByMd5,
+    updateJmeterById
 } from "../../datasource/jmeter/jmeter.sql";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
+import {exec, fork} from 'child_process';
+
 
 @Injectable()
 export class JmeterService {
@@ -89,24 +90,48 @@ export class JmeterService {
         if (updateJmeterDto.preCountNumber != null) jmeterObj.preCountNumber = updateJmeterDto.preCountNumber;
         if (updateJmeterDto.preCountTime != null) jmeterObj.preCountTime = updateJmeterDto.preCountTime;
         if (updateJmeterDto.name != null) jmeterObj.name = updateJmeterDto.name;
-
-        return await updateJmeterById(this.jmeterRepository, updateJmeterDto, updateJmeterDto.id);
+        jmeterObj.md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
+        fs.copyFileSync(this.config.jmeterJmxPath+'/'+jmeterTmpObj.md5+'.jmx', this.config.jmeterJmxPath+'/'+jmeterObj.md5+'.jmx');
+        return await updateJmeterById(this.jmeterRepository, jmeterObj, updateJmeterDto.id);
     }
 
     /**
      * 删除jmeter信息
-     * @param deleteJmeterDto
+     * @param jmeterIdsDto
      */
-    async deleteJmeterInfo(deleteJmeterDto: DeleteJmeterDto) {
-        const jmeterList = await findJmeterByIds(this.jmeterRepository, deleteJmeterDto.ids);
+    async deleteJmeterInfo(jmeterIdsDto: JmeterIdsDto) {
+        const jmeterList = await findJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
         jmeterList.forEach(
             jmeter => {
                 const path = this.config.jmeterJmxPath+`/${jmeter.md5}.jmx`;
                 fs.unlinkSync(path);
             }
-        )
-       return  await deleteJmeterByIds(this.jmeterRepository, deleteJmeterDto.ids);
-    }
+        );
+       return  await deleteJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
+    };
+
+    async runJmeterFile(jmeterIdDto: JmeterIdDto){
+        const jmeterBinPath = this.config.jmeterBinPath;
+        const jmeterJtlPath = this.config.jmeterJtlPath;
+        const jmeterJmxPath = this.config.jmeterJmxPath;
+        const jmeterLogPath = this.config.jmeterLogPath;
+
+        const jmeter = await findJmeterById(this.jmeterRepository, jmeterIdDto.id);
+        const jmeterCountNum = jmeter.preCountNumber;
+        const preCountTime = jmeter.preCountTime;
+        const loopNum = jmeter.loopNum;
+        const remote_address = jmeter.remote_address == null ? '' : '-R'+jmeter.remote_address;
+        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${jmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${jmeter.md5}.log -l ${jmeterJtlPath}/${jmeter.md5}.jtl`;
+    
+        const child = exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                throw new ApiException(`${jmeter.name} => 执行压测失败`, ApiErrorCode.TIMEOUT, HttpStatus.PARTIAL_CONTENT);
+            };
+        });
+        child.addListener('error', (messages)=>{
+            console.log(messages);
+        });
+    };
 }
 
 

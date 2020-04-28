@@ -1,4 +1,4 @@
-import {IsArray, IsNotEmpty, IsOptional} from "class-validator";
+import {IsArray, IsNotEmpty, IsOptional, IsNumber} from "class-validator";
 
 export class CreateJmeterDto {
 
@@ -47,8 +47,14 @@ export class UpdateJmeterDto {
 
 }
 
-export class DeleteJmeterDto {
+export class JmeterIdsDto {
 
     @IsArray()
     ids: number[];
+}
+
+export class JmeterIdDto {
+
+    @IsNumber()
+    id: number;
 }

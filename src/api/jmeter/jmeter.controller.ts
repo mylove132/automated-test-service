@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Post, Put, SetMetadata, UploadedFile, Use
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {JmeterService} from "./jmeter.service";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {CreateJmeterDto, DeleteJmeterDto, UpdateJmeterDto} from "./dto/jmeter.dto";
+import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto, JmeterIdDto} from "./dto/jmeter.dto";
 
 
 
@@ -39,7 +39,13 @@ export class JmeterController {
 
     @Delete('')
     @SetMetadata('isOpen', true)
-    async jmeterDetele(@Body() deleteJmeterDto: DeleteJmeterDto){
-        return this.jmeterService.deleteJmeterInfo(deleteJmeterDto);
+    async jmeterDetele(@Body() jmeterIdsDto: JmeterIdsDto){
+        return this.jmeterService.deleteJmeterInfo(jmeterIdsDto);
     }
+
+  @Post('run')
+  @SetMetadata('isOpen', true)
+  async runJmeter(@Body() jmeterIdDto: JmeterIdDto){
+    return this.jmeterService.runJmeterFile(jmeterIdDto);
+  }
 }
