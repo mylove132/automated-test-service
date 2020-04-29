@@ -4923,6 +4923,352 @@ data						|object		|R			|&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user						|user		|R			|&nbsp;请求者用户信息
 
 
+
+### 12.0 上传.jmx文件
+- **接口说明：** 上传.jmx文件
+- **请求方式：** POST
+- **接口地址：** /api/jmeter/upload
+
+#### 2.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+file						|file		|R			|上传的文件
+
+请求示例：
+
+```
+
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "fileName": "request.jmx",
+        "md5": "60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428"
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;fileName						|string		|R			|&nbsp;上传的文件名称
+&nbsp;&nbsp;&nbsp;md5						|string		|R			|&nbsp;文件唯一标示
+
+
+### 12.1 创建压测信息
+- **接口说明：** 创建压测信息
+- **请求方式：** POST
+- **接口地址：** /api/jmeter
+
+#### 12.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+name						|string		|R			|压测脚本名称
+md5						|string		|R			|压测脚本md5值
+preCountNumber						|number		|R			|压测总线程数
+preCountNumber						|number		|R			|压测总线程数
+preCountTime                        |number		|R			|压测总时长（s）
+loopNum                             |number		|R			|压测循环次数
+remote_address                      |string		|O			|分布式远程IP地址
+
+请求示例：
+
+```
+{"name":"测试222222",
+"md5":"60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428",
+"preCountNumber":120,
+"preCountTime":100,
+"loopNum":-1,
+"remote_address":"192.168.6.11"}
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "name": "测试222222",
+        "md5": "60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428",
+        "preCountNumber": 120,
+        "preCountTime": 100,
+        "loopNum": -1,
+        "remote_address": "192.168.6.11",
+        "id": 20,
+        "createDate": "2020-04-29T02:36:45.968Z",
+        "updateDate": "2020-04-29T02:36:45.968Z"
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+
+
+### 12.12 删除压测信息数据
+- **接口说明：** 通过ID删除压测信息数据
+- **请求方式：** DELETE
+- **接口地址：** /api/jmeter
+
+#### 12.2.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+ids						|number[]		|R			|脚本信息ID集合
+
+
+请求示例：
+
+```
+{"ids":[19]}
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "raw": [],
+        "affected": 1
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+
+
+
+### 12.3 更新压测信息数据
+- **接口说明：** 通过ID更新压测信息数据
+- **请求方式：** PUT
+- **接口地址：** /api/jmeter
+
+#### 12.3.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+id						|number		|R			|脚本信息ID
+name						|string		|O			|压测脚本名称
+preCountNumber						|number		|O			|压测总线程数
+preCountNumber						|number		|O			|压测总线程数
+preCountTime                        |number		|O			|压测总时长（s）
+loopNum                             |number		|O			|压测循环次数
+remote_address                      |string		|O			|分布式远程IP地址
+
+请求示例：
+
+```
+{"name":"测试脚000000101",
+"preCountNumber":180,
+"preCountTime":160,
+"loopNum":200, 
+"id":19,
+"remote_address":"172.168.4.103,192.157.4.16"}
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "generatedMaps": [],
+        "raw": [],
+        "affected": 1
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+
+
+### 12.4 运行压测脚本
+- **接口说明：** 通过ID更新压测信息数据
+- **请求方式：** POST
+- **接口地址：** /api/jmeter/run
+
+#### 12.4.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+id						|number		|R			|脚本信息ID
+
+
+请求示例：
+
+```
+{"id":20}
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "status": true
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;status						|bool		|R			|true: 运行成功；false：运行失败
+
+
+
+### 12.5 查看某个报告信息
+- **接口说明：** 查看某个报告信息
+- **请求方式：** GET
+- **接口地址：** /api/jmeter/watchResult
+
+#### 12.5.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+md5						|string		|R			|运行结果表中的唯一值md5
+
+
+请求示例：
+
+```
+{"md5":'60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428'}
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "url": "http://127.0.0.1:8088/824aee123467641134445dd7d8ab9295a8948c27bd0c177a95f2cbb459d84308/index.html"
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;url						|string		|R			|报告地址
+
+
+### 12.6 查看所有的脚本执行历史结果列表
+- **接口说明：** 查看某个报告信息
+- **请求方式：** GET
+- **接口地址：** /api/jmeter/jmeterResultList
+
+#### 12.6.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+name						|string		|O			|模糊匹配脚本名称
+
+
+请求示例：
+
+```
+/api/jmeter/jmeterResultList?name=测试
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 3,
+                "createDate": "2020-04-29T03:53:26.190Z",
+                "md5": "92168f6ee22e3979cabdf7c840e21f1908d65f5578e9748e605175c67adc7778",
+                "jmeter": {
+                    "id": 20,
+                    "name": "测试222222",
+                    "createDate": "2020-04-29T02:36:45.968Z",
+                    "updateDate": "2020-04-29T03:53:09.747Z",
+                    "preCountTime": 100,
+                    "preCountNumber": 120,
+                    "loopNum": -1,
+                    "md5": "92168f6ee22e3979cabdf7c840e21f1908d65f5578e9748e605175c67adc7778",
+                    "remote_address": "192.168.6.11"
+                }
+            },
+            {
+                "id": 2,
+                "createDate": "2020-04-29T03:50:25.304Z",
+                "md5": "59c20d117729e0ab80526b6b891b759f3ea2ccdd37b1b7a917ae199cd34feba5",
+                "jmeter": {
+                    "id": 20,
+                    "name": "测试222222",
+                    "createDate": "2020-04-29T02:36:45.968Z",
+                    "updateDate": "2020-04-29T03:53:09.747Z",
+                    "preCountTime": 100,
+                    "preCountNumber": 120,
+                    "loopNum": -1,
+                    "md5": "92168f6ee22e3979cabdf7c840e21f1908d65f5578e9748e605175c67adc7778",
+                    "remote_address": "192.168.6.11"
+                }
+            },
+            {
+                "id": 1,
+                "createDate": "2020-04-29T03:38:10.410Z",
+                "md5": "824aee123467641134445dd7d8ab9295a8948c27bd0c177a95f2cbb459d84308",
+                "jmeter": {
+                    "id": 20,
+                    "name": "测试222222",
+                    "createDate": "2020-04-29T02:36:45.968Z",
+                    "updateDate": "2020-04-29T03:53:09.747Z",
+                    "preCountTime": 100,
+                    "preCountNumber": 120,
+                    "loopNum": -1,
+                    "md5": "92168f6ee22e3979cabdf7c840e21f1908d65f5578e9748e605175c67adc7778",
+                    "remote_address": "192.168.6.11"
+                }
+            }
+        ],
+        "itemCount": 3,
+        "totalItems": 3,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+&nbsp;&nbsp;&nbsp;url						|string		|R			|报告地址
+
+
+
 响应码	|说明  
 :----	|:---
 0		|处理成功

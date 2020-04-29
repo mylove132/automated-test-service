@@ -48,7 +48,7 @@ export class JmeterController {
     return this.jmeterService.runJmeterFile(jmeterIdDto);
   }
 
-  @Get('watch_result')
+  @Get('watchResult')
   @SetMetadata('isOpen', true)
   async watchJmeterResult(@Query('md5') md5: string){
     return this.jmeterService.findResult(md5);
