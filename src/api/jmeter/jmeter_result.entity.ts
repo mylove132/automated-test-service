@@ -3,9 +3,12 @@ import {
     Entity,
     ManyToOne,
     PrimaryGeneratedColumn,
+    Column,
+    Unique,
 } from 'typeorm';
 import {JmeterEntity} from "./jmeter.entity";
 
+@Unique(['md5'])
 @Entity('jmeter_result')
 export class JmeterResultEntity {
 
@@ -17,6 +20,9 @@ export class JmeterResultEntity {
 
     @ManyToOne(type => JmeterEntity, jmeter => jmeter.jmeterResults,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     jmeter: JmeterEntity;
+
+    @Column()
+    md5: string;
 
 }
 

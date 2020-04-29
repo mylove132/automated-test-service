@@ -25,7 +25,7 @@ export const saveHistory = async (historyRepository: Repository<HistoryEntity>, 
  * @param historyRepository
  * @param path
  */
-export const findHistoryByPath = async (historyRepository: Repository<HistoryEntity>, path) => {
+export const findHistoryByPath = async (historyRepository: Repository<HistoryEntity>, path: string) => {
     return historyRepository.createQueryBuilder('history').leftJoinAndSelect('history.case', 'case').where(
         qb => {
             if (path) {

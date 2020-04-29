@@ -57,7 +57,11 @@ export class ConfigService {
 
       REDIS_PASSWORD: Joi.string().default(''),
 
+      JMETER_RESULT_URL: Joi.string().default(''),
+
       TASK_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com'),
+
+      //JMETER_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com/static'),
 
       JMETER_BIN_PATH: Joi.string().required().default(''),
 
@@ -184,6 +188,10 @@ export class ConfigService {
 
   get jmeterJmxPath(): string {
     return this.envConfig.JMETER_JMX_PATH;
+  }
+
+  get jmeterResultUrl(): string {
+    return this.envConfig.JMETER_RESULT_URL;
   }
 
   getTypeOrmConfig(): Record<string, any> {

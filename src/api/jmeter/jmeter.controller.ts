@@ -1,9 +1,8 @@
-import {Body, Controller, Delete, Get, Post, Put, SetMetadata, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put, SetMetadata, UploadedFile, UseInterceptors, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {JmeterService} from "./jmeter.service";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto, JmeterIdDto} from "./dto/jmeter.dto";
-
 
 
 @ApiBearerAuth()
@@ -47,5 +46,18 @@ export class JmeterController {
   @SetMetadata('isOpen', true)
   async runJmeter(@Body() jmeterIdDto: JmeterIdDto){
     return this.jmeterService.runJmeterFile(jmeterIdDto);
+  }
+
+  @Get('watch_result')
+  @SetMetadata('isOpen', true)
+  async watchJmeterResult(@Query('md5') md5: string){
+    return this.jmeterService.findResult(md5);
+  }
+
+  @Get('jmeterResultList')
+  @SetMetadata('isOpen', true)
+  async queryJmeterResultList(@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+    limit = limit > 100 ? 100 : limit;
+    return await this.jmeterService.queryJmeterResultList(name, {page, limit});
   }
 }
