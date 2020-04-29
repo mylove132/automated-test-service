@@ -60,4 +60,10 @@ export class JmeterController {
     limit = limit > 100 ? 100 : limit;
     return await this.jmeterService.queryJmeterResultList(name, {page, limit});
   }
+
+  @Get('watchLog')
+  @SetMetadata('isOpen', true)
+  async watchLog(@Query('md5') md5: string){
+    return this.jmeterService.catLog(md5);
+  }
 }

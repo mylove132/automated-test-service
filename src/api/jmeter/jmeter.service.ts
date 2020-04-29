@@ -215,6 +215,14 @@ export class JmeterService {
         const queryBuilder = findJmeterResultList(this.jmeterResultRepository, name);
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
+
+    async catLog(md5: string){
+        const jmeterLogPath = this.config.jmeterLogPath;
+        if (!fs.existsSync(`${jmeterLogPath}/${md5}.log`)) {
+            throw new ApiException(`查看的log日志文件:${md5}.log 不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        return fs.readFileSync(`${jmeterLogPath}/${md5}.log`, {encoding: 'utf-8'});
+    }
 }
 
 
