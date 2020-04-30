@@ -9,7 +9,7 @@ import { JmeterResultEntity } from './jmeter_result.entity';
 @Module({
     imports: [TypeOrmModule.forFeature([JmeterEntity, JmeterResultEntity])],
     controllers: [JmeterController],
-    providers: [JmeterService],
+    providers: [JmeterService, JmeterGateway],
 })
 export class JmeterModule {
 }

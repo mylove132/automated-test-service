@@ -27,11 +27,11 @@
     "@nestjs/common": "^6.7.2",
     "@nestjs/core": "^6.7.2",
     "@nestjs/platform-express": "^6.7.2",
-    "@nestjs/platform-socket.io": "^7.0.9",
+    "@nestjs/platform-socket.io": "^6.10.13",
     "@nestjs/schedule": "latest",
     "@nestjs/swagger": "^3.0.1",
     "@nestjs/typeorm": "^7.0.0",
-    "@nestjs/websockets": "^7.0.9",
+    "@nestjs/websockets": "^6.10.13",
     "bull": "^3.13.0",
     "child_process": "^1.0.2",
     "class-transformer": "^0.2.0",
@@ -56,7 +56,7 @@
     "typeorm": "^0.2.15"
   },
   "devDependencies": {
-    "@nestjs/cli": "^6.9.0",
+    "@nestjs/cli": "^7.1.4",
     "@nestjs/schematics": "^6.7.0",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.5",

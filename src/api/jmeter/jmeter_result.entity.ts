@@ -25,7 +25,7 @@ export class JmeterResultEntity {
     @Column()
     md5: string;
 
-    @Column('enum', {default: null, nullable:true, comment: '脚本运行状态', enum: JmeterRunStatus})
+    @Column('enum', {default: JmeterRunStatus.STATELESS, nullable:false, comment: '脚本运行状态', enum: JmeterRunStatus})
     jmeterRunStatus: JmeterRunStatus;
 }
 

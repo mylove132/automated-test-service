@@ -48,6 +48,6 @@ export enum TaskType {
 }
 
 export enum JmeterRunStatus {
-    RUNNING = 1, FINISH = 2, FAIL = 3 
+    RUNNING = 1, FINISH = 2, FAIL = 3, STATELESS = 4
 }
 
