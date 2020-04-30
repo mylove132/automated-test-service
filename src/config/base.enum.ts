@@ -47,3 +47,7 @@ export enum TaskType {
    INTERFACE = 1, JMETER = 2
 }
 
+export enum JmeterRunStatus {
+    RUNNING = 1, FINISH = 2, FAIL = 3 
+}
+

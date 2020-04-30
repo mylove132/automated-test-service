@@ -7,6 +7,7 @@ import {
     Unique,
 } from 'typeorm';
 import {JmeterEntity} from "./jmeter.entity";
+import { JmeterRunStatus } from 'src/config/base.enum';
 
 @Unique(['md5'])
 @Entity('jmeter_result')
@@ -24,6 +25,8 @@ export class JmeterResultEntity {
     @Column()
     md5: string;
 
+    @Column('enum', {default: null, nullable:true, comment: '脚本运行状态', enum: JmeterRunStatus})
+    jmeterRunStatus: JmeterRunStatus;
 }
 
 
