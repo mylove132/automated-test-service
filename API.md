@@ -5104,11 +5104,13 @@ data						|object		|R			|&nbsp;
 
 ### 12.4 运行压测脚本
 - **接口说明：** 通过ID更新压测信息数据
-- **请求方式：** POST
-- **接口地址：** /api/jmeter/run
+- **请求方式：** SOCKET
+- **接口地址：** :3001
 
 #### 12.4.1 请求参数
   
+  上传命令 "jmeter"
+
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
 id						|number		|R			|脚本信息ID
@@ -5121,22 +5123,20 @@ id						|number		|R			|脚本信息ID
 ```
 返回结果
 
+  监听 "message"
+
 ```
 {
     "code": 0,
-    "msg": "success",
-    "data": {
-        "status": true
-    }
+    "msg": "success"
 }
 ```
 
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;
-&nbsp;&nbsp;&nbsp;status						|bool		|R			|true: 运行成功；false：运行失败
+code						|int		|R			|响应码 0(成功信息) 80001:失败信息
+msg						|string		|R			|&nbsp; (运行的日志信息)
+
 
 
 

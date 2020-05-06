@@ -42,12 +42,6 @@ export class JmeterController {
         return this.jmeterService.deleteJmeterInfo(jmeterIdsDto);
     }
 
-  @Post('run')
-  @SetMetadata('isOpen', true)
-  async runJmeter(@Body() jmeterIdDto: JmeterIdDto){
-    return this.jmeterService.runJmeterFile(jmeterIdDto);
-  }
-
   @Get('watchResult')
   @SetMetadata('isOpen', true)
   async watchJmeterResult(@Query('md5') md5: string){

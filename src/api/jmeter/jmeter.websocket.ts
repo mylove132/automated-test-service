@@ -5,11 +5,11 @@ import { exec } from 'child_process';
 import { Server } from 'socket.io';
 import { findJmeterById, updateJmeterMd5ById, saveJmeterResult } from 'src/datasource/jmeter/jmeter.sql';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JmeterEntity } from './jmeter.entity';
 import { Repository } from 'typeorm';
 import { CommonUtil } from 'src/utils/common.util';
 import * as crypto from "crypto";
 import { JmeterResultEntity } from './jmeter_result.entity';
-import { JmeterEntity } from './jmeter.entity';
 import { JmeterRunStatus } from 'src/config/base.enum';
 
 @WebSocketGateway(3001)
@@ -37,51 +37,44 @@ export class JmeterGateway {
         const loopNum = jmeter.loopNum;
         const remote_address = jmeter.remote_address == null ? '' : '-R ' + jmeter.remote_address;
 
-        CommonUtil.printLog1(JSON.stringify(jmeter));
         let newJmeter: JmeterEntity;
-
         //更新md5值
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
         const newJmxPath = this.config.jmeterJmxPath + `/${md5}.jmx`;
         fs.copyFileSync(this.config.jmeterJmxPath + `/${jmeter.md5}.jmx`, newJmxPath);
-        CommonUtil.printLog1(md5)
+    
         await updateJmeterMd5ById(this.jmeterRepository, md5, jmeter.id);
         newJmeter = await findJmeterById(this.jmeterRepository, jmeter.id);
 
-        //拼装命令行
         const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${newJmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${newJmeter.md5}.log -l ${jmeterJtlPath}/${newJmeter.md5}.jtl ${remote_address}`;
         console.log(cmd)
-        //执行命令行
-        const child = exec(cmd, async (error, stdout, stderr) => {
+        let flag = true;
+        const child = exec(cmd, {killSignal: "SIGINT"}, async (error, stdout, stderr) => {
             if (error) {
-                child.kill('SIGINT');
+                flag = false;
+                this.server.emit('message', {code: 80001, msg: error.stack});
+                const jmeterResult = new JmeterResultEntity();
+                jmeterResult.jmeter = newJmeter;
+                jmeterResult.md5 = newJmeter.md5;
+                jmeterResult.jmeterRunStatus = JmeterRunStatus.FAIL;
+                await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+                child.kill("SIGINT");
             }
         });
 
         child.stdout.on("data", (data) => {
-            console.log(data)
-            this.server.emit('message', { code: 0, msg: data });
-        });
-        // child.stdin.on('data', (data) => {
-        //     console.log('error----------'+data)
-        //     this.server.emit('message', { code: 80001, msg: data });
-        // });
-        // child.stdin.on('close', async () => {
-        //     const jmeterResult = new JmeterResultEntity();
-        //     jmeterResult.jmeter = newJmeter;
-        //     jmeterResult.md5 = newJmeter.md5;
-        //     jmeterResult.jmeterRunStatus = JmeterRunStatus.FAIL;
-        //     console.log('================' + JSON.stringify(jmeterResult))
-        //     await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
-        // });
-        child.stdout.on("close", async () => {
-            const jmeterResult = new JmeterResultEntity();
-            jmeterResult.jmeter = newJmeter;
-            jmeterResult.md5 = newJmeter.md5;
-            jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
-            await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+            this.server.emit('message', {code: 0, msg: data});
         });
 
+        child.stdout.on("close", async () => {
+            if (flag) {
+                const jmeterResult = new JmeterResultEntity();
+                jmeterResult.jmeter = newJmeter;
+                jmeterResult.md5 = newJmeter.md5;
+                jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
+                await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+            }
+        });
 
     }
 }

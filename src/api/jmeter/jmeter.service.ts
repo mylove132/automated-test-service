@@ -129,63 +129,63 @@ export class JmeterService {
        return  await deleteJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
     };
 
-    async runJmeterFile(jmeterIdDto: JmeterIdDto){
-        const jmeterBinPath = this.config.jmeterBinPath;
-        const jmeterJtlPath = this.config.jmeterJtlPath;
-        const jmeterJmxPath = this.config.jmeterJmxPath;
-        const jmeterLogPath = this.config.jmeterLogPath;
+    // async runJmeterFile(jmeterIdDto: JmeterIdDto){
+    //     const jmeterBinPath = this.config.jmeterBinPath;
+    //     const jmeterJtlPath = this.config.jmeterJtlPath;
+    //     const jmeterJmxPath = this.config.jmeterJmxPath;
+    //     const jmeterLogPath = this.config.jmeterLogPath;
 
-        const jmeter = await findJmeterById(this.jmeterRepository, jmeterIdDto.id);
-        const jmeterCountNum = jmeter.preCountNumber;
-        const preCountTime = jmeter.preCountTime;
-        const loopNum = jmeter.loopNum;
-        const remote_address = jmeter.remote_address == null ? '' : '-R'+jmeter.remote_address;
+    //     const jmeter = await findJmeterById(this.jmeterRepository, jmeterIdDto.id);
+    //     const jmeterCountNum = jmeter.preCountNumber;
+    //     const preCountTime = jmeter.preCountTime;
+    //     const loopNum = jmeter.loopNum;
+    //     const remote_address = jmeter.remote_address == null ? '' : '-R'+jmeter.remote_address;
 
-        let newJmeter: JmeterEntity;
-        //更新md5值
-        if (fs.existsSync(this.config.jmeterJtlPath+`/${jmeter.md5}.jtl`)){
-            const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-            const newJmxPath = this.config.jmeterJmxPath+`/${md5}.jmx`;
-            fs.copyFileSync(this.config.jmeterJmxPath+`/${jmeter.md5}.jmx`, newJmxPath);
-            await updateJmeterMd5ById(this.jmeterRepository, md5, jmeter.id);
-            newJmeter = await findJmeterById(this.jmeterRepository, jmeter.id);
-        } else {
-            newJmeter = jmeter;
-        }
-        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${newJmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${newJmeter.md5}.log -l ${jmeterJtlPath}/${newJmeter.md5}.jtl`;
-        const child = exec(cmd, (error, stdout, stderr) => {
-            if (error) {
-                throw new ApiException(`${jmeter.name} => 执行压测失败`, ApiErrorCode.TIMEOUT, HttpStatus.PARTIAL_CONTENT);
-            };
-        });
-        child.stdout.on('data',(data)=>{
-            console.log('---------------'+data);
-        });
-        //判断命令行是否执行成功
-        const result = await new Promise((resolve, reject)=>{
-            let num = 0;
-            const inerval = setInterval(() => {
-                if (fs.existsSync(this.config.jmeterJtlPath+`/${jmeter.md5}.jtl`)){
-                    clearInterval(inerval);
-                    resolve({status: true});
-                }else{
-                    if (num > 30){
-                        clearInterval(inerval);
-                        reject({status: false});
-                        num++;
-                    }
-                }
-            }, 1000);
-        }); 
-        // 命令行执行后保存结果
-        if (result['status']) {
-            const jmeterResult = new JmeterResultEntity();
-            jmeterResult.jmeter = newJmeter;
-            jmeterResult.md5 = newJmeter.md5;
-            await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
-        }
-        return result;
-    };
+    //     let newJmeter: JmeterEntity;
+    //     //更新md5值
+    //     if (fs.existsSync(this.config.jmeterJtlPath+`/${jmeter.md5}.jtl`)){
+    //         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
+    //         const newJmxPath = this.config.jmeterJmxPath+`/${md5}.jmx`;
+    //         fs.copyFileSync(this.config.jmeterJmxPath+`/${jmeter.md5}.jmx`, newJmxPath);
+    //         await updateJmeterMd5ById(this.jmeterRepository, md5, jmeter.id);
+    //         newJmeter = await findJmeterById(this.jmeterRepository, jmeter.id);
+    //     } else {
+    //         newJmeter = jmeter;
+    //     }
+    //     const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${newJmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${newJmeter.md5}.log -l ${jmeterJtlPath}/${newJmeter.md5}.jtl`;
+    //     const child = exec(cmd, (error, stdout, stderr) => {
+    //         if (error) {
+    //             throw new ApiException(`${jmeter.name} => 执行压测失败`, ApiErrorCode.TIMEOUT, HttpStatus.PARTIAL_CONTENT);
+    //         };
+    //     });
+    //     child.stdout.on('data',(data)=>{
+    //         console.log('---------------'+data);
+    //     });
+    //     //判断命令行是否执行成功
+    //     const result = await new Promise((resolve, reject)=>{
+    //         let num = 0;
+    //         const inerval = setInterval(() => {
+    //             if (fs.existsSync(this.config.jmeterJtlPath+`/${jmeter.md5}.jtl`)){
+    //                 clearInterval(inerval);
+    //                 resolve({status: true});
+    //             }else{
+    //                 if (num > 30){
+    //                     clearInterval(inerval);
+    //                     reject({status: false});
+    //                     num++;
+    //                 }
+    //             }
+    //         }, 1000);
+    //     }); 
+    //     // 命令行执行后保存结果
+    //     if (result['status']) {
+    //         const jmeterResult = new JmeterResultEntity();
+    //         jmeterResult.jmeter = newJmeter;
+    //         jmeterResult.md5 = newJmeter.md5;
+    //         await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+    //     }
+    //     return result;
+    // };
 
     /**
      * 
@@ -202,7 +202,6 @@ export class JmeterService {
         if (!fs.existsSync(jmeterJtlPath+`/${md5}.jtl`)){
             throw new ApiException(`${md5}.jtl文件不存在,请确认脚本是否执行完毕。`,ApiErrorCode.JTL_FILE_UNEXIST, HttpStatus.BAD_REQUEST);
         }
-
         if (!fs.existsSync(jmeterHtmlPath+`/${md5}`)){
             const cmd = `${jmeterBinPath} -g ${jmeterJtlPath}/${md5}.jtl -o ${jmeterHtmlPath}/${md5}`;
             execSync(cmd);
@@ -216,6 +215,11 @@ export class JmeterService {
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
 
+
+    /**
+     * 查看jmeter执行的日志信息
+     * @param md5 
+     */
     async catLog(md5: string){
         const jmeterLogPath = this.config.jmeterLogPath;
         if (!fs.existsSync(`${jmeterLogPath}/${md5}.log`)) {
