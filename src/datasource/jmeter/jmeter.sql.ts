@@ -20,20 +20,6 @@ export const createJmeter = async (jmeterEntityRepository: Repository<JmeterEnti
 };
 
 /**
- * 通过md5值查找jmeter
- * @param jmeterEntityRepository
- * @param md5
- */
-export const findJmeterByMd5 = async (jmeterEntityRepository: Repository<JmeterEntity>, md5) => {
-    return await jmeterEntityRepository.findOne({md5: md5}).catch(
-        err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-    )
-};
-
-/**
  * 通过id查找jmeter
  * @param jmeterEntityRepository
  * @param id
@@ -72,21 +58,6 @@ export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterE
  */
 export const updateJmeterById = async (jmeterEntityRepository: Repository<JmeterEntity>, jmeterObj, id) => {
     return await jmeterEntityRepository.update(id, jmeterObj).catch(
-        err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
-    )
-};
-
-/**
- * 更新jmeter的md5值
- * @param jmeterEntityRepository 
- * @param md5 
- * @param id 
- */
-export const updateJmeterMd5ById = async (jmeterEntityRepository: Repository<JmeterEntity>, md5, id) => {
-    return await jmeterEntityRepository.update(id, {md5: md5}).catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);

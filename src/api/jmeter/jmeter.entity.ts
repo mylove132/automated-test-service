@@ -1,8 +1,7 @@
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Binary} from 'typeorm';
 import {CaseEntity} from "../case/case.entity";
 import {JmeterResultEntity} from "./jmeter_result.entity";
 
-@Unique(['md5'])
 @Entity('jmeter')
 export class JmeterEntity {
 
@@ -29,8 +28,8 @@ export class JmeterEntity {
     @Column({default: -1,comment:'循环次数'})
     loopNum: number;
 
-    @Column()
-    md5: string;
+    @Column({nullable: true})
+    url: string;
 
     @OneToMany(type => CaseEntity, cases => cases.jmeter)
     cases: CaseEntity[];

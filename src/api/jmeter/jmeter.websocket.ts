@@ -2,7 +2,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/web
 import { ConfigService } from "../../config/config.service";
 import { exec } from 'child_process';
 import { Server } from 'socket.io';
-import { findJmeterById, updateJmeterMd5ById, saveJmeterResult } from 'src/datasource/jmeter/jmeter.sql';
+import { findJmeterById, saveJmeterResult } from 'src/datasource/jmeter/jmeter.sql';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JmeterEntity } from './jmeter.entity';
 import { Repository } from 'typeorm';
@@ -10,8 +10,9 @@ import { CommonUtil } from 'src/utils/common.util';
 import * as crypto from "crypto";
 import { JmeterResultEntity } from './jmeter_result.entity';
 import { JmeterRunStatus } from 'src/config/base.enum';
-
-@WebSocketGateway(3001, {namespace: 'jmeter'})
+import * as fs from 'fs';
+import { HttpService } from '@nestjs/common';
+@WebSocketGateway(3001, {namespace: 'jmeter', origins:'*:*'})
 export class JmeterGateway {
 
     @WebSocketServer() server: Server;
@@ -20,7 +21,8 @@ export class JmeterGateway {
     constructor(@InjectRepository(JmeterEntity)
     private readonly jmeterRepository: Repository<JmeterEntity>,
         @InjectRepository(JmeterResultEntity)
-        private readonly jmeterResultRepository: Repository<JmeterResultEntity>, ) { }
+        private readonly jmeterResultRepository: Repository<JmeterResultEntity>,
+        private httpService: HttpService, ) { }
 
     @SubscribeMessage('jmeter')
     async onEvent(client: any, data: any) {
@@ -36,12 +38,16 @@ export class JmeterGateway {
         const loopNum = jmeter.loopNum;
         const remote_address = jmeter.remote_address == null ? '' : '-R ' + jmeter.remote_address;
 
-        //更新md5值
+       
+        //创建临时jmx文件
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-
-        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${jmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
+        const tmpJmxtFilePath = '/tmp/'+md5+'.jmx';
+        fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
+        //构建命令行
+        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
         console.log(cmd)
         let flag = true;
+        //执行命令行
         const child = exec(cmd, {killSignal: "SIGINT"}, async (error, stdout, stderr) => {
             if (error) {
                 flag = false;
@@ -55,10 +61,12 @@ export class JmeterGateway {
             }
         });
 
+        //监听返回记录
         child.stdout.on("data", (data) => {
             this.server.emit('message', {code: 0, msg: data});
         });
 
+        //监听结束
         child.stdout.on("close", async () => {
             if (flag) {
                 const jmeterResult = new JmeterResultEntity();
@@ -67,6 +75,7 @@ export class JmeterGateway {
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
             }
+            fs.unlinkSync(tmpJmxtFilePath);
             this.server.emit('message', {code: 80000, msg: `end`});
         });
 

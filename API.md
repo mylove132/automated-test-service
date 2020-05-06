@@ -4924,43 +4924,6 @@ data						|object		|R			|&nbsp;
 
 
 
-### 12.0 上传.jmx文件
-- **接口说明：** 上传.jmx文件
-- **请求方式：** POST
-- **接口地址：** /api/jmeter/upload
-
-#### 2.2.1 请求参数
-  
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-file						|file		|R			|上传的文件
-
-请求示例：
-
-```
-
-```
-返回结果
-
-```
-{
-    "code": 0,
-    "msg": "success",
-    "data": {
-        "fileName": "request.jmx",
-        "md5": "60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428"
-    }
-}
-```
-
-参数名称						|类型		|出现要求	|描述  
-:----						|:---		|:------	|:---	
-code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
-message						|string		|R			|&nbsp;
-data						|object		|R			|&nbsp;
-&nbsp;&nbsp;&nbsp;fileName						|string		|R			|&nbsp;上传的文件名称
-&nbsp;&nbsp;&nbsp;md5						|string		|R			|&nbsp;文件唯一标示
-
 
 ### 12.1 创建压测信息
 - **接口说明：** 创建压测信息
@@ -4972,7 +4935,7 @@ data						|object		|R			|&nbsp;
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
 name						|string		|R			|压测脚本名称
-md5						|string		|R			|压测脚本md5值
+url						    |string		|R			|上传的jmeter脚本url
 preCountNumber						|number		|R			|压测总线程数
 preCountNumber						|number		|R			|压测总线程数
 preCountTime                        |number		|R			|压测总时长（s）
@@ -4983,7 +4946,7 @@ remote_address                      |string		|O			|分布式远程IP地址
 
 ```
 {"name":"测试222222",
-"md5":"60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428",
+"url":"https://img.blingabc.com/6a097407cc8640928bb7f8378051f08d.jmx",
 "preCountNumber":120,
 "preCountTime":100,
 "loopNum":-1,
@@ -4997,7 +4960,7 @@ remote_address                      |string		|O			|分布式远程IP地址
     "msg": "success",
     "data": {
         "name": "测试222222",
-        "md5": "60e96b3de4429a711e6e99094f5de2523f2555c8ea1ec5a0e5d7aa2f3fec7428",
+        "url": "https://img.blingabc.com/6a097407cc8640928bb7f8378051f08d.jmx",
         "preCountNumber": 120,
         "preCountTime": 100,
         "loopNum": -1,

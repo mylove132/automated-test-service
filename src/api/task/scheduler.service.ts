@@ -385,7 +385,7 @@ export class SchedulerService {
         //更新md5值
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
 
-        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${jmeter.md5}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
+        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${jmeter}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
         console.log(cmd)
         let flag = true;
         const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {

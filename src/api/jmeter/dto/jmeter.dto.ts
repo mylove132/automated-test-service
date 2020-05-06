@@ -1,13 +1,12 @@
-import {IsArray, IsNotEmpty, IsOptional, IsNumber} from "class-validator";
+import {IsArray, IsNotEmpty, IsOptional, IsNumber, IsUrl} from "class-validator";
 
 export class CreateJmeterDto {
 
+    @IsUrl()
+    url: string;
 
     @IsNotEmpty()
     name: string;
-
-    @IsNotEmpty()
-    md5: string;
 
     @IsNotEmpty()
     preCountNumber: number;
@@ -25,7 +24,6 @@ export class CreateJmeterDto {
 
 
 export class UpdateJmeterDto {
-
 
     @IsNotEmpty()
     id: number;

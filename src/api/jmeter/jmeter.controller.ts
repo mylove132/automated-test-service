@@ -17,12 +17,6 @@ export class JmeterController {
     return this.jmeterService.jmeterDownload();
   }
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  @SetMetadata('isOpen', true)
-  async jmeterUpload(@UploadedFile() file){
-    return await this.jmeterService.uploadFile(file);
-  }
 
   @Post('')
   @SetMetadata('isOpen', true)

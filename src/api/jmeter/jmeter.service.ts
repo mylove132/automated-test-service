@@ -4,15 +4,12 @@ import {Repository} from 'typeorm';
 import * as fs from 'fs';
 import {ConfigService} from "../../config/config.service";
 import {JmeterEntity} from "./jmeter.entity";
-import * as crypto from "crypto";
-import {CommonUtil} from "../../utils/common.util";
 import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto} from "./dto/jmeter.dto";
 import {
     createJmeter,
     deleteJmeterByIds,
     findJmeterById,
     findJmeterByIds,
-    findJmeterByMd5,
     updateJmeterById,
     findJmeterResultList,
     findJmeterList,
@@ -56,19 +53,23 @@ export class JmeterService {
         return fs.readFileSync('/Users/liuzhanhui/lzh/workspace/node/automated-test-service/src/config/request.jmx');
     }
 
-    /**
-     * 上传jmx文件
-     * @param file
-     */
-    async uploadFile(file) {
-        const fileName = file.originalname;
-        const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-        fs.writeFileSync(this.config.jmeterJmxPath + `/${md5}.jmx`, file.buffer);
-        return {
-            fileName: fileName,
-            md5: md5
-        }
-    }
+    // /**
+    //  * 上传jmx文件
+    //  * @param file
+    //  * @param createJmeterDto
+    //  */
+    // async uploadFile(createJmeterDto: CreateJmeterDto) {
+    //     console.log('---------------'+JSON.stringify(createJmeterDto));
+    //     const jmeterObj = new JmeterEntity();
+    //     const fileName = file.originalname;
+    //     jmeterObj.name = fileName;
+    //     jmeterObj.loopNum = createJmeterDto.loopNum;
+    //     jmeterObj.preCountNumber = createJmeterDto.preCountNumber;
+    //     jmeterObj.preCountTime = createJmeterDto.preCountTime;
+    //     jmeterObj.remote_address = createJmeterDto.remote_address;
+    //     return await createJmeter(this.jmeterRepository, createJmeterDto);
+
+    // }
 
 
     /**
@@ -76,17 +77,7 @@ export class JmeterService {
      * @param createJmeterDto
      */
     async createJmeterInfo(createJmeterDto: CreateJmeterDto) {
-        let fileList = fs.readdirSync(this.config.jmeterJmxPath);
-        fileList = fileList.map(file => {
-            return file.split('.')[0]
-        });
-        if (fileList.indexOf(createJmeterDto.md5) == -1) {
-            throw new ApiException(`md5值：${createJmeterDto.md5}文件不存在`,
-                ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.PARTIAL_CONTENT);
-        }
-        const jmeterObj = await findJmeterByMd5(this.jmeterRepository, createJmeterDto.md5);
-        if (jmeterObj) throw new ApiException(`md5值：${createJmeterDto.md5}已存在`,
-            ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        console.log('---------------'+JSON.stringify(createJmeterDto));
         return await createJmeter(this.jmeterRepository, createJmeterDto);
     }
 
@@ -114,15 +105,7 @@ export class JmeterService {
      * @param jmeterIdsDto
      */
     async deleteJmeterInfo(jmeterIdsDto: JmeterIdsDto) {
-        const jmeterList = await findJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
-        jmeterList.forEach(
-            jmeter => {
-                const path = this.config.jmeterJmxPath+`/${jmeter.md5}.jmx`;
-                if (fs.existsSync(path)){
-                    fs.unlinkSync(path);
-                } 
-            }
-        );
+        const jmeterList = await findJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids); 
        return  await deleteJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
     };
 
