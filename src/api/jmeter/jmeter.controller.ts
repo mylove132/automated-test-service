@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Post, Put, SetMetadata, UploadedFile, Use
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {JmeterService} from "./jmeter.service";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto, JmeterIdDto} from "./dto/jmeter.dto";
+import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto} from "./dto/jmeter.dto";
 
 
 @ApiBearerAuth()
@@ -48,11 +48,25 @@ export class JmeterController {
     return this.jmeterService.findResult(md5);
   }
 
+  @Get('jmeterList')
+  @SetMetadata('isOpen', true)
+  async queryJmeterList(@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+    limit = limit > 100 ? 100 : limit;
+    return await this.jmeterService.queryJmeterList(name, {page, limit});
+  }
+
   @Get('jmeterResultList')
   @SetMetadata('isOpen', true)
   async queryJmeterResultList(@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
     limit = limit > 100 ? 100 : limit;
     return await this.jmeterService.queryJmeterResultList(name, {page, limit});
+  }
+
+  @Get('jmeterResultListByJmeterId')
+  @SetMetadata('isOpen', true)
+  async queryJmeterResultListByJmeterId(@Query('jmeterId') jmeterId: number, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+    limit = limit > 100 ? 100 : limit;
+    return await this.jmeterService.queryJmeterResultListByJmeterId(jmeterId, {page, limit});
   }
 
   @Get('watchLog')

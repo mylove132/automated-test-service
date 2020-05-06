@@ -12,7 +12,7 @@ import * as crypto from "crypto";
 import { JmeterResultEntity } from './jmeter_result.entity';
 import { JmeterRunStatus } from 'src/config/base.enum';
 
-@WebSocketGateway(3001)
+@WebSocketGateway(3001, {namespace: 'jmeter'})
 export class JmeterGateway {
 
     @WebSocketServer() server: Server;

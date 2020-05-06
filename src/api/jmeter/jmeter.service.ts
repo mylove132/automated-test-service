@@ -16,7 +16,9 @@ import {
     updateJmeterById,
     updateJmeterMd5ById,
     saveJmeterResult,
-    findJmeterResultList
+    findJmeterResultList,
+    findJmeterList,
+    findJmeterResultListById
 } from "../../datasource/jmeter/jmeter.sql";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
@@ -106,8 +108,6 @@ export class JmeterService {
         if (updateJmeterDto.preCountNumber != null) jmeterObj.preCountNumber = updateJmeterDto.preCountNumber;
         if (updateJmeterDto.preCountTime != null) jmeterObj.preCountTime = updateJmeterDto.preCountTime;
         if (updateJmeterDto.name != null) jmeterObj.name = updateJmeterDto.name;
-        jmeterObj.md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-        fs.copyFileSync(this.config.jmeterJmxPath+'/'+jmeterTmpObj.md5+'.jmx', this.config.jmeterJmxPath+'/'+jmeterObj.md5+'.jmx');
         return await updateJmeterById(this.jmeterRepository, jmeterObj, updateJmeterDto.id);
     }
 
@@ -117,7 +117,6 @@ export class JmeterService {
      */
     async deleteJmeterInfo(jmeterIdsDto: JmeterIdsDto) {
         const jmeterList = await findJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
-
         jmeterList.forEach(
             jmeter => {
                 const path = this.config.jmeterJmxPath+`/${jmeter.md5}.jmx`;
@@ -210,8 +209,34 @@ export class JmeterService {
     }
 
 
+    /**
+     * 查询脚本列表
+     * @param name 
+     * @param options 
+     */
+    async queryJmeterList(name: string, options: IPaginationOptions) {
+        const queryBuilder = findJmeterList(this.jmeterRepository, name);
+        return await paginate<JmeterEntity>(queryBuilder, options);
+    }
+
+    /**
+     * 查询脚本运行结果列表
+     * @param name 
+     * @param options 
+     */
     async queryJmeterResultList(name: string, options: IPaginationOptions) {
         const queryBuilder = findJmeterResultList(this.jmeterResultRepository, name);
+        return await paginate<JmeterResultEntity>(queryBuilder, options);
+    }
+
+
+    /**
+     * 通过jmeterId查询结果
+     * @param id 
+     * @param options 
+     */
+    async queryJmeterResultListByJmeterId(jmeterId: number, options: IPaginationOptions) {
+        const queryBuilder = findJmeterResultListById(this.jmeterResultRepository, jmeterId);
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
 

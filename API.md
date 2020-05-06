@@ -5105,11 +5105,11 @@ data						|object		|R			|&nbsp;
 ### 12.4 运行压测脚本
 - **接口说明：** 通过ID更新压测信息数据
 - **请求方式：** SOCKET
-- **接口地址：** :3001
+- **接口地址：** https://postman.t.blingabc.com/socket/jmeter
 
 #### 12.4.1 请求参数
   
-  上传命令 "jmeter"
+  运行指令 "jmeter"
 
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
@@ -5182,7 +5182,7 @@ data						|object		|R			|&nbsp;
 - **请求方式：** GET
 - **接口地址：** /api/jmeter/watchLog
 
-#### 12.6.1 请求参数
+#### 12.7.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
@@ -5204,12 +5204,12 @@ md5						|string		|R			|执行结果的md5值
 }
 ```
 
-### 12.6 查看所有的脚本执行历史结果列表
+### 12.8 查看所有的脚本执行历史结果列表
 - **接口说明：** 查看某个报告信息
 - **请求方式：** GET
 - **接口地址：** /api/jmeter/jmeterResultList
 
-#### 12.6.1 请求参数
+#### 12.8.1 请求参数
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---	
@@ -5293,7 +5293,169 @@ name						|string		|O			|模糊匹配脚本名称
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|object		|R			|&nbsp;
-&nbsp;&nbsp;&nbsp;url						|string		|R			|报告地址
+
+
+### 12.9 查看所有上传脚本列表
+- **接口说明：** 查看某个报告信息
+- **请求方式：** GET
+- **接口地址：** /api/jmeter/jmeterList
+
+#### 12.9.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+name						|string		|O			|模糊匹配脚本名称
+
+
+请求示例：
+
+```
+/api/jmeter/jmeterList?name=测试
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 20,
+                "name": "测试222222",
+                "createDate": "2020-04-29T02:36:45.968Z",
+                "updateDate": "2020-05-06T03:42:20.123Z",
+                "preCountTime": 100,
+                "preCountNumber": 120,
+                "loopNum": -1,
+                "md5": "b239ea2576394c7f536e389e886c18d31ba1d8ff35d6134bc2108bfea66de8f8",
+                "remote_address": "192.168.6.11"
+            },
+            {
+                "id": 21,
+                "name": "watch",
+                "createDate": "2020-05-01T23:22:27.647Z",
+                "updateDate": "2020-05-05T09:13:03.328Z",
+                "preCountTime": 100,
+                "preCountNumber": 120,
+                "loopNum": 50,
+                "md5": "563ecf6b53017c55928c5f707903d00700dcb2225850fb3bba55bda39584b601",
+                "remote_address": "127.0.0.1"
+            }
+        ],
+        "itemCount": 2,
+        "totalItems": 2,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
+
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
+message						|string		|R			|&nbsp;
+data						|object		|R			|&nbsp;
+
+
+
+### 12.10 查看所有上传脚本列表
+- **接口说明：** 查看某个报告信息
+- **请求方式：** GET
+- **接口地址：** /api/jmeter/jmeterResultListByJmeterId
+
+#### 12.10.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+jmeterId						|number		|R			|上传的脚本ID
+
+
+请求示例：
+
+```
+/api/jmeter/jmeterResultListByJmeterId?jmeterId=22
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 93,
+                "createDate": "2020-05-06T03:57:30.003Z",
+                "md5": "ee1f71929d41eec96442babaa8e5ca6614085b6b2f7d9a3016cae21150312e31",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 92,
+                "createDate": "2020-05-06T03:56:30.263Z",
+                "md5": "26717f2554335d8f514cf1240e4ad25a49927dc3d8e92639bc07d62a9b01f8a5",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 91,
+                "createDate": "2020-05-06T03:54:08.084Z",
+                "md5": "6745ce354ec4e51a9d0f2fc5ec477c4f124fcd429b88ee42a43971d195f4c86c",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 90,
+                "createDate": "2020-05-06T03:53:32.338Z",
+                "md5": "cf4cbf0fc1729c03d2a3efe34fcc9c28eca18ff3acd896bff2931d8e2b93cac4",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 89,
+                "createDate": "2020-05-06T03:50:36.345Z",
+                "md5": "6f8a3cd044dc7fe6837e1863087e3a0107645dea9810b362d073c2c57c441e90",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 88,
+                "createDate": "2020-05-06T03:50:08.630Z",
+                "md5": "d58070b63cfca97eff92ba059fc043907cec479fd922ee8839700a19860bbca9",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 87,
+                "createDate": "2020-05-06T03:47:39.827Z",
+                "md5": "75edf54bfbdae8853046df1b2a23533cc7ff5dd013d104ea9888f9d2883d7c51",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 86,
+                "createDate": "2020-05-06T03:43:21.839Z",
+                "md5": "199ec287cc002c00dfb674cebb180df604fc134f101342bce9d58627feea8c82",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 85,
+                "createDate": "2020-05-06T03:42:41.693Z",
+                "md5": "b239ea2576394c7f536e389e886c18d31ba1d8ff35d6134bc2108bfea66de8f8",
+                "jmeterRunStatus": 3
+            },
+            {
+                "id": 84,
+                "createDate": "2020-05-06T03:42:16.025Z",
+                "md5": "c1cd5c94f823bedbb198f9c01aa80697b47a2ba5eaedb61ea368a3ca87d55f75",
+                "jmeterRunStatus": 3
+            }
+        ],
+        "itemCount": 10,
+        "totalItems": 38,
+        "pageCount": 4,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
 
 
 

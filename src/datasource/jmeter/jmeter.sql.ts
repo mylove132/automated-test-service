@@ -125,6 +125,25 @@ export const saveJmeterResult = async (jmeterResultEntityRepository: Repository<
 };
 
 /**
+ * 查询jmeter脚本列表
+ * @param jmeterResultEntityRepository 
+ * @param name 
+ */
+export const findJmeterList = (jmeterEntityRepository: Repository<JmeterEntity>, name: string) => {
+    return jmeterEntityRepository.createQueryBuilder('jmeter').
+    where(
+        qb => {
+            if (name) {
+                qb.where("jmeter.name LIKE :param")
+                    .setParameters({
+                        param: '%' + name + '%'
+                    })
+            }
+        }
+    ).orderBy('jmeter.updateDate','DESC');
+};
+
+/**
  * 查询执行结果列表，模糊匹配压测脚本
  * @param jmeterResultEntityRepository 
  * @param name 
@@ -142,4 +161,14 @@ export const findJmeterResultList = (jmeterResultEntityRepository: Repository<Jm
             }
         }
     ).orderBy('jmeterResult.createDate','DESC');
+};
+
+/**
+ * 通过jmeterid查询结果
+ * @param jmeterResultEntityRepository 
+ * @param jmeterId 
+ */
+export const findJmeterResultListById = (jmeterResultEntityRepository: Repository<JmeterResultEntity>, jmeterId) => {
+    return jmeterResultEntityRepository.createQueryBuilder('jmeterResult').where('jmeterResult.jmeter = :jmeter',{jmeter: jmeterId})
+    .orderBy('jmeterResult.createDate','DESC');
 };
