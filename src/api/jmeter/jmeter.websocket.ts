@@ -74,6 +74,7 @@ export class JmeterGateway {
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
             }
+            this.server.emit('message', {code: 80000, msg: `end`});
         });
 
     }
