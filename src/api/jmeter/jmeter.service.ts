@@ -6,7 +6,7 @@ import {ConfigService} from "../../config/config.service";
 import {JmeterEntity} from "./jmeter.entity";
 import * as crypto from "crypto";
 import {CommonUtil} from "../../utils/common.util";
-import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto, JmeterIdDto} from "./dto/jmeter.dto";
+import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto} from "./dto/jmeter.dto";
 import {
     createJmeter,
     deleteJmeterByIds,
@@ -14,15 +14,13 @@ import {
     findJmeterByIds,
     findJmeterByMd5,
     updateJmeterById,
-    updateJmeterMd5ById,
-    saveJmeterResult,
     findJmeterResultList,
     findJmeterList,
     findJmeterResultListById
 } from "../../datasource/jmeter/jmeter.sql";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
-import {exec, fork, execSync} from 'child_process';
+import {execSync} from 'child_process';
 import { JmeterResultEntity } from './jmeter_result.entity';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
