@@ -10,10 +10,12 @@ import {CaseEntity} from "../case/case.entity";
 import { QueueModule } from "../queue/queue.module";
 import { TaskResultEntity } from "./task_result.entity";
 import {CatalogEntity} from "../catalog/catalog.entity";
+import { JmeterEntity } from '../jmeter/jmeter.entity';
+import { JmeterResultEntity } from '../jmeter/jmeter_result.entity';
 
 
 @Module({
-    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity, CatalogEntity]),QueueModule, RunModule],
+    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity, CatalogEntity, JmeterEntity, JmeterResultEntity]),QueueModule, RunModule],
     providers: [SchedulerService],
     controllers: [
         SchedulerController
