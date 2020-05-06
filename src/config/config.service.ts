@@ -69,8 +69,6 @@ export class ConfigService {
 
       JMETER_LOG_PATH: Joi.string().required().default(''),
 
-      JMETER_JMX_PATH: Joi.string().required().default(''),
-
       JMETER_HTML_PATH: Joi.string().required().default(''),
 
       DINGTALK_ACCESS_TOKEN: Joi.string().required(),
@@ -184,10 +182,6 @@ export class ConfigService {
 
   get jmeterHtmlPath(): string {
     return this.envConfig.JMETER_HTML_PATH;
-  }
-
-  get jmeterJmxPath(): string {
-    return this.envConfig.JMETER_JMX_PATH;
   }
 
   get jmeterResultUrl(): string {

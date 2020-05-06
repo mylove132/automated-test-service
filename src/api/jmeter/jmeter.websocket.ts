@@ -29,7 +29,6 @@ export class JmeterGateway {
 
         const jmeterBinPath = this.config.jmeterBinPath;
         const jmeterJtlPath = this.config.jmeterJtlPath;
-        const jmeterJmxPath = this.config.jmeterJmxPath;
         const jmeterLogPath = this.config.jmeterLogPath;
 
         const jmeter = await findJmeterById(this.jmeterRepository, data.id);
@@ -44,7 +43,7 @@ export class JmeterGateway {
         const tmpJmxtFilePath = '/tmp/'+md5+'.jmx';
         fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
         //构建命令行
-        const cmd = `${jmeterBinPath} -n -t ${jmeterJmxPath}/${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
+        const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
         console.log(cmd)
         let flag = true;
         //执行命令行
@@ -75,6 +74,7 @@ export class JmeterGateway {
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
             }
+            //删除临时生成的jmx文件
             fs.unlinkSync(tmpJmxtFilePath);
             this.server.emit('message', {code: 80000, msg: `end`});
         });
