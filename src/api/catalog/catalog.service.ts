@@ -10,7 +10,7 @@ import {CommonUtil} from '../../utils/common.util';
 import {PlatformCodeEntity} from "./platformCode.entity";
 import {
     deleteCatalogByIds,
-    findCatalogById, findCatalogByIds,
+    findCatalogById,
     findCatalogByPlatformCodes, findCatalogOfCaseByIds,
     saveCatalog, updateCatalog
 } from '../../datasource/catalog/catalog.sql';
@@ -51,12 +51,12 @@ export class CatalogService {
      * @param platformCode
      * @param isPub
      */
-    async findCatalog(platformCode: string, isPub?: boolean): Promise<CatalogEntity[]> {
+    async findCatalog(platformCode: string): Promise<CatalogEntity[]> {
         let platformCodes = [];
         platformCode.indexOf(',') != -1 ? platformCodes = platformCode.split(',').map(pc => {return pc;}) : platformCodes.push(platformCode);
         const platformIdList = (await findPlatformCodeByCodeList(this.platformRepository, platformCodes)).map(pc => {return pc.id;});
         const result = await findCatalogByPlatformCodes(this.catalogRepository, platformIdList);
-        return CommonUtil.getTree(result, isPub);
+        return CommonUtil.getTree(result);
     }
 
 

@@ -5068,7 +5068,7 @@ data						|object		|R			|&nbsp;
 ### 12.4 运行压测脚本
 - **接口说明：** 通过ID更新压测信息数据
 - **请求方式：** SOCKET
-- **接口地址：** https://postman.t.blingabc.com/socket/jmeter
+- **接口地址：** https://postman.t.blingabc.com/jmeter
 
 #### 12.4.1 请求参数
   

@@ -1,6 +1,6 @@
 import { Md5 } from "ts-md5";
 import { ConfigService } from "../config/config.service";
-import {exec} from 'child_process';
+import * as os from 'os';
 
 export class CommonUtil {
 
@@ -9,7 +9,7 @@ export class CommonUtil {
    * 判断参数是否是数字
    * @param val
    */
-  static isNumber(val) {
+  static isNumber(val: string) {
     var regPos = /^\d+(\.\d+)?$/; //非负浮点数
     var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
     if (regPos.test(val) || regNeg.test(val)) {
@@ -20,7 +20,7 @@ export class CommonUtil {
   }
 
   //生成从minNum到maxNum的随机数
-  static randomNum(minNum, maxNum) {
+  static randomNum(minNum: number, maxNum: number) {
     return Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
   }
 
@@ -28,7 +28,7 @@ export class CommonUtil {
    * 生成随机位数字符串
    * @param len
    */
-  static randomChar(len) {
+  static randomChar(len: number) {
     var chars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
     var tempLen = chars.length, tempStr = "";
     for (var i = 0; i < len; ++i) {
@@ -42,7 +42,7 @@ export class CommonUtil {
    * @param param
    * @param app_key
    */
-  static generateSign(param: string, isProdEnv) {
+  static generateSign(param: string, isProdEnv: boolean) {
     let jsonParam = JSON.parse(param);
     const timeUnix = (Math.round(new Date().getTime() / 1000).toString());
     jsonParam["ts"] = timeUnix;
@@ -58,7 +58,11 @@ export class CommonUtil {
     return { md5: md5.appendAsciiStr(paramValue).end(), ts: timeUnix };
   }
 
-  private static sort_ASCII(obj) {
+  /**
+   * 对象ascii排序
+   * @param obj 
+   */
+  private static sort_ASCII(obj: any) {
     var arr = new Array();
     var num = 0;
     for (var i in obj) {
@@ -74,22 +78,10 @@ export class CommonUtil {
   }
 
   /**
-   * 排序
-   * @param property
-   */
-  static compare(property) {
-    return function(a, b) {
-      var value1 = a[property];
-      var value2 = b[property];
-      return value1 - value2;
-    };
-  }
-
-  /**
    * 处理path
    * @param path
    */
-  static handlePath(path) {
+  static handlePath(path: string) {
     if (path.charAt(0) != "/") path = "/" + path;
     return path;
   }
@@ -98,7 +90,7 @@ export class CommonUtil {
    * 处理url
    * @param url
    */
-  static handleUrl(url) {
+  static handleUrl(url: string) {
     url = url.charAt(url.length - 1) == "/" ? url.substr(0, url.length - 1) : url;
     return url;
   }
@@ -108,7 +100,7 @@ export class CommonUtil {
    * @param oldArr
    * @param isPub
    */
-  static getTree(oldArr, isPub) {
+  static getTree(oldArr: any) {
     oldArr.forEach(element => {
       let parentId = element.parentId;
       if (parentId !== 0) {
@@ -122,34 +114,31 @@ export class CommonUtil {
         });
       }
     });
-    if (isPub == null) {
-      oldArr = oldArr.filter(ele => ele.parentId === null); //这一步是过滤，按树展开，将多余的数组剔除；
-      return oldArr;
-    }
-    oldArr = oldArr.filter(ele => {
-      const x = isPub === "true" ? true : false;
-      return (ele.parentId === null && ele.isPub === x);
-    }); //这一步是过滤，按树展开，将多余的数组剔除；
+    oldArr = oldArr.filter(ele => ele.parentId === null); //这一步是过滤，按树展开，将多余的数组剔除；
     return oldArr;
   }
 
 
-  static getTokenFromResult(data) {
-    let token;
-      for (var key in data) {
-        if (token) {
+  /**
+   * 递归查询登录返回的token值
+   * @param data 
+   */
+  static getTokenFromResult(data: any) {
+    let token: string;
+    for (var key in data) {
+      if (token) {
+        break
+      }
+      if (data.hasOwnProperty(key) === true) {
+        if (key === "token") {
+          token = data[key];
           break
-        }
-        if (data.hasOwnProperty(key) === true) {
-          if (key === "token") {
-            token = data[key];
-            break
-          } else {
-            if (data[key] instanceof Object) {
-              token = this.getTokenFromResult(data[key]);
-            }
+        } else {
+          if (data[key] instanceof Object) {
+            token = this.getTokenFromResult(data[key]);
           }
         }
+      }
     }
     if (token) {
       return token;
@@ -158,19 +147,31 @@ export class CommonUtil {
     }
   }
 
-  static execCmd(cmd: string){
-    exec(cmd,(err, stdout, stderr)=>{
-      console.log(stdout);
-        }
-    )
+
+
+  /**
+   * 打印信息
+   * @param meg 
+   */
+  static printLog2(meg: any) {
+    console.log("---------------------------------------------------" + meg);
   }
 
-  static printLog2(meg) {
-    console.log("-----------------------------" + meg);
+  /**
+   * 打印信息
+   * @param meg 
+   */
+  static printLog1(meg: any) {
+    console.log("***************************************************" + meg);
   }
 
-  static printLog1(meg) {
-    console.log("-----------**********************------------------" + meg);
+
+  /**
+   * 获取操作系统信息
+   */
+  getOperatingSystem() {
+    return os.totalmem();
   }
+
 
 }

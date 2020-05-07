@@ -1,28 +1,28 @@
-import {HttpStatus, Injectable} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
-import {CaseEntity} from "../case/case.entity";
-import {CovertDto, RunCaseDto} from "./dto/run.dto";
-import {CurlService} from "../curl/curl.service";
-import {EnvService} from "../env/env.service";
-import {ApiException} from "../../shared/exceptions/api.exception";
-import {ApiErrorCode} from "../../shared/enums/api.error.code";
-import {AxiosRequestConfig} from "axios";
-import {getAssertObjectValue, getRequestMethodTypeString} from "../../utils";
-import {HistoryService} from "../history/history.service";
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { CaseEntity } from "../case/case.entity";
+import { CovertDto, RunCaseDto } from "./dto/run.dto";
+import { CurlService } from "../curl/curl.service";
+import { EnvService } from "../env/env.service";
+import { ApiException } from "../../shared/exceptions/api.exception";
+import { ApiErrorCode } from "../../shared/enums/api.error.code";
+import { AxiosRequestConfig } from "axios";
+import { getAssertObjectValue, getRequestMethodTypeString } from "../../utils";
+import { HistoryService } from "../history/history.service";
 import * as FormData from "form-data";
 import * as request from "request";
-import {IRunCaseById} from "./run.interface";
-import {TokenEntity} from "../token/token.entity";
-import {findTokenById} from "../../datasource/token/token.sql";
+import { IRunCaseById } from "./run.interface";
+import { TokenEntity } from "../token/token.entity";
+import { findTokenById } from "../../datasource/token/token.sql";
 import {
   findCaseByAlias,
   findCaseOfAssertTypeAndAssertJudgeById,
   findCaseOfEndpointAndTokenById
 } from "../../datasource/case/case.sql";
-import {InjectQueue} from "@nestjs/bull";
-import {Queue} from "bull";
-import {ParamType} from "../../config/base.enum";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
+import { ParamType } from "../../config/base.enum";
 import { CommonUtil } from "../../utils/common.util";
 
 
@@ -94,10 +94,10 @@ export class RunService {
       requestData.method = this.parseRequestMethod(runCaseDto);
       requestData.headers = headers;
       requestData.url = url;
-      CommonUtil.printLog2('接口请求参数:'+JSON.stringify(requestData))
+      CommonUtil.printLog2('接口请求参数:' + JSON.stringify(requestData))
       const result = await this.curlService.makeRequest(requestData).toPromise();
       const endTime = new Date();
-      resultObj['cas'] = {caseName: caseObj.name,catalogName: caseObj.catalog.name};
+      resultObj['cas'] = { caseName: caseObj.name, catalogName: caseObj.catalog.name };
       resultObj["endTime"] = endTime;
       const rumTime = endTime.getTime() - startTime.getTime();
       resultObj["rumTime"] = rumTime;
@@ -140,9 +140,9 @@ export class RunService {
         }
       );
 
-    console.log("接口执行返回结果：" + JSON.stringify(resultObj));
-    resultList.push(resultObj);
-  }
+      console.log("接口执行返回结果：" + JSON.stringify(resultObj));
+      resultList.push(resultObj);
+    }
     return resultList;
   }
 
@@ -211,7 +211,7 @@ export class RunService {
       const form = RunService.generateFileStream("file", JSON.parse(runCaseDto.param)["file"]);
       return form;
     } else {
-      if (runCaseDto.param){
+      if (runCaseDto.param) {
         const vParams = JSON.parse(runCaseDto.param);
         return await this.analysisParam(vParams, endpoint);
       }
@@ -259,31 +259,36 @@ export class RunService {
 
         //匹配参数中的级联调用
         else if (regData.startsWith("alias") != -1) {
-            const regData = value.toString().replace(paramReg, "$1");
-            const alias = regData.split(".")[0];
-            const dataName = regData.split(".")[1];
+          const regData = value.toString().replace(paramReg, "$1");
+          const alias = regData.split(".")[0];
+          const dataName = regData.split(".")[1];
 
-            const caseInstance = await findCaseByAlias(this.caseRepository, alias);
-            if (!caseInstance) {
-              throw new ApiException(`别名:${alias}不存在`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-            }
-            if (!this.tmpResult[alias]) {
-              const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
-              this.tmpResult[alias] = runResult;
-            }
-            CommonUtil.printLog2('执行别名结果集合:'+JSON.stringify(this.tmpResult))
-            const newVal = regData.substr(alias.length+1,regData.length-1).replace(dataName, "data");
-            const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
-            CommonUtil.printLog2('alias:'+alias+"-------"+paramValue)
-            param[paramsKey] = paramValue;
+          const caseInstance = await findCaseByAlias(this.caseRepository, alias);
+          if (!caseInstance) {
+            throw new ApiException(`别名:${alias}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
           }
+          if (!this.tmpResult[alias]) {
+            const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
+            this.tmpResult[alias] = runResult;
+          }
+          CommonUtil.printLog2('执行别名结果集合:' + JSON.stringify(this.tmpResult))
+          const newVal = regData.substr(alias.length + 1, regData.length - 1).replace(dataName, "data");
+          const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
+          CommonUtil.printLog2('alias:' + alias + "-------" + paramValue)
+          param[paramsKey] = paramValue;
+        }
       }
     }
     return param;
   }
 
 
-  private async runCaseByCaseInstance(caseInstance: CaseEntity, endpoint) {
+  /**
+   * 
+   * @param caseInstance 递归执行场景接口
+   * @param endpoint 
+   */
+  private async runCaseByCaseInstance(caseInstance: CaseEntity, endpoint: string) {
     const runCaseDto: RunCaseDto = Object.assign({}, caseInstance, {
       endpoint: endpoint,
       type: String(caseInstance.type),
@@ -298,10 +303,10 @@ export class RunService {
     requestData.headers = headers;
     requestData.url = url;
     const result = await this.curlService.makeRequest(requestData).toPromise();
-    if (result.result){
+    if (result.result) {
       return result.data;
     } else {
-      throw new ApiException(`运行接口：${caseInstance.name}失败`,ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+      throw new ApiException(`运行接口：${caseInstance.name}失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -318,7 +323,7 @@ export class RunService {
    * @param covertDto
    */
   async covertCurl(covertDto: CovertDto) {
-    let type;
+    let type: string;
     switch (covertDto.type) {
       case 0:
         type = "GET";
@@ -332,7 +337,7 @@ export class RunService {
       default:
         type = "GET";
     }
-    let ht;
+    let ht: string;
     if (covertDto.header != null) {
       const header: Map<String, Object> = JSON.parse(covertDto.header);
       header.forEach(
@@ -348,7 +353,7 @@ export class RunService {
       args = "";
     }
 
-    let result;
+    let result: string;
     result = `curl -g -i -X ${type} ${covertDto.url} ${ht} -d ${args}`;
 
     return result;
