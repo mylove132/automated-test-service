@@ -153,6 +153,24 @@ export const updateEnv = async (entityRepository: Repository<EnvEntity>, envObj,
     )
 };
 
+
+/**
+ * 更新endpoint
+ * @param endpointEntity 
+ * @param endpoint 
+ */
+export const updateEndPoint = async (endpointEntity: Repository<EndpointEntity>, endpoint: EndpointEntity) => {
+    return await endpointEntity.update(endpoint.id, endpoint).
+    catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    )
+};
+
+
+
 /**
  * 添加环境
  * @param entityRepository

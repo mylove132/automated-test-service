@@ -5,6 +5,7 @@ import { EnvEntity } from "./env.entity";
 import { AddEndpointDto, DeleteEndpointDto, DeleteEnvDto } from "./dto/env.dto";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
 import {OperateModule, OperateType} from "../../config/base.enum";
+import { EndpointEntity } from "./endpoint.entity";
 
 @ApiBearerAuth()
 @ApiUseTags('env')
@@ -38,6 +39,16 @@ export class EnvController {
     @Put()
     async updateEnv(@Body() envEntity: EnvEntity) {
         return this.envService.updateEnv(envEntity);
+    }
+
+    @OpeModule(OperateModule.ENDPOINT)
+    @OpeType(OperateType.UPDATE)
+    @OperateDesc('')
+    @ApiOperation({ title: 'update endpoint' })
+    @ApiResponse({ status: 200, description: 'update endpoint success.'})
+    @Put('endpoint')
+    async updateEndpoint(@Body() endpointEntity: EndpointEntity) {
+        return this.envService.updateEndpointService(endpointEntity);
     }
 
    @OpeModule(OperateModule.ENV)

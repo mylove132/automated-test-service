@@ -15,7 +15,8 @@ import {
     deleteEnvByIds, findAllEndpoints,
     findAllEnv, findEndpointByEnvIds, findEndpointInstanceByEndpoint, findEndpoints,
     findEnvById, findEnvByIds, saveEndpoint,
-    updateEnv
+    updateEnv,
+    updateEndPoint
 } from "../../datasource/env/env.sql";
 
 export class EnvService {
@@ -58,6 +59,12 @@ export class EnvService {
         envObj.name = env.name;
         return await updateEnv(this.envRepository, envObj, env.id);
     }
+
+    async updateEndpointService(endpoint: EndpointEntity){
+        return await updateEndPoint(this.endpointgRepository, endpoint);
+    }
+
+    
 
     /**
      * 删除环境
