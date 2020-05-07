@@ -50,7 +50,7 @@ export class JmeterGateway {
         const child = exec(cmd, {killSignal: "SIGINT"}, async (error, stdout, stderr) => {
             if (error) {
                 flag = false;
-                this.server.emit('message', {code: 80001, msg: error.stack});
+                this.server.emit('message', {code: 80001,id: data.id, msg: error.stack});
                 const jmeterResult = new JmeterResultEntity();
                 jmeterResult.jmeter = jmeter;
                 jmeterResult.md5 = md5;
@@ -62,7 +62,7 @@ export class JmeterGateway {
 
         //监听返回记录
         child.stdout.on("data", (data) => {
-            this.server.emit('message', {code: 0, msg: data});
+            this.server.emit('message', {code: 0, id: data.id, msg: data});
         });
 
         //监听结束
@@ -76,7 +76,7 @@ export class JmeterGateway {
             }
             //删除临时生成的jmx文件
             //fs.unlinkSync(tmpJmxtFilePath);
-            this.server.emit('message', {code: 80000, msg: `end`});
+            this.server.emit('message', {code: 80000, id: data.id, msg: `end`});
         });
 
     }

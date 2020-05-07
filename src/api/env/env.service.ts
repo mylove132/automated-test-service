@@ -60,6 +60,10 @@ export class EnvService {
         return await updateEnv(this.envRepository, envObj, env.id);
     }
 
+    /**
+     * 更新endpoint
+     * @param endpoint 
+     */
     async updateEndpointService(endpoint: EndpointEntity){
         return await updateEndPoint(this.endpointgRepository, endpoint);
     }
@@ -136,35 +140,65 @@ export class EnvService {
         if (!reg.test(endpoint)) {
             return endpoint
         }
-        let result = '';
+        //let result = '';
         const envData = await findEnvById(this.envRepository, envId);
         let urlList: any = endpoint.split('.');
-        // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
-        if (urlList.length == 3) { // 生产环境
-            urlList.splice(1, 0, '', 't');
-        } else { // 长度为4则为测试环境
-            const tempList = urlList[0].split('-');
-            if (tempList.length == 1) {
-                urlList.splice(1, 0, '');
-            } else {
-                urlList[0] = urlList[0].split('-');
-                // urlList = urlList.flat();
-                urlList.splice(0, 1, ...urlList[0])
+
+        //处理test环境
+        if (envData.name == 'test') {
+            if (urlList[0].indexOf('-') != -1) {
+                urlList[0].split('-').splice(1,1);
             }
+            if (urlList.indexOf('t') == -1) {
+                urlList.splice(1,0,'t');
+            }
+            return urlList.join('');
         }
-        switch(envData.name) {
-            case 'test':
-                urlList.splice(1, 1);
-                result = urlList.join('.');
-                break;
-            case 'prod':
-                urlList.splice(1, 2);
-                result = urlList.join('.');
-                break;
-            default:
-                result = `${urlList[0]}-${envData.name}.` + urlList.splice(2).join('.');
-                break;
+         //处理prod环境
+        if (envData.name == 'prod') {
+            if (urlList[0].indexOf('-') != -1) {
+                urlList[0].split('-').splice(1,1);
+            }
+            if (urlList.indexOf('t') != -1) {
+                urlList.splice(1,1);
+            }
+            return urlList.join('');
         }
-        return result
+        //处理测试环境
+        if (urlList[0].indexOf('-') != -1) {
+            urlList[0].split('-').splice(1,1,envData.name);
+        } else {
+            urlList[0] = urlList[0] += '-' + envData.name;
+        }
+        return urlList.join('');
+
+
+        // // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
+        // if (urlList.length == 3 && urlList[0].indexOf('-') == -1) { // 生产环境
+        //     urlList.splice(1, 0, '', 't');
+        // } else { // 长度为4则为测试环境
+        //     const tempList = urlList[0].split('-');
+        //     if (tempList.length == 1) {
+        //         urlList.splice(1, 0, '');
+        //     } else {
+        //         urlList[0] = urlList[0].split('-');
+        //         // urlList = urlList.flat();
+        //         urlList.splice(0, 1, ...urlList[0])
+        //     }
+        // }
+        // switch(envData.name) {
+        //     case 'test':
+        //         urlList.splice(1, 1);
+        //         result = urlList.join('.');
+        //         break;
+        //     case 'prod':
+        //         urlList.splice(1, 2);
+        //         result = urlList.join('.');
+        //         break;
+        //     default:
+        //         result = `${urlList[0]}-${envData.name}.` + urlList.splice(2).join('.');
+        //         break;
+        // }
+        // return result
     }
 }
