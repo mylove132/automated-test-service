@@ -35,7 +35,7 @@ export class JmeterGateway {
         const jmeterCountNum = jmeter.preCountNumber;
         const preCountTime = jmeter.preCountTime;
         const loopNum = jmeter.loopNum;
-        const remote_address = jmeter.remote_address == null ? '' : '-R ' + jmeter.remote_address;
+        const remote_address = jmeter.remote_address == null ? '' : `-R ${jmeter.remote_address}`;
 
        
         //创建临时jmx文件
