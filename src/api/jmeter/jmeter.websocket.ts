@@ -35,7 +35,7 @@ export class JmeterGateway {
         const jmeterCountNum = jmeter.preCountNumber;
         const preCountTime = jmeter.preCountTime;
         const loopNum = jmeter.loopNum;
-        const remote_address = jmeter.remote_address == null ? '' : `-R ${jmeter.remote_address}`;
+        const remote_address = jmeter.remote_address == null ? '' : '-R '+jmeter.remote_address;
 
        
         //创建临时jmx文件
@@ -75,7 +75,7 @@ export class JmeterGateway {
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
             }
             //删除临时生成的jmx文件
-            fs.unlinkSync(tmpJmxtFilePath);
+            //fs.unlinkSync(tmpJmxtFilePath);
             this.server.emit('message', {code: 80000, msg: `end`});
         });
 
