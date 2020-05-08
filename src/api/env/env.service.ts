@@ -147,30 +147,33 @@ export class EnvService {
         //处理test环境
         if (envData.name == 'test') {
             if (urlList[0].indexOf('-') != -1) {
-                urlList[0].split('-').splice(1,1);
+                urlList[0] = urlList[0].split('-')[0];
             }
             if (urlList.indexOf('t') == -1) {
                 urlList.splice(1,0,'t');
             }
-            return urlList.join('');
+            
+            return urlList.join('.');
         }
          //处理prod环境
         if (envData.name == 'prod') {
             if (urlList[0].indexOf('-') != -1) {
-                urlList[0].split('-').splice(1,1);
+                urlList[0] = urlList[0].split('-')[0];
             }
             if (urlList.indexOf('t') != -1) {
                 urlList.splice(1,1);
             }
-            return urlList.join('');
+            return urlList.join('.');
         }
         //处理测试环境
         if (urlList[0].indexOf('-') != -1) {
-            urlList[0].split('-').splice(1,1,envData.name);
+            const tmpList = urlList[0].split('-');
+            tmpList.splice(1,1,envData.name);
+            urlList[0] = tmpList.join('-');
         } else {
             urlList[0] = urlList[0] += '-' + envData.name;
         }
-        return urlList.join('');
+        return urlList.join('.');
 
 
         // // 目的分成5段 例如：['https://oapi', 'smix1', 't', 'blingabc', 'com']
