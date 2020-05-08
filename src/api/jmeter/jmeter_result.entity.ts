@@ -22,8 +22,8 @@ export class JmeterResultEntity {
     @ManyToOne(type => JmeterEntity, jmeter => jmeter.jmeterResults,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     jmeter: JmeterEntity;
 
-    @Column()
-    md5: string;
+     @Column()
+     md5: string;
 
     @Column('enum', {default: JmeterRunStatus.STATELESS, nullable:false, comment: '脚本运行状态', enum: JmeterRunStatus})
     jmeterRunStatus: JmeterRunStatus;

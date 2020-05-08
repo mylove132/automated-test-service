@@ -87,8 +87,8 @@ export class CaseEntity {
     @Column({nullable: true})
     alias: string;
 
-    @ManyToOne(type => JmeterEntity, jmeter => jmeter.cases,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
-    jmeter: JmeterEntity;
+    // @ManyToOne(type => JmeterEntity, jmeter => jmeter.cases,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
+    // jmeter: JmeterEntity;
 
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     token: TokenEntity;

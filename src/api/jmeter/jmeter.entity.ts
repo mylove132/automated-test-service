@@ -31,8 +31,8 @@ export class JmeterEntity {
     @Column({nullable: true})
     url: string;
 
-    @OneToMany(type => CaseEntity, cases => cases.jmeter)
-    cases: CaseEntity[];
+    // @OneToMany(type => CaseEntity, cases => cases.jmeter)
+    // cases: CaseEntity[];
 
     @Column({nullable: true})
     remote_address: string;
