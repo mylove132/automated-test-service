@@ -65,7 +65,7 @@ export class CaseEntity {
     @ManyToOne(type => AssertJudgeEntity, assertJudge => assertJudge.cases, {cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     assertJudge: AssertJudgeEntity;
 
-    @Column({comment: '断言内容'})
+    @Column({comment: '断言内容',nullable: true})
     assertText: string;
 
     @Column({name:'assertKey',nullable:true,comment: '断言key值'})

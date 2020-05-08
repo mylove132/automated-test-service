@@ -343,7 +343,7 @@ export class SchedulerService {
      * @param cron
      * @param md5
      */
-    private async runSingleTask(caseIds: number[], envId, cron, md5) {
+    private async runSingleTask(caseIds: number[], envId: number, cron: string, md5: string) {
         CommonUtil.printLog2(caseIds)
         const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
         const job = new CronJob(cron, async () => {
@@ -382,10 +382,9 @@ export class SchedulerService {
         const loopNum = jmeter.loopNum;
         const remote_address = jmeter.remote_address == null ? '' : '-R ' + jmeter.remote_address;
 
-    
+
         //更新md5值
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-
         const cmd = `${jmeterBinPath} -n -t ${jmeter}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
         console.log(cmd)
         let flag = true;
@@ -414,7 +413,7 @@ export class SchedulerService {
     }
 
 
-    private isExistTask(md5) {
+    private isExistTask(md5: string) {
         try {
             this.schedulerRegistry.getCronJob(md5);
             return true;
