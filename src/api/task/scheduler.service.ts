@@ -1,4 +1,4 @@
-import { SchedulerRegistry } from "@nestjs/schedule";
+import { SchedulerRegistry, Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ApiException } from "../../shared/exceptions/api.exception";
@@ -92,7 +92,7 @@ export class SchedulerService {
             for (const id of taskIdsDto.ids) {
                 const schObj = await findScheduleById(this.scheRepository, id);
                 if (schObj.status == RunStatus.RUNNING) this.schedulerRegistry.deleteCronJob(schObj.md5);
-                const delSchedulerObj = await deleteSchedulerById(this.scheRepository, RunStatus.DELETE, id);
+                await deleteSchedulerById(this.scheRepository, id);
             }
         } catch (e) {
             throw new HttpException("定时任务删除异常", HttpStatus.BAD_REQUEST);
@@ -306,7 +306,7 @@ export class SchedulerService {
      * 排查定时任务库，确认定时任务是否存活
      *
      */
-    //@Cron("* * * * * *", { name: "checkStatus" })
+    @Cron("* */10 * * * *", { name: "checkStatus" })
     async checkJobRunStatus() {
         //console.log('------------------------排查定时任务--------------------')
         const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);
