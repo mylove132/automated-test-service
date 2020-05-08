@@ -91,10 +91,12 @@ export class SchedulerService {
         try {
             for (const id of taskIdsDto.ids) {
                 const schObj = await findScheduleById(this.scheRepository, id);
+                console.log(JSON.stringify(schObj))
                 if (schObj.status == RunStatus.RUNNING) this.schedulerRegistry.deleteCronJob(schObj.md5);
                 await deleteSchedulerById(this.scheRepository, id);
             }
         } catch (e) {
+            console.log(e)
             throw new HttpException("定时任务删除异常", HttpStatus.BAD_REQUEST);
         }
         return { status: true };
@@ -306,7 +308,7 @@ export class SchedulerService {
      * 排查定时任务库，确认定时任务是否存活
      *
      */
-    @Cron("* */10 * * * *", { name: "checkStatus" })
+    //@Cron("* */10 * * * *", { name: "checkStatus" })
     async checkJobRunStatus() {
         //console.log('------------------------排查定时任务--------------------')
         const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);

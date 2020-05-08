@@ -52,7 +52,6 @@ export class SchedulerController {
     return this.schedulerService.stopJob(taskIdsDto);
   }
 
-  z;
 
   @OpeModule(OperateModule.TASK)
   @OpeType(OperateType.STOPTASK)
@@ -93,7 +92,7 @@ export class SchedulerController {
 
   @Get("/taskResult/:id")
   @SetMetadata('isOpen', true)
-  async getTaskResultById(@Param('id') id) {
+  async getTaskResultById(@Param('id') id: number) {
     return this.schedulerService.getTaskResultByIdService(id);
   }
 

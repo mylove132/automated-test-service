@@ -83,7 +83,7 @@ export const findScheduleListByStatus = async (schedulerRepository: Repository<S
  * @param schedulerRepository
  * @param id
  */
-export const findScheduleById = async (schedulerRepository: Repository<SchedulerEntity>, id) => {
+export const findScheduleById = async (schedulerRepository: Repository<SchedulerEntity>, id: number) => {
     return await schedulerRepository.findOne(id).catch(
         err => {
             console.log(err);
@@ -161,7 +161,7 @@ export const updateSchedulerRunStatus = async (schedulerRepository: Repository<S
  * @param runStatus
  * @param id
  */
-export const deleteSchedulerById = async (schedulerRepository: Repository<SchedulerEntity>, id) => {
+export const deleteSchedulerById = async (schedulerRepository: Repository<SchedulerEntity>, id: number) => {
     return await schedulerRepository.delete(id).catch(
         err => {
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
