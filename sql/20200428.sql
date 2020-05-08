@@ -8,4 +8,4 @@ ALTER TABLE "jmeter" ADD "url" string;
 ALTER TABLE "secheduler_catalogs_catalog" DROP CONSTRAINT "FK_0b156f1316d0acaaf7310fc61b1";
 ALTER TABLE "secheduler_catalogs_catalog" DROP CONSTRAINT "FK_c8170a590fb4460220c9f2cae30";
 ALTER TABLE "secheduler_catalogs_catalog" ADD CONSTRAINT "FK_c8170a590fb4460220c9f2cae30" FOREIGN KEY ("sechedulerId") REFERENCES "secheduler"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
-ALTER TABLE "secheduler_catalogs_catalog" ADD CONSTRAINT "FK_0b156f1316d0acaaf7310fc61b1" FOREIGN KEY ("catalogId") REFERENCES "catalog"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "secheduler_catalogs_catalog" ADD CONSTRAINT "FK_0b156f1316d0acaaf7310fc61b1" FOREIGN KEY ("catalogId") REFERENCES "catalog"("id") ON DELETE CASCADE ON UPDATE NO ACTION

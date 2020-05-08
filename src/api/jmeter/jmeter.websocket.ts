@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { ConfigService } from "../../config/config.service";
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { Server } from 'socket.io';
 import { findJmeterById, saveJmeterResult } from 'src/datasource/jmeter/jmeter.sql';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +12,7 @@ import { JmeterResultEntity } from './jmeter_result.entity';
 import { JmeterRunStatus } from 'src/config/base.enum';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/common';
-@WebSocketGateway(3001, {namespace: 'jmeter', origins:'*:*'})
+@WebSocketGateway(3001, { namespace: 'jmeter', origins: '*:*' })
 export class JmeterGateway {
 
     @WebSocketServer() server: Server;
@@ -35,48 +35,58 @@ export class JmeterGateway {
         const jmeterCountNum = jmeter.preCountNumber;
         const preCountTime = jmeter.preCountTime;
         const loopNum = jmeter.loopNum;
-        const remote_address = jmeter.remote_address == null ? '' : '-R '+jmeter.remote_address;
+        const remote_address = jmeter.remote_address == null || jmeter.remote_address == '' ? '' : '-R ' + jmeter.remote_address;
 
-       
-        //创建临时jmx文件
+
+        //创建临时文件
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-        const tmpJmxtFilePath = '/tmp/'+md5+'.jmx';
+        const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
+        const tmpJtlFilePath = '/tmp/' + md5 + '.jtl';
+        const tmpLogFilePath = '/tmp/' + md5 + '.log';
         fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
+
         //构建命令行
-        const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
+        const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address}`;
         console.log(cmd)
-        let flag = true;
         //执行命令行
-        const child = exec(cmd, {killSignal: "SIGINT"}, async (error, stdout, stderr) => {
+        const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {
             if (error) {
-                flag = false;
-                this.server.emit('message', {code: 80001,id: data.id, msg: error.stack});
+                this.server.emit('message', { code: 80001, id: data.id, msg: error.stack });
+            }
+        });
+        //监听返回记录
+        child.stdout.on("data", (data) => {
+            this.server.emit('message', { code: 0, id: data.id, msg: data });
+        });
+        //监听结束
+        child.stdout.on("close", async () => {
+            if (!fs.existsSync(jmeterJtlPath + `/${md5}.jtl`)) {
                 const jmeterResult = new JmeterResultEntity();
                 jmeterResult.jmeter = jmeter;
                 jmeterResult.md5 = md5;
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FAIL;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
-                child.kill("SIGINT");
             }
-        });
-
-        //监听返回记录
-        child.stdout.on("data", (data) => {
-            this.server.emit('message', {code: 0, id: data.id, msg: data});
-        });
-
-        //监听结束
-        child.stdout.on("close", async () => {
-            if (flag) {
+            else {
                 const jmeterResult = new JmeterResultEntity();
                 jmeterResult.jmeter = jmeter;
                 jmeterResult.md5 = md5;
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+                //copy运行结果到远程服务器
+                const copyJtl = `scp -r ${tmpJtlFilePath}  ${jmeterJtlPath}`;
+                execSync(copyJtl);
+                //删除本地的数据
+                fs.unlinkSync(tmpJtlFilePath);
             }
-            //删除临时生成的jmx文件
-            //fs.unlinkSync(tmpJmxtFilePath);
-            this.server.emit('message', {code: 80000, id: data.id, msg: `end`});
+            //copy压测信息到远程服务器
+            const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
+            execSync(copyLog);
+            //删除临时生成的压测文件
+            fs.unlinkSync(tmpJmxtFilePath);
+            fs.unlinkSync(tmpLogFilePath);
+
+            this.server.emit('message', { code: 80000, id: data.id, msg: `end` });
         });
 
     }
