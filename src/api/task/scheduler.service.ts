@@ -415,7 +415,7 @@ export class SchedulerService {
 
 
     /**
-     * 检查定时任务是否存在
+     * 
      * @param md5 
      */
     private isExistTask(md5: string) {
@@ -435,7 +435,11 @@ export class SchedulerService {
      */
     async getAllTaskResult(schedulerId: number, options: IPaginationOptions) {
         let queryBuilder = await findAllTaskResult(this.taskResultRepository, schedulerId);
-        return (await paginate<TaskResultEntity>(queryBuilder, options)).items.map(obj => { return JSON.parse(obj.result) });
+        const data = await paginate<TaskResultEntity>(queryBuilder, options);
+        for (let item of data.items) {
+            item.result = JSON.parse(item.result);
+        }
+        return data;
     }
 
     /**
