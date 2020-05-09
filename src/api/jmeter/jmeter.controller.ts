@@ -1,7 +1,6 @@
 import {Body, Controller, Delete, Get, Post, Put, SetMetadata, UploadedFile, UseInterceptors, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiUseTags} from '@nestjs/swagger';
 import {JmeterService} from "./jmeter.service";
-import {FileInterceptor} from "@nestjs/platform-express";
 import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto} from "./dto/jmeter.dto";
 
 

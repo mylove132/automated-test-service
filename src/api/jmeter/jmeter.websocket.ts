@@ -41,8 +41,8 @@ export class JmeterGateway {
         //创建临时文件
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
         const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
-        const tmpJtlFilePath = '/tmp/' + md5 + '.jtl';
-        const tmpLogFilePath = '/tmp/' + md5 + '.log';
+        const tmpJtlFilePath = jmeterJtlPath + md5 + '.jtl';
+        const tmpLogFilePath = jmeterLogPath + md5 + '.log';
         fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
 
         //构建命令行
@@ -74,17 +74,17 @@ export class JmeterGateway {
                 jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
                 await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
                 //copy运行结果到远程服务器
-                const copyJtl = `scp -r ${tmpJtlFilePath}  ${jmeterJtlPath}`;
-                execSync(copyJtl);
+                //const copyJtl = `scp -r ${tmpJtlFilePath}  ${jmeterJtlPath}`;
+                //execSync(copyJtl);
                 //删除本地的数据
-                fs.unlinkSync(tmpJtlFilePath);
+                //fs.unlinkSync(tmpJtlFilePath);
             }
             //copy压测信息到远程服务器
-            const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
-            execSync(copyLog);
+            //const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
+            //execSync(copyLog);
             //删除临时生成的压测文件
             fs.unlinkSync(tmpJmxtFilePath);
-            fs.unlinkSync(tmpLogFilePath);
+            //fs.unlinkSync(tmpLogFilePath);
 
             this.server.emit('message', { code: 80000, id: data.id, msg: `end` });
         });

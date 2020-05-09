@@ -39,9 +39,9 @@ export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEn
  * @param ids
  */
 export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids) => {
-    return await jmeterEntityRepository.createQueryBuilder().
-    where('id IN (:...ids)',{ids: ids}).
-    andWhere('isRealDelete = :isRealDelete', {isRealDelete: false}).
+    return await jmeterEntityRepository.createQueryBuilder('jmeter').
+    where('jmeter.id IN (:...ids)',{ids: ids}).
+    andWhere('jmeter.isRealDelete = :isRealDelete', {isRealDelete: false}).
     getMany().
     catch(
         err => {
@@ -75,7 +75,9 @@ export const updateJmeterById = async (jmeterEntityRepository: Repository<Jmeter
  * @param ids
  */
 export const deleteJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids: any) => {
-    return await jmeterEntityRepository.update(ids, {isRealDelete: true}).catch(
+    return await jmeterEntityRepository.createQueryBuilder('jmeter').update().set({
+        isRealDelete: true
+    }).where('jmeter.id IN (:...ids)',{ids: ids}).execute().catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
