@@ -187,9 +187,16 @@ export const saveTaskResult = async (taskResultRepository: Repository<TaskResult
  * 查询所有的定时任务执行记录
  * @param taskResultRepository
  */
-export const findAllTaskResult = async (taskResultRepository: Repository<TaskResultEntity>) => {
+export const findAllTaskResult = async (taskResultRepository: Repository<TaskResultEntity>, schedulerId: number) => {
     return taskResultRepository.createQueryBuilder('taskResult').
     leftJoinAndSelect('taskResult.scheduler','scheduler').
+    where(
+      qb => {
+        if (schedulerId) {
+          qb.where('scheduler.id = :schedulerId',{schedulerId: schedulerId});
+        }
+      }
+    ).
     orderBy("taskResult.createDate", "DESC");
 };
 

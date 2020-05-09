@@ -413,6 +413,11 @@ export class SchedulerService {
     }
 
 
+
+    /**
+     * 检查定时任务是否存在
+     * @param md5 
+     */
     private isExistTask(md5: string) {
         try {
             this.schedulerRegistry.getCronJob(md5);
@@ -423,8 +428,13 @@ export class SchedulerService {
     }
 
 
-    async getAllTaskResult(options: IPaginationOptions) {
-        let queryBuilder = await findAllTaskResult(this.taskResultRepository);
+    /**
+     * 查询定时任务结果
+     * @param schedulerId 
+     * @param options 
+     */
+    async getAllTaskResult(schedulerId: number, options: IPaginationOptions) {
+        let queryBuilder = await findAllTaskResult(this.taskResultRepository, schedulerId);
         return (await paginate<TaskResultEntity>(queryBuilder, options)).items.map(obj => { return JSON.parse(obj.result) });
     }
 

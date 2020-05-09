@@ -85,9 +85,9 @@ export class SchedulerController {
   }
 
   @Get("/taskResult")
-  async getTaskResult( @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
+  async getTaskResult(@Query("schedulerId") schedulerId?: number, @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
-    return this.schedulerService.getAllTaskResult( { page, limit });
+    return this.schedulerService.getAllTaskResult(schedulerId, { page, limit });
   }
 
   @Get("/taskResult/:id")
