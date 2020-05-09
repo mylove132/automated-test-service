@@ -116,7 +116,7 @@ export class SchedulerService {
             if (!task) throw new ApiException(`停止的任务id:${id}不存在`, ApiErrorCode.SCHEDULER_MD5_INVAILD, HttpStatus.BAD_REQUEST);
             if (this.isExistTask(task.md5)) {
                 try {
-                    this.schedulerRegistry.getCronJob(task.md5).stop();
+                    this.schedulerRegistry.deleteCronJob(task.md5);
                     await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, id);
                     stopSuccess.push(task.id);
                 } catch (e) {
@@ -457,6 +457,9 @@ export class SchedulerService {
 
     async restartTask(){
         const ids: number[] = (await findScheduleRuningIds(this.scheRepository)).map(sch => {return sch.id});
+        if (ids.length == 0) {
+            return;
+        }
         const taskIds = new TaskIdsDto();
         taskIds.ids = ids;
         await this.restartCheckJobTask(taskIds);

@@ -110,6 +110,7 @@ export class RunService {
       const rumTime = endTime.getTime() - startTime.getTime();
       resultObj["rumTime"] = rumTime;
       const res = JSON.stringify(result.data);
+      console.log('-----------------'+res)
       if (result.result) {
         const assert = await this.execAssert(caseId, result.data);
         resultObj["result"] = result.data;
