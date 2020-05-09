@@ -109,10 +109,10 @@ export class RunService {
       resultObj["endTime"] = endTime;
       const rumTime = endTime.getTime() - startTime.getTime();
       resultObj["rumTime"] = rumTime;
-      const res = JSON.stringify(result.data);
-      console.log('-----------------'+res)
+      const res = result.data == '' || result.data == null ? null : JSON.stringify(result.data);
       if (result.result) {
-        const assert = await this.execAssert(caseId, result.data);
+        const tmpResult = result.data == '' || result.data == null ? null : result.data;
+        const assert = await this.execAssert(caseId, tmpResult);
         resultObj["result"] = result.data;
         resultObj["status"] = assert["result"];
         resultObj["assert"] = assert;
@@ -377,12 +377,11 @@ export class RunService {
    * @param result
    */
   private async execAssert(caseId: number, result: any) {
-
     const caseObj = await findCaseOfAssertTypeAndAssertJudgeById(this.caseRepository, caseId);
     if (!caseObj)
       throw new ApiException(`caseId: ${caseId} 不存在`, ApiErrorCode.CASELIST_ID_INVALID, HttpStatus.BAD_REQUEST);
     let assertResult = {};
-    let execResult;
+    let execResult: any;
     try {
       execResult = getAssertObjectValue(result, caseObj.assertKey);
     } catch (e) {
@@ -393,7 +392,6 @@ export class RunService {
       assertResult["result"] = (execResult == caseObj.assertText);
       return assertResult;
     }
-    execResult = execResult ? execResult : null;
     switch (caseObj.assertType.id) {
       case 1:
         switch (caseObj.assertJudge.id) {
@@ -458,7 +456,7 @@ export class RunService {
             assertResult["relation"] = caseObj.assertJudge.name;
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
-            assertResult["result"] = (execResult == null || execResult == '');
+            assertResult["result"] = (execResult == null);
             break;
           case 10:
             assertResult["assertKey"] = caseObj.assertKey;

@@ -31,6 +31,9 @@ export function getAssertObjectValue(obj: any, keys: string): any {
   if (keys.indexOf('.') != -1){
     keyList = keys.split('.');
   }else {
+	  if(obj == null || obj == '') {
+		  return null;
+	  }
     return JSON.stringify(obj);
   }
 	keyList.shift();
