@@ -356,8 +356,9 @@ export class SchedulerService {
             const saveResult: TaskResultEntity = await saveTaskResult(this.taskResultRepository, taskResult);
             CommonUtil.printLog2(JSON.stringify(saveResult))
             if (taskResult.scheduler.isSendMessage) {
+                console.log('定时任务消息发送：')
                 const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-                this.sendMessageQueue.add("sendMessage", config.taskResultUrl + saveResult.id);
+                this.sendMessageQueue.add("sendMessage", `${taskResult.scheduler.name}：`+config.taskResultUrl + saveResult.id);
             }
         });
         this.schedulerRegistry.addCronJob(md5, job);

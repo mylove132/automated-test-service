@@ -18,7 +18,8 @@ export class CurlService {
 	 async sendDingTalkMessage(message: string) {
 		const token = this.configService.dingtalkAccessToken;
 		const env = this.configService.env === 'production' ? '生产' : '测试';
-		const result = await this.httpService.post(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
+		console.log('钉钉消息环境：'+env)
+		const result = this.httpService.post(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
 			msgtype: 'text',
 			text: {
 				content: `
@@ -26,9 +27,7 @@ export class CurlService {
 					${message}
 				`
 			}
-		}).pipe(
-			catchError(error => of(`钉钉消息发送失败: ${error}`)),
-		).subscribe();
+		}).pipe(catchError(error => of(`钉钉消息发送失败: ${error}`))).subscribe();
 		return result;
 	}
 

@@ -228,7 +228,6 @@ export class RunService {
     var regex2 = /\[(.+?)\]/g;
     for (let paramsKey in param) {
       const value = param[paramsKey];
-      console.log(value)
       if (paramReg.test(value)) {
         const regData = value.replace(paramReg, "$1");
         //匹配参数中的随机数
