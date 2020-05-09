@@ -47,7 +47,7 @@ export class CreateCaseDto {
     @IsOptional()
     paramType: ParamType;
 
-    @IsNotEmpty()
+    @IsOptional()
     assertText: string;
 
     @IsNotEmpty()
