@@ -173,7 +173,6 @@ export class JmeterService {
      * @param md5 
      */
     async findResult(md5: string){
-
         const jmeterBinPath = this.config.jmeterBinPath;
         const jmeterJtlPath = this.config.jmeterJtlPath;
         const jmeterResultUrl = this.config.jmeterResultUrl;
