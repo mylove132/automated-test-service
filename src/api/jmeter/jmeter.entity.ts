@@ -40,6 +40,8 @@ export class JmeterEntity {
     @OneToMany(type => JmeterResultEntity, jmeterResults => jmeterResults.jmeter)
     jmeterResults: JmeterResultEntity[];
 
+    @Column({default: false})
+    isRealDelete: boolean;
 }
 
 

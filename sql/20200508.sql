@@ -9,3 +9,4 @@ ALTER TABLE "secheduler" ALTER COLUMN "status" DROP DEFAULT;
 ALTER TABLE "secheduler" ALTER COLUMN "status" TYPE "secheduler_status_enum" USING "status"::"text"::"secheduler_status_enum";
 ALTER TABLE "secheduler" ALTER COLUMN "status" SET DEFAULT '2';
 DROP TYPE "secheduler_status_enum_old";
+ALTER TABLE "jmeter" ADD "isRealDelete" boolean NOT NULL DEFAULT false;

@@ -1,4 +1,4 @@
-import {Repository} from "typeorm";
+import {Repository, Brackets} from "typeorm";
 import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {HttpStatus} from "@nestjs/common";
@@ -10,7 +10,7 @@ import { JmeterResultEntity } from "src/api/jmeter/jmeter_result.entity";
  * @param jmeterEntityRepository
  * @param jmeterObj
  */
-export const createJmeter = async (jmeterEntityRepository: Repository<JmeterEntity>, jmeterObj) => {
+export const createJmeter = async (jmeterEntityRepository: Repository<JmeterEntity>, jmeterObj: any) => {
     return await jmeterEntityRepository.save(jmeterObj).catch(
         err => {
             console.log(err);
@@ -40,7 +40,9 @@ export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEn
  */
 export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids) => {
     return await jmeterEntityRepository.createQueryBuilder().
-    where('id IN (:...ids)',{ids: ids}).getMany().
+    where('id IN (:...ids)',{ids: ids}).
+    andWhere('isRealDelete = :isRealDelete', {isRealDelete: false}).
+    getMany().
     catch(
         err => {
             console.log(err);
@@ -72,8 +74,8 @@ export const updateJmeterById = async (jmeterEntityRepository: Repository<Jmeter
  * @param jmeterEntityRepository
  * @param ids
  */
-export const deleteJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids) => {
-    return await jmeterEntityRepository.delete(ids).catch(
+export const deleteJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids: any) => {
+    return await jmeterEntityRepository.update(ids, {isRealDelete: true}).catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -102,15 +104,13 @@ export const saveJmeterResult = async (jmeterResultEntityRepository: Repository<
  */
 export const findJmeterList = (jmeterEntityRepository: Repository<JmeterEntity>, name: string) => {
     return jmeterEntityRepository.createQueryBuilder('jmeter').
-    where(
-        qb => {
+    where('jmeter.isRealDelete = :isRealDelete',{isRealDelete: false}).
+    andWhere(
+        new Brackets(qb => {
             if (name) {
-                qb.where("jmeter.name LIKE :param")
-                    .setParameters({
-                        param: '%' + name + '%'
-                    })
+                qb.where("jmeter.name LIKE :param",{param: '%' + name + '%'})
             }
-        }
+        })
     ).orderBy('jmeter.updateDate','DESC');
 };
 

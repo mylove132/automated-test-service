@@ -61,8 +61,6 @@ export class ConfigService {
 
       TASK_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com'),
 
-      //JMETER_RESULT_URL: Joi.string().required().default('https://autotop.blingabc.com/static'),
-
       JMETER_BIN_PATH: Joi.string().required().default(''),
 
       JMETER_JTL_PATH: Joi.string().required().default(''),

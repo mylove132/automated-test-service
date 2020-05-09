@@ -92,7 +92,6 @@ export class SchedulerService {
         try {
             for (const id of taskIdsDto.ids) {
                 const schObj = await findScheduleById(this.scheRepository, id);
-                console.log(JSON.stringify(schObj))
                 if (schObj.status == RunStatus.RUNNING) this.schedulerRegistry.deleteCronJob(schObj.md5);
                 await deleteSchedulerById(this.scheRepository, id);
             }

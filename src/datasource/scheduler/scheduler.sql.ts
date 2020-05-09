@@ -177,7 +177,7 @@ export const updateSchedulerRunStatus = async (schedulerRepository: Repository<S
  * @param id
  */
 export const deleteSchedulerById = async (schedulerRepository: Repository<SchedulerEntity>, id: number) => {
-    return await schedulerRepository.delete(id).catch(
+    return await schedulerRepository.update(id,{status: RunStatus.DELETE}).catch(
         err => {
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
         }
