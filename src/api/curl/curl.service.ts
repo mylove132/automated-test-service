@@ -62,9 +62,7 @@ export class CurlService {
 			map(res => {
 				return this.verifyMiddleWare(res) ? { result: true, data: res.data } : { result: false, data: res.data };
 			}),
-			catchError(error => of(`status：${error.response['status']
-			} statusText：${error.response['statusText']}
-			  `)),
+			catchError(error => of(`status：${error.response['status']} statusText：${error.response['statusText']}`)),
 		);
 	}
 	/**

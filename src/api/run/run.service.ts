@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CaseEntity } from "../case/case.entity";
@@ -60,7 +60,11 @@ export class RunService {
     requestData.url = url;
     // 响应结果
     CommonUtil.printLog1(JSON.stringify(requestData));
-    const result = await this.curlService.makeRequest(requestData).toPromise();
+    const result = await this.curlService.makeRequest(requestData).toPromise().catch(
+      err => {
+        throw new  BadRequestException(`执行url--${url}--失败`, err);
+      }
+    );
     const endTime = new Date();
     resultObj["endTime"] = endTime;
     result.result == null ? resultObj["result"] = null : resultObj["result"] = result.data;
@@ -95,7 +99,11 @@ export class RunService {
       requestData.headers = headers;
       requestData.url = url;
       CommonUtil.printLog2('接口请求参数:' + JSON.stringify(requestData))
-      const result = await this.curlService.makeRequest(requestData).toPromise();
+      const result = await this.curlService.makeRequest(requestData).toPromise().catch(
+        err => {
+          throw new BadRequestException(`执行url--${url}--失败`, err);
+        }
+      )
       const endTime = new Date();
       resultObj['cas'] = { caseName: caseObj.name, catalogName: caseObj.catalog.name };
       resultObj["endTime"] = endTime;
@@ -301,7 +309,11 @@ export class RunService {
     requestData.method = this.parseRequestMethod(runCaseDto);
     requestData.headers = headers;
     requestData.url = url;
-    const result = await this.curlService.makeRequest(requestData).toPromise();
+    const result = await this.curlService.makeRequest(requestData).toPromise().catch(
+      err => {
+        throw new  BadRequestException(`执行url--${url}--失败`, err);
+      }
+    );
     if (result.result) {
       return result.data;
     } else {
@@ -363,7 +375,7 @@ export class RunService {
    * @param caseId
    * @param result
    */
-  private async execAssert(caseId, result) {
+  private async execAssert(caseId: number, result: any) {
 
     const caseObj = await findCaseOfAssertTypeAndAssertJudgeById(this.caseRepository, caseId);
     if (!caseObj)

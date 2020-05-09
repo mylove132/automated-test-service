@@ -4,8 +4,8 @@ import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 import { CaseEntity } from "../../api/case/case.entity";
 import { AssertJudgeEntity, AssertTypeEntity } from "../../api/case/assert.entity";
-import { CaseGrade} from "../../config/base.enum";
-import {CatalogEntity} from "../../api/catalog/catalog.entity";
+import { CaseGrade } from "../../config/base.enum";
+import { CatalogEntity } from "../../api/catalog/catalog.entity";
 
 
 /**
@@ -22,14 +22,15 @@ export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>,
   );
 };
 
-export const finCaseNamesByIds = async (caseEntityRepository: Repository<CaseEntity>, ids) => {
-    return await caseEntityRepository.createQueryBuilder().select().
-    where("id IN (:...ids)",{ids: ids}).
+export const finCaseNamesByIds = async (caseEntityRepository: Repository<CaseEntity>, ids: any) => {
+  return await caseEntityRepository.createQueryBuilder("case").select().
+    where("case.id IN (:...ids)", { ids: ids }).
+    andWhere("case.isRealDelete = :isRealDelete", {isRealDelete: false}).
     getMany().catch(
-        err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-        }
+      err => {
+        console.log(err);
+        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      }
     );
 };
 
@@ -42,15 +43,15 @@ export const finCaseNamesByIds = async (caseEntityRepository: Repository<CaseEnt
  */
 export const findCaseByAlias = async (caseEntityRepository: Repository<CaseEntity>, alias: string) => {
   return await caseEntityRepository.createQueryBuilder('cas').
-  leftJoinAndSelect('cas.token','token').
-  where('cas.alias = :alias',{alias: alias}).
-  getOne().
-  catch(
-    err => {
-      console.log(err);
-      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-    }
-  );
+    leftJoinAndSelect('cas.token', 'token').
+    where('cas.alias = :alias', { alias: alias }).
+    getOne().
+    catch(
+      err => {
+        console.log(err);
+        throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+      }
+    );
 };
 
 
@@ -62,7 +63,10 @@ export const findCaseByAlias = async (caseEntityRepository: Repository<CaseEntit
  * @param name
  */
 export const findCaseByPathAndName = async (caseEntityRepository: Repository<CaseEntity>, path, name) => {
-  return await caseEntityRepository.createQueryBuilder("case").where("case.path = :path", { path: path }).andWhere("case.name = :name", { name: name }).getOne().catch(
+  return await caseEntityRepository.createQueryBuilder("case").
+  where("case.path = :path", { path: path }).
+  andWhere("case.name = :name", { name: name }).
+  getOne().catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -91,21 +95,24 @@ export const findCaseUnionEndpoint = async (caseEntityRepository: Repository<Cas
  * @param catalogId
  * @param caseGradeList
  */
-export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, catalogId, caseGradeList) => {
-  return caseEntityRepository.createQueryBuilder("case").
-  leftJoinAndSelect("case.endpointObject", "endpoint").
-  leftJoinAndSelect("case.assertType", "assertType").
-  leftJoinAndSelect("case.assertJudge", "assertJudge").
-  leftJoinAndSelect("case.token", "token").
-  leftJoinAndSelect("token.platformCode", "platformCode").
-  leftJoinAndSelect("token.env", "env").where(qb => {
-    if (catalogId) {
-      qb.where("case.catalog = :catalog", { catalog: catalogId });
-      qb.andWhere("case.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
-    }else {
-        qb.where("case.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
-    }
-  }).orderBy("case.updateDate", "DESC");
+export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepository: Repository<CaseEntity>, 
+  catalogId: number, caseGradeList: any) => {
+  return caseEntityRepository.createQueryBuilder("cas").
+    leftJoinAndSelect("cas.endpointObject", "endpoint").
+    leftJoinAndSelect("cas.assertType", "assertType").
+    leftJoinAndSelect("cas.assertJudge", "assertJudge").
+    leftJoinAndSelect("cas.token", "token").
+    leftJoinAndSelect("token.platformCode", "platformCode").
+    leftJoinAndSelect("token.env", "env").where(qb => {
+      if (catalogId) {
+        qb.where("cas.catalog = :catalog", { catalog: catalogId });
+        qb.andWhere("cas.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
+        qb.andWhere("cas.isRealDelete = :isRealDelete", { isRealDelete: false });
+      } else {
+        qb.where("cas.caseGrade  IN (:...caseGradeList)", { caseGradeList: caseGradeList });
+        qb.andWhere("cas.isRealDelete = :isRealDelete", { isRealDelete: false });
+      }
+    }).orderBy("cas.updateDate", "DESC");
 };
 
 
@@ -156,10 +163,10 @@ export const findCaseOfAssertTypeAndAssertJudgeById = async (caseEntityRepositor
 export const findCaseByCaseGradeAndCatalogs = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, catalogIds) => {
   return await caseEntityRepository
     .createQueryBuilder("cas").where
-      ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
-      andWhere('cas.catalog IN (:...catalogs)',{catalogs: catalogIds}).
-      getMany().
-      catch(
+    ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
+    andWhere('cas.catalog IN (:...catalogs)', { catalogs: catalogIds }).
+    getMany().
+    catch(
       err => {
         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
       }
@@ -214,9 +221,11 @@ export const saveCase = async (caseEntityRepository: Repository<CaseEntity>, cas
  * @param caseEntityRepository
  * @param caseIds
  */
-export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, caseIds) => {
-  return await caseEntityRepository.delete(caseIds)
-    .catch(err => {
+export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, caseIds: any) => {
+  return await caseEntityRepository.createQueryBuilder().update(CaseEntity).set({
+    isRealDelete: true
+  }).where('id IN (:...ids)',{ids: caseIds}).execute().
+    catch(err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
     });
@@ -283,17 +292,17 @@ export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, n
 
 
 export const batchUpdateCaseOfCatalogId =
-    async (caseRepository: Repository<CaseEntity>, caseIds: number[], catalog: CatalogEntity) => {
+  async (caseRepository: Repository<CaseEntity>, caseIds: number[], catalog: CatalogEntity) => {
     caseRepository.createQueryBuilder().
-    update(CaseEntity).
-    set({
+      update(CaseEntity).
+      set({
         catalog: catalog
-    }).where('id IN (:...caseIds)',{caseIds: caseIds}).
-    execute().
-    catch(
+      }).where('id IN (:...caseIds)', { caseIds: caseIds }).
+      execute().
+      catch(
         err => {
-            console.log(err);
-            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+          console.log(err);
+          throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
         }
-    )
-};
+      )
+  };

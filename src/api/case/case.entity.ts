@@ -93,6 +93,9 @@ export class CaseEntity {
     @ManyToOne(type => TokenEntity, token => token.cases,{cascade: true,onDelete: 'SET NULL',onUpdate: 'CASCADE'})
     token: TokenEntity;
 
+    
+    @Column('bool',{default: false})
+    isRealDelete: boolean;
 }
 
 

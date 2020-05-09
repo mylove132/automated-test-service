@@ -1,4 +1,4 @@
-import {HttpStatus, Injectable} from '@nestjs/common';
+import {HttpStatus, Injectable, BadRequestException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {DeleteResult, Repository} from 'typeorm';
 import {ApiException} from '../../shared/exceptions/api.exception';
@@ -176,19 +176,23 @@ export class TokenService {
      * @param body
      * @param platformCodeId
      */
-    private async getNewToken(url, body) {
+    private async getNewToken(url: string, body: any) {
         const requestData = {
             url: url,
             method: getRequestMethodTypeString(1),
             data: JSON.parse(body)
         };
         CommonUtil.printLog2('token请求体:'+JSON.stringify(requestData))
-        const result = await this.curlService.makeRequest(requestData).toPromise();
+        const result = await this.curlService.makeRequest(requestData).toPromise().catch(
+            err => {
+              throw new BadRequestException(`执行url--${url}--失败`, err);
+            }
+          );
         if (!result) {
             throw new ApiException(`登录URL：${url}，登录body：${body},登录失败`,
                 ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
-        let token;
+        let token: string;
         CommonUtil.printLog2(JSON.stringify(result));
         if (!result.data) throw new ApiException('获取token的用户数据有误，请检查',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         if (result.data.code === 10000) {
