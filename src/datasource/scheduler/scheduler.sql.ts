@@ -108,6 +108,21 @@ export const findScheduleByMd5 = async (schedulerRepository: Repository<Schedule
 };
 
 /**
+ * 查询所有运行中的定时任务ID
+ * @param schedulerRepository 
+ */
+export const findScheduleRuningIds = async (schedulerRepository: Repository<SchedulerEntity>) => {
+  return await schedulerRepository.createQueryBuilder().
+  where('status = :status',{status: RunStatus.RUNNING}).
+  getMany().catch(
+    err => {
+      console.log(err);
+      throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+    }
+  )
+};
+
+/**
  * 保存定时任务
  * @param schedulerRepository
  * @param schedulerObj

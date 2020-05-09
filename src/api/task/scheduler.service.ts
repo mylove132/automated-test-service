@@ -28,7 +28,8 @@ import {
     saveScheduler,
     saveTaskResult,
     updateScheduler,
-    updateSchedulerRunStatus
+    updateSchedulerRunStatus,
+    findScheduleRuningIds
 } from "../../datasource/scheduler/scheduler.sql";
 import { findEnvById } from "../../datasource/env/env.sql";
 import { InjectQueue } from "@nestjs/bull";
@@ -452,6 +453,13 @@ export class SchedulerService {
         if (!resultObj) throw new ApiException(`报告ID:${taskResultId}不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         resultObj.result = JSON.parse(resultObj.result);
         return resultObj;
+    }
+
+    async restartTask(){
+        const ids: number[] = (await findScheduleRuningIds(this.scheRepository)).map(sch => {return sch.id});
+        const taskIds = new TaskIdsDto();
+        taskIds.ids = ids;
+        await this.restartCheckJobTask(taskIds);
     }
 
 }

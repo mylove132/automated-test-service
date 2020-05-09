@@ -22,5 +22,8 @@ import { JmeterResultEntity } from '../jmeter/jmeter_result.entity';
     ]
 })
 export class SchedulerModule {
-
+    //重启系统的定时任务
+     constructor(private sch: SchedulerService) {
+        sch.restartTask();
+    }
 }
