@@ -62,10 +62,11 @@ export const findCaseByAlias = async (caseEntityRepository: Repository<CaseEntit
  * @param path
  * @param name
  */
-export const findCaseByPathAndName = async (caseEntityRepository: Repository<CaseEntity>, path, name) => {
+export const findCaseByPathAndName = async (caseEntityRepository: Repository<CaseEntity>, path: string, name: string) => {
   return await caseEntityRepository.createQueryBuilder("case").
   where("case.path = :path", { path: path }).
   andWhere("case.name = :name", { name: name }).
+  andWhere("case.isRealDelete = :isRealDelete",{isRealDelete: false}).
   getOne().catch(
     err => {
       console.log(err);
