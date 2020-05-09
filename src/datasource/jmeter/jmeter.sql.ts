@@ -106,13 +106,15 @@ export const saveJmeterResult = async (jmeterResultEntityRepository: Repository<
  */
 export const findJmeterList = (jmeterEntityRepository: Repository<JmeterEntity>, name: string) => {
     return jmeterEntityRepository.createQueryBuilder('jmeter').
-    where('jmeter.isRealDelete = :isRealDelete',{isRealDelete: false}).
-    andWhere(
-        new Brackets(qb => {
+    where(
+        qb => {
             if (name) {
-                qb.where("jmeter.name LIKE :param",{param: '%' + name + '%'})
+                qb.where('jmeter.isRealDelete = :isRealDelete',{isRealDelete: false});
+                qb.andWhere("jmeter.name LIKE :param",{param: '%' + name + '%'});
+            }else {
+                qb.where('jmeter.isRealDelete = :isRealDelete',{isRealDelete: false});
             }
-        })
+        }
     ).orderBy('jmeter.updateDate','DESC');
 };
 
