@@ -41,8 +41,8 @@ export class JmeterGateway {
         //创建临时文件
         const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
         const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
-        const tmpJtlFilePath = jmeterJtlPath + md5 + '.jtl';
-        const tmpLogFilePath = jmeterLogPath + md5 + '.log';
+        const tmpJtlFilePath = jmeterJtlPath + '/' + md5 + '.jtl';
+        const tmpLogFilePath = jmeterLogPath + '/' + md5 + '.log';
         fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
 
         //构建命令行
