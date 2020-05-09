@@ -458,7 +458,7 @@ export class RunService {
             assertResult["relation"] = caseObj.assertJudge.name;
             assertResult["expect"] = caseObj.assertText;
             assertResult["actual"] = execResult;
-            assertResult["result"] = (execResult == null);
+            assertResult["result"] = (execResult == null || execResult == '');
             break;
           case 10:
             assertResult["assertKey"] = caseObj.assertKey;
