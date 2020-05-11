@@ -83,7 +83,7 @@ export class JmeterGateway {
             //const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
             //execSync(copyLog);
             //删除临时生成的压测文件
-            fs.unlinkSync(tmpJmxtFilePath);
+            //fs.unlinkSync(tmpJmxtFilePath);
             //fs.unlinkSync(tmpLogFilePath);
 
             this.server.emit('message', { code: 80000, id: data.id, msg: `end` });
