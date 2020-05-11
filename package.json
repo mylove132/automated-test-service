@@ -5,8 +5,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "start:prod": "export NODE_ENV=production && node dist/main.js",
-    "start:prod:1": "export NODE_ENV=production && node dist/main.js",
+    "start:prod": "export NODE_ENV=production && nest start",
     "start:test": "export NODE_ENV=test && node dist/main.js",
     "start:test:watch": "export NODE_ENV=test && nest start --watch",
     "start": "export NODE_ENV=development && node index.js",
