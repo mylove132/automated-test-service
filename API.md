@@ -3975,7 +3975,6 @@ status				    |number		|O			|定时任务的状态（默认查询所有：1：�
 code						|int		|R			|响应码，代码定义请见“附录A 响应吗说明”
 message						|string		|R			|&nbsp;
 data						|any		|R			|&nbsp;返回历史记录值
-&nbsp;&nbsp;&nbsp;&nbsp;item|any		|R			|&nbsp;环境信息
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id|number		|R			|&nbsp;任务ID
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name|string		|R			|&nbsp;任务名称
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;md5|string		|R			|&nbsp;任务md5值（定时任务的k值）
@@ -3987,57 +3986,52 @@ data						|any		|R			|&nbsp;返回历史记录值
 返回示例
 ```
 {
-    "data": {
-        "items": [
-            {
-                "id": 26,
-                "name": "测试定时任务",
-                "md5": "322a9d79d4a5ba59561af021813fa4f869983cb2ab3e64e617ec4f6b4c8c4070",
-                "taskType": 1,
-                "createDate": "2020-03-23T07:48:58.173Z",
-                "updateDate": "2020-03-23T08:35:42.221Z",
-                "status": 2,
-                "cron": "* * * * * *"
-            },
-            {
-                "id": 28,
-                "name": "测试定时任务test",
-                "md5": "c93ebd140345b18fcb65853001e8b73bd931ef2f1cb666c08e1a84a72095a8e2",
-                "taskType": 1,
-                "createDate": "2020-03-23T08:17:04.844Z",
-                "updateDate": "2020-03-23T08:35:42.337Z",
-                "status": 2,
-                "cron": "1 * * * * *"
-            },
-            {
-                "id": 27,
-                "name": "测试定时任务test",
-                "md5": "82e67a4b8c4655673738f2d2e65d756079ab7675512c6d1e007699ef2745469c",
-                "taskType": 1,
-                "createDate": "2020-03-23T08:05:05.114Z",
-                "updateDate": "2020-03-23T08:35:42.106Z",
-                "status": 2,
-                "cron": "1 * * * * *"
-            },
-            {
-                "id": 29,
-                "name": "测试定时任务test",
-                "md5": "902896c214d4459d88ae715fc174c47b23c4c33c1e463ce9fc772ac700eac341",
-                "taskType": 1,
-                "createDate": "2020-03-23T08:24:00.153Z",
-                "updateDate": "2020-03-23T09:05:05.252Z",
-                "status": 2,
-                "cron": "1 * * * * *"
-            }
-        ],
-        "itemCount": 4,
-        "totalItems": 4,
-        "pageCount": 1,
-        "next": "",
-        "previous": ""
-    },
     "code": 0,
-    "message": "success"
+    "msg": "success",
+    "data": [
+        {
+            "id": 83,
+            "name": "测试定时任务",
+            "md5": "60a8fa9a2f1d27fbafc69671ca68b2fa7fdb38cb75372101aeb889e911008e1a",
+            "createDate": "2020-05-09T02:07:23.215Z",
+            "updateDate": "2020-05-09T07:06:29.107Z",
+            "caseGrade": 1,
+            "status": 3,
+            "taskType": 1,
+            "cron": "*/10 * * * * *",
+            "isSendMessage": true,
+            "env": {
+                "id": 19,
+                "name": "smix5"
+            },
+            "catalogs": [
+                {
+                    "id": 149,
+                    "createDate": "2020-03-20T10:56:40.605Z",
+                    "updateDate": "2020-03-20T10:56:40.605Z",
+                    "name": "工单",
+                    "isPub": false,
+                    "parentId": 48
+                },
+                {
+                    "id": 82,
+                    "createDate": "2020-03-09T08:13:24.230Z",
+                    "updateDate": "2020-03-09T08:13:24.230Z",
+                    "name": "核实验证码",
+                    "isPub": false,
+                    "parentId": 64
+                },
+                {
+                    "id": 49,
+                    "createDate": "2020-02-29T06:04:33.640Z",
+                    "updateDate": "2020-02-29T06:04:33.640Z",
+                    "name": "比邻外教APP",
+                    "isPub": false,
+                    "parentId": 46
+                }
+            ]
+        }
+    ]
 }
 ```
 
