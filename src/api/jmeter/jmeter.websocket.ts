@@ -43,7 +43,9 @@ export class JmeterGateway {
         const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
         const tmpJtlFilePath = jmeterJtlPath + '/' + md5 + '.jtl';
         const tmpLogFilePath = jmeterLogPath + '/' + md5 + '.log';
-        fs.writeFileSync(tmpJmxtFilePath, this.httpService.get(jmeter.url));
+        //下载文件
+        const ds = await this.httpService.get(jmeter.url).toPromise();
+        fs.writeFileSync(tmpJmxtFilePath, ds.data);
 
         //构建命令行
         const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address}`;
@@ -83,7 +85,7 @@ export class JmeterGateway {
             //const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
             //execSync(copyLog);
             //删除临时生成的压测文件
-            //fs.unlinkSync(tmpJmxtFilePath);
+            fs.unlinkSync(tmpJmxtFilePath);
             //fs.unlinkSync(tmpLogFilePath);
 
             this.server.emit('message', { code: 80000, id: data.id, msg: `end` });
