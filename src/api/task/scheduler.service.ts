@@ -38,7 +38,7 @@ import { TaskResultEntity } from "./task_result.entity";
 import { ConfigService } from "../../config/config.service";
 import { findCatalogByIds } from "../../datasource/catalog/catalog.sql";
 import { CatalogEntity } from "../catalog/catalog.entity";
-import { findJmeterById, saveJmeterResult } from "src/datasource/jmeter/jmeter.sql";
+import { findJmeterById, saveJmeterResult } from "../../datasource/jmeter/jmeter.sql";
 import { JmeterEntity } from "../jmeter/jmeter.entity";
 import { JmeterResultEntity } from "../jmeter/jmeter_result.entity";
 import { exec } from "child_process";

@@ -2,14 +2,14 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/web
 import { ConfigService } from "../../config/config.service";
 import { exec, execSync } from 'child_process';
 import { Server } from 'socket.io';
-import { findJmeterById, saveJmeterResult } from 'src/datasource/jmeter/jmeter.sql';
+import { findJmeterById, saveJmeterResult } from '../../datasource/jmeter/jmeter.sql';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JmeterEntity } from './jmeter.entity';
 import { Repository } from 'typeorm';
-import { CommonUtil } from 'src/utils/common.util';
+import { CommonUtil } from '../../utils/common.util';
 import * as crypto from "crypto";
 import { JmeterResultEntity } from './jmeter_result.entity';
-import { JmeterRunStatus } from 'src/config/base.enum';
+import { JmeterRunStatus } from '../../config/base.enum';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/common';
 @WebSocketGateway(3001, { namespace: 'jmeter', origins: '*:*' })

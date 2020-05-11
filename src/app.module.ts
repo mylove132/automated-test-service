@@ -38,8 +38,8 @@ const modules = [
     EnvModule,
     RunModule,
     HistoryModule,
-    SchedulerModule,
     JmeterModule,
+    SchedulerModule,
     TokenModule,
     OperateModule
 ];

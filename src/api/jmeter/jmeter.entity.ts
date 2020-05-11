@@ -1,5 +1,4 @@
 import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Binary} from 'typeorm';
-import {CaseEntity} from "../case/case.entity";
 import {JmeterResultEntity} from "./jmeter_result.entity";
 
 @Entity('jmeter')

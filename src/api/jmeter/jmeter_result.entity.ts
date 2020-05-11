@@ -7,7 +7,7 @@ import {
     Unique,
 } from 'typeorm';
 import {JmeterEntity} from "./jmeter.entity";
-import { JmeterRunStatus } from 'src/config/base.enum';
+import { JmeterRunStatus } from '../../config/base.enum';
 
 @Unique(['md5'])
 @Entity('jmeter_result')
