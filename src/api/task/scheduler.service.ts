@@ -42,6 +42,7 @@ import { findJmeterById, saveJmeterResult } from "src/datasource/jmeter/jmeter.s
 import { JmeterEntity } from "../jmeter/jmeter.entity";
 import { JmeterResultEntity } from "../jmeter/jmeter_result.entity";
 import { exec } from "child_process";
+import { CurlService } from "../curl/curl.service";
 
 
 var parser = require("cron-parser");
@@ -63,7 +64,8 @@ export class SchedulerService {
         private readonly jmeterRepository: Repository<JmeterEntity>,
         @InjectRepository(JmeterResultEntity)
         private readonly jmeterResultRepository: Repository<JmeterResultEntity>,
-        @InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue,
+        //@InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue,
+        private readonly curlService: CurlService,
         private readonly runService: RunService) {
     }
 
@@ -344,7 +346,7 @@ export class SchedulerService {
      * @param md5
      */
     private async runSingleTask(caseIds: number[], envId: number, cron: string, md5: string) {
-        CommonUtil.printLog2(caseIds)
+        
         const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
         const job = new CronJob(cron, async () => {
             let result = await this.runService.runCaseById(caseListDto);
@@ -358,7 +360,7 @@ export class SchedulerService {
             if (taskResult.scheduler.isSendMessage) {
                 console.log('定时任务消息发送：')
                 const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-                this.sendMessageQueue.add("sendMessage", `${taskResult.scheduler.name}：`+config.taskResultUrl + saveResult.id);
+                this.curlService.sendDingTalkMessage(`${taskResult.scheduler.name}：`+config.taskResultUrl + saveResult.id);
             }
         });
         this.schedulerRegistry.addCronJob(md5, job);

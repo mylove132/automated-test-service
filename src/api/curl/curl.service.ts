@@ -15,7 +15,7 @@ export class CurlService {
 	 * 向钉钉群发送消息
 	 *@param {message} : text钉钉消息
 	 */
-	 async sendDingTalkMessage(message: string) {
+	 sendDingTalkMessage(message: string) {
 		const token = this.configService.dingtalkAccessToken;
 		const env = this.configService.env === 'production' ? '生产' : '测试';
 		console.log('钉钉消息环境：'+env)

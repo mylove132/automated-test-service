@@ -13,7 +13,7 @@ import { CatalogEntity } from "../../api/catalog/catalog.entity";
  * @param caseEntityRepository
  * @param id
  */
-export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>, id) => {
+export const findCaseById = async (caseEntityRepository: Repository<CaseEntity>, id: number) => {
   return await caseEntityRepository.findOne(id).catch(
     err => {
       console.log(err);
@@ -81,7 +81,12 @@ export const findCaseByPathAndName = async (caseEntityRepository: Repository<Cas
  * @param caseEntityRepository
  */
 export const findCaseUnionEndpoint = async (caseEntityRepository: Repository<CaseEntity>) => {
-  return await caseEntityRepository.createQueryBuilder("case").select("case.endpoint").groupBy("case.endpoint").addGroupBy("case.id").getMany().catch(
+  return await caseEntityRepository.createQueryBuilder("case").
+  select("case.endpoint").
+  groupBy("case.endpoint").
+  addGroupBy("case.id").
+  getMany().
+  catch(
     err => {
       console.log(err);
       throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -122,7 +127,7 @@ export const findCaseByCatalogIdAndCaseTypeAndCaseGrade = async (caseEntityRepos
  * @param caseEntityRepository
  * @param caseId
  */
-export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repository<CaseEntity>, caseId) => {
+export const findCaseOfEndpointAndTokenById = async (caseEntityRepository: Repository<CaseEntity>, caseId: number) => {
   return await caseEntityRepository.createQueryBuilder("case")
     .select()
     .leftJoinAndSelect("case.endpointObject", "endpointObj")
@@ -161,11 +166,12 @@ export const findCaseOfAssertTypeAndAssertJudgeById = async (caseEntityRepositor
  * @param caseGrade
  * @param catalogIds
  */
-export const findCaseByCaseGradeAndCatalogs = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, catalogIds) => {
+export const findCaseByCaseGradeAndCatalogs = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, catalogIds: any) => {
   return await caseEntityRepository
     .createQueryBuilder("cas").where
     ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
     andWhere('cas.catalog IN (:...catalogs)', { catalogs: catalogIds }).
+    andWhere('cas.isRealDelete = :isRealDelete', {isRealDelete: false}).
     getMany().
     catch(
       err => {

@@ -29,7 +29,7 @@ export const findSchedulerOfCaseAndEnvById = async (schedulerRepository: Reposit
  * @param schedulerRepository
  * @param ids
  */
-export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Repository<SchedulerEntity>, ids) => {
+export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Repository<SchedulerEntity>, ids: any) => {
     return await schedulerRepository.createQueryBuilder("sch").
     leftJoinAndSelect("sch.env", "env").
     leftJoinAndSelect("sch.catalogs", "catalogs").

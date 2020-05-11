@@ -10,7 +10,7 @@ export class RunProcessor {
   ){}
 
     @Process('sendMessage')
-    async handleTranscode(job: Job) {
-         await this.curlService.sendDingTalkMessage(job.data);
+    handleTranscode(job: Job) {
+        this.curlService.sendDingTalkMessage(job.data);
     }
 }

@@ -20,8 +20,6 @@ import {
   findCaseOfAssertTypeAndAssertJudgeById,
   findCaseOfEndpointAndTokenById
 } from "../../datasource/case/case.sql";
-import { InjectQueue } from "@nestjs/bull";
-import { Queue } from "bull";
 import { ParamType } from "../../config/base.enum";
 import { CommonUtil } from "../../utils/common.util";
 
@@ -36,7 +34,7 @@ export class RunService {
     private readonly curlService: CurlService,
     private readonly historyService: HistoryService,
     private readonly envService: EnvService,
-    @InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue
+    //@InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue
   ) {
   }
   private tmpResult = {};
@@ -119,7 +117,7 @@ export class RunService {
         resultObj["errMsg"] = null;
         if (caseObj.isFailNotice) {
           if (!assert["result"]) {
-            this.sendMessageQueue.add("sendMessage",
+            this.curlService.sendDingTalkMessage(
               `接口 ${caseObj.name} 运行失败，期望结果:${caseObj.assertText}
                            期望条件 ${assert["relation"]}
                            实际结果${assert["actual"]} 不符合`);
@@ -130,7 +128,7 @@ export class RunService {
         resultObj["result"] = null;
         resultObj["errMsg"] = result;
         if (caseObj.isFailNotice) {
-          this.sendMessageQueue.add("sendMessage", `接口 ${caseObj.name} 运行失败，失败内容: ${result}`);
+          this.curlService.sendDingTalkMessage(`接口 ${caseObj.name} 运行失败，失败内容: ${result}`);
         }
       }
       // 保存历史记录
