@@ -459,6 +459,7 @@ export class SchedulerService {
         if (ids.length == 0) {
             return;
         }
+        console.log(`重启的定时任务ID:${ids}`)
         const taskIds = new TaskIdsDto();
         taskIds.ids = ids;
         await this.restartCheckJobTask(taskIds);
