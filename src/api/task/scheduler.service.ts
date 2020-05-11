@@ -83,7 +83,8 @@ export class SchedulerService {
      */
     async getAllJobs(runStatus: RunStatus, options: IPaginationOptions) {
         let queryBuilder = await findScheduleByStatus(this.scheRepository, runStatus);
-        return await paginate<SchedulerEntity>(queryBuilder, options);
+        //return await paginate<SchedulerEntity>(queryBuilder, options);
+        return queryBuilder;
     }
 
     /**

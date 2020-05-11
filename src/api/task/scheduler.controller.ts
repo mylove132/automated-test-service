@@ -32,7 +32,7 @@ export class SchedulerController {
 
   @Get("")
   async getAllJobs(@Query("status")status?: number, @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
-    limit = limit > 100 ? 100 : limit;
+    //limit = limit > 100 ? 100 : limit;
     return this.schedulerService.getAllJobs(status, { page, limit });
   }
 
