@@ -279,10 +279,10 @@ export class RunService {
             const runResult = await this.runCaseByCaseInstance(caseInstance, endpoint);
             this.tmpResult[alias] = runResult;
           }
-          CommonUtil.printLog2('执行别名结果集合:' + JSON.stringify(this.tmpResult))
+          Logger.info('执行别名结果集合:' + JSON.stringify(this.tmpResult))
           const newVal = regData.substr(alias.length + 1, regData.length - 1).replace(dataName, "data");
           const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
-          CommonUtil.printLog2('alias:' + alias + "-------" + paramValue)
+          Logger.info(`执行中保存的别名：${alias}, 执行脚本返回的数据：${paramValue})`);
           param[paramsKey] = paramValue;
         }
       }

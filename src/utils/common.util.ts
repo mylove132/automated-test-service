@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { Md5 } from "ts-md5";
 import { ConfigService } from "../config/config.service";
 import * as os from 'os';
@@ -146,25 +147,6 @@ export class CommonUtil {
       return null
     }
   }
-
-
-
-  /**
-   * 打印信息
-   * @param meg 
-   */
-  static printLog2(meg: any) {
-    console.log("---------------------------------------------------" + meg);
-  }
-
-  /**
-   * 打印信息
-   * @param meg 
-   */
-  static printLog1(meg: any) {
-    console.log("***************************************************" + meg);
-  }
-
 
   /**
    * 获取操作系统信息
