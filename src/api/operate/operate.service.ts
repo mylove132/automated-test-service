@@ -35,7 +35,7 @@ export class OperateService {
    * 创建操作记录
    * @param operateEntity
    */
-  async createOperate(operateEntity: OperateEntity) {
+  async createOperateService (operateEntity: OperateEntity) {
     return await saveOperate(this.operateRepository, operateEntity);
   }
 
@@ -44,7 +44,7 @@ export class OperateService {
    * 创建异常记录
    * @param exceptionEntity
    */
-  async createException(exceptionEntity: ExceptionEntity) {
+  async createExceptionService (exceptionEntity: ExceptionEntity) {
     return await saveException(this.exceptionRepository, exceptionEntity);
   }
 
@@ -56,7 +56,7 @@ export class OperateService {
    * @param keyword
    * @param options
    */
-  async findOperate(userId: number, operateModule: OperateModule, operateType: OperateType, keyword: string,  options: IPaginationOptions): Promise<Pagination<OperateEntity>> {
+  async findOperateService (userId: number, operateModule: OperateModule, operateType: OperateType, keyword: string,  options: IPaginationOptions): Promise<Pagination<OperateEntity>> {
 
     const queryBuilder = await findOperateByUserAndOperate(this.operateRepository, userId, operateModule, operateType, keyword);
     return await paginate<OperateEntity>(queryBuilder, options);

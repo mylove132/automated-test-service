@@ -16,9 +16,9 @@ export class OperateController {
   @ApiOperation({title:'query operate list',description:'query operate list'})
   @ApiResponse({ status: 200, description: "query operate list success."})
   @Get("")
-  async findOperateList(@Query("page") page: number = 1, @Query("limit") limit: number = 10, @Query("userId") userId?: number, @Query("operateModule") operateModule?: OperateModule,
+  async findOperateListController (@Query("page") page: number = 1, @Query("limit") limit: number = 10, @Query("userId") userId?: number, @Query("operateModule") operateModule?: OperateModule,
                         @Query("operateType") operateType?: OperateType,  @Query("keyword") keyword?: string): Promise<Pagination<OperateEntity>> {
-    return this.operateService.findOperate(userId, operateModule,operateType,keyword,{page, limit});
+    return this.operateService.findOperateService(userId, operateModule,operateType,keyword,{page, limit});
   }
 
   // @ApiOperation({title:'query operate by keyword list',description:'query operate list'})

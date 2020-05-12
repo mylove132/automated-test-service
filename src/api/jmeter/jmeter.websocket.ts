@@ -12,6 +12,7 @@ import { JmeterResultEntity } from './jmeter_result.entity';
 import { JmeterRunStatus } from '../../config/base.enum';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/common';
+import { Logger } from '../../utils/log4js';
 @WebSocketGateway(3001, { namespace: 'jmeter', origins: '*:*' })
 export class JmeterGateway {
 
@@ -49,7 +50,7 @@ export class JmeterGateway {
 
         //构建命令行
         const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address}`;
-        console.log(cmd)
+        Logger.info(`压测脚本命令行：${cmd}`)
         //执行命令行
         const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {
             if (error) {
@@ -87,7 +88,6 @@ export class JmeterGateway {
             //删除临时生成的压测文件
             fs.unlinkSync(tmpJmxtFilePath);
             //fs.unlinkSync(tmpLogFilePath);
-
             this.server.emit('message', { code: 80000, id: data.id, msg: `end` });
         });
 

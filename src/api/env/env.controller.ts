@@ -17,8 +17,8 @@ export class EnvController {
     @ApiOperation({ title: 'query all env' })
     @ApiResponse({ status: 200, description: 'query all env success.'})
     @Get()
-    async queryAllEnv() {
-        return this.envService.allEnv();
+    async queryAllEnvController() {
+        return this.envService.allEnvService();
     }
 
     @OpeModule(OperateModule.ENV)
@@ -27,8 +27,8 @@ export class EnvController {
     @ApiOperation({ title: 'create env' })
     @ApiResponse({ status: 200, description: 'create env success.'})
     @Post()
-    async createEnv(@Body() envEntity: EnvEntity) {
-        return this.envService.addEnv(envEntity);
+    async createEnvController(@Body() envEntity: EnvEntity) {
+        return this.envService.addEnvService(envEntity);
     }
 
     @OpeModule(OperateModule.ENV)
@@ -37,8 +37,8 @@ export class EnvController {
     @ApiOperation({ title: 'update env' })
     @ApiResponse({ status: 200, description: 'update env success.'})
     @Put()
-    async updateEnv(@Body() envEntity: EnvEntity) {
-        return this.envService.updateEnv(envEntity);
+    async updateEnvController(@Body() envEntity: EnvEntity) {
+        return this.envService.updateEnvService(envEntity);
     }
 
     @OpeModule(OperateModule.ENDPOINT)
@@ -47,7 +47,7 @@ export class EnvController {
     @ApiOperation({ title: 'update endpoint' })
     @ApiResponse({ status: 200, description: 'update endpoint success.'})
     @Put('endpoint')
-    async updateEndpoint(@Body() endpointEntity: EndpointEntity) {
+    async updateEndpointController(@Body() endpointEntity: EndpointEntity) {
         return this.envService.updateEndpointService(endpointEntity);
     }
 
@@ -57,8 +57,8 @@ export class EnvController {
     @ApiOperation({ title: 'delete env' })
     @ApiResponse({ status: 200, description: 'delete env success.'})
     @Delete()
-    async deleteEnv(@Body() deleteEnvDto: DeleteEnvDto) {
-        return this.envService.deleteEnv(deleteEnvDto);
+    async deleteEnvController(@Body() deleteEnvDto: DeleteEnvDto) {
+        return this.envService.deleteEnvService(deleteEnvDto);
     }
 
     @OpeModule(OperateModule.ENDPOINT)
@@ -67,14 +67,14 @@ export class EnvController {
     @ApiOperation({ title: 'create endpoint' })
     @ApiResponse({ status: 200, description: 'create endpoint success.'})
     @Post('endpoint')
-    async createEndpoint(@Body() addEndpointDto: AddEndpointDto) {
-        return this.envService.addEndpoint(addEndpointDto);
+    async createEndpointController(@Body() addEndpointDto: AddEndpointDto) {
+        return this.envService.addEndpointService(addEndpointDto);
     }
 
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Get('/endpoint')
-    async findEndpointByEnvId( @Query('envIds') envIds){
+    async findEndpointByEnvIdController( @Query('envIds') envIds){
         return this.envService.findEndpointByEnv(envIds);
     }
 
@@ -82,7 +82,7 @@ export class EnvController {
   @ApiOperation({ title: 'find endpoint' })
   @ApiResponse({ status: 200, description: 'find endpoint success.'})
   @Get('/all_endpoint')
-  async findEndpoint(){
+  async findEndpointController(){
     return this.envService.findAllEndpointService();
   }
 
@@ -92,8 +92,8 @@ export class EnvController {
     @ApiOperation({ title: 'find endpoint' })
     @ApiResponse({ status: 200, description: 'find endpoint success.'})
     @Delete('/endpoint')
-    async deleteEndpointByIds(@Body() deleteEndpointDto: DeleteEndpointDto){
-        return this.envService.deleteEndpointByIds(deleteEndpointDto);
+    async deleteEndpointByIdsController(@Body() deleteEndpointDto: DeleteEndpointDto){
+        return this.envService.deleteEndpointByIdsService(deleteEndpointDto);
     }
 
 }

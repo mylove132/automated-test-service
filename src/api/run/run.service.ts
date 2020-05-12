@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { HttpStatus, Injectable, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -22,6 +23,7 @@ import {
 } from "../../datasource/case/case.sql";
 import { ParamType } from "../../config/base.enum";
 import { CommonUtil } from "../../utils/common.util";
+import { Logger } from "../../utils/log4js";
 
 
 @Injectable()
@@ -34,7 +36,6 @@ export class RunService {
     private readonly curlService: CurlService,
     private readonly historyService: HistoryService,
     private readonly envService: EnvService,
-    //@InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue
   ) {
   }
   private tmpResult = {};
@@ -44,7 +45,7 @@ export class RunService {
    * @param runCaseDto
    */
   async runTempCase(runCaseDto: RunCaseDto): Promise<any> {
-    CommonUtil.printLog1(JSON.stringify(runCaseDto))
+    Logger.info(`运行临时接口请求数据：JSON.stringify(runCaseDto)`)
     let resultObj = {};
     resultObj["startTime"] = new Date();
     // 生成请求数据
@@ -57,7 +58,7 @@ export class RunService {
     requestData.headers = headers;
     requestData.url = url;
     // 响应结果
-    CommonUtil.printLog1(JSON.stringify(requestData));
+    Logger.info(`运行临时接口响应结果JSON.stringify(requestData)`);
     const result = await this.curlService.makeRequest(requestData).toPromise().catch(
       err => {
         throw new  BadRequestException(`执行url--${url}--失败`, err);
@@ -77,6 +78,7 @@ export class RunService {
    */
   async runCaseById(runCaseById: IRunCaseById): Promise<any> {
     let resultList = [];
+    Logger.info(`通过ID执行接口ID集合：${runCaseById.caseIds},环境ID：${runCaseById.envId},接口执行者：${runCaseById.executor}`)
     for (let caseId of runCaseById.caseIds) {
       let resultObj = {};
       const startTime = new Date();
@@ -96,7 +98,7 @@ export class RunService {
       requestData.method = this.parseRequestMethod(runCaseDto);
       requestData.headers = headers;
       requestData.url = url;
-      CommonUtil.printLog2('接口请求参数:' + JSON.stringify(requestData))
+      Logger.info('接口请求参数:' + JSON.stringify(requestData))
       const result = await this.curlService.makeRequest(requestData).toPromise().catch(
         err => {
           throw new BadRequestException(`执行url--${url}--失败`, err);

@@ -164,7 +164,7 @@ export const saveToken = async (tokenEntityRepository: Repository<TokenEntity>, 
  * @param tokenEntityRepository
  * @param ids
  */
-export const deleteTokenByIds = async (tokenEntityRepository: Repository<TokenEntity>, ids) => {
+export const deleteTokenByIds = async (tokenEntityRepository: Repository<TokenEntity>, ids: any) => {
     return await tokenEntityRepository.delete(ids).
     catch(
         err => {

@@ -1,5 +1,4 @@
 import {InjectRepository} from '@nestjs/typeorm';
-import {UserEntity} from '../user/user.entity';
 import { Repository} from 'typeorm';
 import {CatalogEntity} from './catalog.entity';
 import {CreateCatalogDto, DeleteCatalogDto, UpdateCatalogDto} from './dto/catalog.dto';
@@ -34,7 +33,7 @@ export class CatalogService {
      * 添加目录
      * @param createCatalogDto
      */
-    async addCatalog(createCatalogDto: CreateCatalogDto) {
+    async addCatalogService(createCatalogDto: CreateCatalogDto) {
         const { name, isPub, parentId, platformCode} = createCatalogDto;
         const catalog = new CatalogEntity();
         const platformObj = await findPlatformCodeByCode(this.platformRepository, platformCode);
@@ -42,6 +41,7 @@ export class CatalogService {
         catalog.parentId = createCatalogDto.parentId;
         catalog.name = createCatalogDto.name;
         catalog.isPub = isPub;
+        Logger.info(`添加的目录数据：${JSON.stringify(catalog)}`)
         return await saveCatalog(this.catalogRepository, catalog);
     }
 
@@ -51,7 +51,7 @@ export class CatalogService {
      * @param platformCode
      * @param isPub
      */
-    async findCatalog(platformCode: string): Promise<CatalogEntity[]> {
+    async findCatalogService(platformCode: string): Promise<CatalogEntity[]> {
         let platformCodes = [];
         platformCode.indexOf(',') != -1 ? platformCodes = platformCode.split(',').map(pc => {return pc;}) : platformCodes.push(platformCode);
         const platformIdList = (await findPlatformCodeByCodeList(this.platformRepository, platformCodes)).map(pc => {return pc.id;});
@@ -60,7 +60,7 @@ export class CatalogService {
     }
 
 
-    async findPlatformCode(): Promise<PlatformCodeEntity[]> {
+    async findPlatformCodeService(): Promise<PlatformCodeEntity[]> {
         return await findAllPlatformCode(this.platformRepository);
     }
 
@@ -70,13 +70,7 @@ export class CatalogService {
      * 删除目录
      * @param deleteCatalogDto
      */
-    async deleteById(deleteCatalogDto: DeleteCatalogDto) {
-        const catalogList = await findCatalogOfCaseByIds(this.catalogRepository, deleteCatalogDto.ids);
-        catalogList.map(
-            catalog => {
-                Logger.info(`删除目录：${catalog.name},所含用例：${catalog.cases == [] ? null:catalog.cases.map(cas => {return cas.name})}`)
-            }
-        );
+    async deleteByIdService(deleteCatalogDto: DeleteCatalogDto) {
         return  await deleteCatalogByIds(this.catalogRepository, deleteCatalogDto.ids);
     }
 
@@ -84,7 +78,7 @@ export class CatalogService {
      * 更新目录
      * @param updateCatalogDto
      */
-    async updateCatalog(updateCatalogDto: UpdateCatalogDto): Promise<Object> {
+    async updateCatalogService(updateCatalogDto: UpdateCatalogDto): Promise<Object> {
         const {id, name, isPub, platformCode} = updateCatalogDto;
         const catalogObj = new CatalogEntity();
         const catalog = await findCatalogById(this.catalogRepository, id);
@@ -93,6 +87,7 @@ export class CatalogService {
         catalogObj.isPub = isPub;
         catalogObj.platformCode = platformObj;
         if (catalog.name) catalogObj.name = name;
+        Logger.info(`更新目录的数据：${catalogObj}`);
         return await updateCatalog(this.catalogRepository, catalogObj, id);
 
     }

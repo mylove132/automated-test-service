@@ -62,11 +62,10 @@ export class CaseService {
      * 添加用例
      * @param createCaseDto
      */
-    async addCase(createCaseDto: CreateCaseDto) {
+    async addCaseService(createCaseDto: CreateCaseDto) {
 
-        Logger.info(`添加目录:${createCaseDto.name}`);
+        Logger.info(`添加接口: ${createCaseDto.name}`);
         const caseObj = new CaseEntity();
-
         if (createCaseDto.isNeedSign != null) caseObj.isNeedSign = createCaseDto.isNeedSign;
         if (createCaseDto.caseGrade != null) caseObj.caseGrade = createCaseDto.caseGrade;
         if (createCaseDto.tokenId != null) caseObj.token = await findTokenById(this.tokenRepository, createCaseDto.tokenId);
@@ -96,6 +95,7 @@ export class CaseService {
         caseObj.path = pa;
         caseObj.header = createCaseDto.header;
         caseObj.param = createCaseDto.param;
+        Logger.info(`添加接口的数据信息: ${JSON.stringify(caseObj)}`)
         const result = await saveCase(this.caseRepository, caseObj);
         const cObj = new CaseEntity();
         cObj.alias = "alias" + result.id;
@@ -111,7 +111,7 @@ export class CaseService {
      * @param caseGradeList
      * @param options 分页信息
      */
-    async findCase(catalogId: number, envId: number, caseGradeList: number[], options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
+    async findCaseService(catalogId: number, envId: number, caseGradeList: number[], options: IPaginationOptions): Promise<Pagination<CaseEntity>> {
 
         if (envId == 0 || envId == null) throw new ApiException(`envId不能为空或者0`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         const queryBuilder = await findCaseByCatalogIdAndCaseTypeAndCaseGrade(this.caseRepository, catalogId, caseGradeList);
@@ -124,7 +124,7 @@ export class CaseService {
      * 通过id删除用例
      * @param deleteCaseDto
      */
-    async deleteById(deleteCaseDto: DeleteCaseDto) {
+    async deleteByIdService(deleteCaseDto: DeleteCaseDto) {
         const caseNames = await finCaseNamesByIds(this.caseRepository, deleteCaseDto.ids);
         Logger.info(`删除的用例：${caseNames.map(cas => {return cas.name})}`);
         return await deleteCase(this.caseRepository, deleteCaseDto.ids);
@@ -133,14 +133,14 @@ export class CaseService {
     /**
      * 获取所有的断言类型
      */
-    async getAllAssertType() {
+    async getAllAssertTypeService() {
         return await findAllAssertType(this.assertTypeRepository);
     }
 
     /**
      * 获取所有的断言判断
      */
-    async getAllAssertJudge() {
+    async getAllAssertJudgeService() {
         return await findAllAssertJudge(this.assertJudgeRepository);
     }
 
@@ -148,7 +148,7 @@ export class CaseService {
      * 更新接口用例
      * @param updateCaseDto
      */
-    async updateCase(updateCaseDto: UpdateCaseDto) {
+    async updateCaseService(updateCaseDto: UpdateCaseDto) {
 
         console.log(JSON.stringify(updateCaseDto))
         const caseObj = new CaseEntity();
@@ -173,6 +173,8 @@ export class CaseService {
         if (updateCaseDto.assertType != null) caseObj.assertType = await findAssertTypeById(this.assertTypeRepository, updateCaseDto.assertType);
         if (updateCaseDto.assertJudge != null) caseObj.assertJudge = await findAssertJudgeById(this.assertJudgeRepository, updateCaseDto.assertJudge);
         if (updateCaseDto.assertKey != null) caseObj.assertKey = updateCaseDto.assertKey;
+
+        Logger.info(`更新接口的数据：${JSON.stringify(caseObj)}`)
         return await updateCase(this.caseRepository, caseObj, updateCaseDto.id);
     }
 
@@ -180,7 +182,7 @@ export class CaseService {
         return await searchCaseByName(this.caseRepository, name);
     }
 
-    async unionFindAllEndpoint() {
+    async unionFindAllEndpointService() {
         return await findCaseUnionEndpoint(this.caseRepository);
     }
 
@@ -188,9 +190,9 @@ export class CaseService {
      * 批量更新目录ID
      * @param batchUpdateCatalogDto
      */
-    async batchUpdateCatalog(batchUpdateCatalogDto: BatchUpdateCatalogDto){
+    async batchUpdateCatalogService(batchUpdateCatalogDto: BatchUpdateCatalogDto){
         const catalog = await findCatalogById(this.catalogRepository, batchUpdateCatalogDto.catalogId);
-        CommonUtil.printLog1(JSON.stringify(catalog))
+        Logger.info(`批量迁移的目录：${JSON.stringify(catalog)}`)
         return await batchUpdateCaseOfCatalogId(this.caseRepository, batchUpdateCatalogDto.caseIds, catalog);
     }
 }

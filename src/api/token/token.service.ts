@@ -1,17 +1,17 @@
-import {HttpStatus, Injectable, BadRequestException} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {DeleteResult, Repository} from 'typeorm';
-import {ApiException} from '../../shared/exceptions/api.exception';
-import {ApiErrorCode} from '../../shared/enums/api.error.code';
-import {TokenEntity} from "./token.entity";
-import {CreateTokenDto, DeleteTokenDto, UpdateTokenDto} from "./dto/token.dto";
-import {getRequestMethodTypeString} from "../../utils";
-import {CurlService} from "../curl/curl.service";
-import {EnvEntity} from "../env/env.entity";
-import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
-import {PlatformCodeEntity} from "../catalog/platformCode.entity";
-import {Logger} from "../../utils/log4js";
-import {Cron} from "@nestjs/schedule";
+import { HttpStatus, Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository } from 'typeorm';
+import { ApiException } from '../../shared/exceptions/api.exception';
+import { ApiErrorCode } from '../../shared/enums/api.error.code';
+import { TokenEntity } from "./token.entity";
+import { CreateTokenDto, DeleteTokenDto, UpdateTokenDto } from "./dto/token.dto";
+import { getRequestMethodTypeString } from "../../utils";
+import { CurlService } from "../curl/curl.service";
+import { EnvEntity } from "../env/env.entity";
+import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
+import { PlatformCodeEntity } from "../catalog/platformCode.entity";
+import { Logger } from "../../utils/log4js";
+import { Cron } from "@nestjs/schedule";
 import {
     deleteTokenByIds,
     findAllTokenByPlatformCodeIdAndEnvId,
@@ -25,10 +25,10 @@ import {
     updateToken,
     updateTokenByNewToken
 } from "../../datasource/token/token.sql";
-import {findEnvById} from "../../datasource/env/env.sql";
-import {findPlatformCodeById} from "../../datasource/platformCode/platform.sql";
-import {from} from "rxjs";
-import {distinct} from "rxjs/operators";
+import { findEnvById } from "../../datasource/env/env.sql";
+import { findPlatformCodeById } from "../../datasource/platformCode/platform.sql";
+import { from } from "rxjs";
+import { distinct } from "rxjs/operators";
 import { CommonUtil } from "../../utils/common.util";
 
 
@@ -59,7 +59,7 @@ export class TokenService {
      */
     async addTokenService(createTokenDto: CreateTokenDto) {
         const url = createTokenDto.url.charAt(createTokenDto.url.length - 1) ==
-        '/' ? createTokenDto.url.substring(0, createTokenDto.url.length - 1) : createTokenDto.url;
+            '/' ? createTokenDto.url.substring(0, createTokenDto.url.length - 1) : createTokenDto.url;
         const tObj = await findTokenByUrlAndUsername(this.tokenRepository, url, createTokenDto.username);
         if (tObj) throw new ApiException(`url: ${createTokenDto.url} 与用户名: ${createTokenDto.username} 已存在`,
             ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -69,9 +69,9 @@ export class TokenService {
         tokenObj.url = url;
         tokenObj.body = createTokenDto.body;
         tokenObj.platformCode = await findPlatformCodeById(this.platformRepository, createTokenDto.platformCodeId);
-        CommonUtil.printLog2(JSON.stringify(tokenObj))
+        Logger.info(`添加token的数据信息：${JSON.stringify(tokenObj)}`)
         const token = await this.getNewToken(tokenObj.url, tokenObj.body);
-        if (!token) throw new ApiException('获取登录token失败',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        if (!token) throw new ApiException('获取登录token失败', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         tokenObj.token = token;
         return await saveToken(this.tokenRepository, tokenObj);
     }
@@ -82,7 +82,7 @@ export class TokenService {
      * @param platformCodeId 平台code码
      * @param options
      */
-    async findToken(envId: number, platformCodeId: number, options: IPaginationOptions): Promise<Pagination<TokenEntity>> {
+    async findTokenService (envId: number, platformCodeId: number, options: IPaginationOptions): Promise<Pagination<TokenEntity>> {
         let queryBuilder = await findTokenByEnvIdAndPlatformCode(this.tokenRepository, envId, platformCodeId);
         return await paginate<TokenEntity>(queryBuilder, options);
 
@@ -91,8 +91,8 @@ export class TokenService {
     /**
      * 获取所有token表中的platform（去重）
      */
-    async getAllTokenOfPlatform(){
-        const result = (await findAllTokenPlatform(this.tokenRepository)).map(res => {return res.platformCode});
+    async getAllTokenOfPlatformService() {
+        const result = (await findAllTokenPlatform(this.tokenRepository)).map(res => { return res.platformCode });
         let rs = [];
         from(result).pipe(
             distinct((item) => item.id),
@@ -105,8 +105,8 @@ export class TokenService {
     /**
      * 获取token中环境通过platformCodeID（去重）
      */
-    async getAllTokenOfEnv(platformCodeId){
-      const result = (await findAllTokenEnvByPlatformCodeId(this.tokenRepository, platformCodeId)).map(res => {return res.env});
+    async getAllTokenOfEnvService(platformCodeId: number) {
+        const result = (await findAllTokenEnvByPlatformCodeId(this.tokenRepository, platformCodeId)).map(res => { return res.env });
         let rs = [];
         from(result).pipe(
             distinct((item) => item.id),
@@ -119,8 +119,8 @@ export class TokenService {
     /**
      * 获取token中环境通过platformCodeID（去重）
      */
-    async getAllTokenByEnvIdAndPlatformId(platformCodeId, envId) {
-        const result = (await findAllTokenByPlatformCodeIdAndEnvId(this.tokenRepository, platformCodeId, envId)).map(res => {return {username: res.username,tokenId: res.id}});
+    async getAllTokenByEnvIdAndPlatformIdService (platformCodeId: number, envId: number) {
+        const result = (await findAllTokenByPlatformCodeIdAndEnvId(this.tokenRepository, platformCodeId, envId)).map(res => { return { username: res.username, tokenId: res.id } });
         return result;
     }
 
@@ -150,13 +150,14 @@ export class TokenService {
         tokenObj.url = updateTokenDto.url != null ? updateTokenDto.url.charAt(updateTokenDto.url.length - 1) == '/' ?
             updateTokenDto.url.substring(0, updateTokenDto.url.length - 1) : updateTokenDto.url : tokenObj.url;
         tokenObj.token = await this.getNewToken(tokenObj.url, tokenObj.body);
+        Logger.info(`更新token的数据信息： ${JSON.stringify(tokenObj)}`)
         return await updateToken(this.tokenRepository, tokenObj, updateTokenDto.id);
     }
 
     /**
      *  定时更新token
      */
-    @Cron('0 0 0 * * *')
+    @Cron('0 0 0 * * *', { name: 'updateToken' })
     async updateTokenTask() {
         Logger.info('-----------------执行token定时更新任务----------------------');
         Logger.access('-----------------执行token定时更新任务----------------------');
@@ -182,19 +183,17 @@ export class TokenService {
             method: getRequestMethodTypeString(1),
             data: JSON.parse(body)
         };
-        CommonUtil.printLog2('token请求体:'+JSON.stringify(requestData))
         const result = await this.curlService.makeRequest(requestData).toPromise().catch(
             err => {
-              throw new BadRequestException(`执行url--${url}--失败`, err);
+                throw new BadRequestException(`执行url--${url}--失败`, err);
             }
-          );
+        );
         if (!result) {
             throw new ApiException(`登录URL：${url}，登录body：${body},登录失败`,
                 ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
         let token: string;
-        CommonUtil.printLog2(JSON.stringify(result));
-        if (!result.data) throw new ApiException('获取token的用户数据有误，请检查',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        if (!result.data) throw new ApiException('获取token的用户数据有误，请检查', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         if (result.data.code === 10000) {
             token = CommonUtil.getTokenFromResult(result.data);
         } else {

@@ -47,22 +47,22 @@ export class TokenController {
   async findCaseByIdController(@Query("envId") envId?: number, @Query("platformCodeId") platformCodeId?: number,
                                @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
-    return this.tokenService.findToken(envId, platformCodeId, { page, limit });
+    return this.tokenService.findTokenService(envId, platformCodeId, { page, limit });
   }
 
   @Get("platform")
   async findTokenOfPlatformController() {
-    return await this.tokenService.getAllTokenOfPlatform();
+    return await this.tokenService.getAllTokenOfPlatformService();
   }
 
   @Get("env")
   async findTokenOfEnvController(@Query("platformCodeId") platformCodeId: number) {
-    return await this.tokenService.getAllTokenOfEnv(platformCodeId);
+    return await this.tokenService.getAllTokenOfEnvService(platformCodeId);
   }
 
   @Get("userAndToken")
   async findTokenOfEnvAndPlatformController(@Query("platformCodeId") platformCodeId: number, @Query("envId") envId: number) {
-    return await this.tokenService.getAllTokenByEnvIdAndPlatformId(platformCodeId, envId);
+    return await this.tokenService.getAllTokenByEnvIdAndPlatformIdService(platformCodeId, envId);
   }
 
   @OpeModule(OperateModule.TOKEN)

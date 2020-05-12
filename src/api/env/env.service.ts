@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {EnvEntity} from './env.entity';
@@ -31,7 +32,7 @@ export class EnvService {
     /**
      * 获取所有的环境
      */
-    async allEnv(){
+    async allEnvService(){
         return await findAllEnv(this.envRepository);
     }
 
@@ -39,10 +40,11 @@ export class EnvService {
      * 添加环境
      * @param env
      */
-    async addEnv(env: EnvEntity){
+    async addEnvService(env: EnvEntity){
         if (!env.name) throw new ApiException('环境名称不能为空',ApiErrorCode.ENV_NAME_INVAILD, HttpStatus.BAD_REQUEST);
         const envObj = new EnvEntity();
         envObj.name = env.name;
+        Logger.info(`添加环境名称：${env.name}`);
        return await addEnv(this.envRepository, envObj);
     }
 
@@ -50,13 +52,14 @@ export class EnvService {
      * 更新环境
      * @param env
      */
-    async updateEnv(env: EnvEntity){
+    async updateEnvService(env: EnvEntity){
         if (!env.id) throw new ApiException('环境id不能为空',ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         const envO = await findEnvById(this.envRepository, env.id);
         if (!envO) throw new ApiException(`更新env的ID：${env.id}不存在`,ApiErrorCode.ENV_ID_INVALID, HttpStatus.BAD_REQUEST);
         const envObj = new EnvEntity();
         envObj.id = env.id;
         envObj.name = env.name;
+        Logger.info(`更新环境数据：${JSON.stringify(envObj)}`);
         return await updateEnv(this.envRepository, envObj, env.id);
     }
 
@@ -74,7 +77,7 @@ export class EnvService {
      * 删除环境
      * @param deleteEnvDto
      */
-    async deleteEnv(deleteEnvDto: DeleteEnvDto){
+    async deleteEnvService(deleteEnvDto: DeleteEnvDto){
         const envNames = await findEnvByIds(this.envRepository, deleteEnvDto.ids);
         Logger.info(`删除的环境名称：${envNames}`);
         return await deleteEnvByIds(this.envRepository, deleteEnvDto.ids);
@@ -84,7 +87,7 @@ export class EnvService {
      * 删除endpoint
      * @param deleteEndpointDto
      */
-    async deleteEndpointByIds( deleteEndpointDto: DeleteEndpointDto){
+    async deleteEndpointByIdsService( deleteEndpointDto: DeleteEndpointDto){
        return await deleteEndpointByIds(this.endpointgRepository, deleteEndpointDto.endpointIds);
     }
 
@@ -92,7 +95,7 @@ export class EnvService {
      * 添加endpoint实体
      * @param addEndpointDto
      */
-    async addEndpoint(addEndpointDto: AddEndpointDto){
+    async addEndpointService(addEndpointDto: AddEndpointDto){
         const addPoint = new EndpointEntity();
         const endpoint = CommonUtil.handleUrl(addEndpointDto.endpoint);
         const endpointObj = await findEndpointInstanceByEndpoint(this.endpointgRepository, endpoint);
@@ -104,6 +107,7 @@ export class EnvService {
        addPoint.name = addEndpointDto.name;
        addPoint.endpoint = endpoint;
        addPoint.envs = envList;
+       Logger.info(`添加endpoint数据：${JSON.stringify(addPoint)}`);
       return await saveEndpoint(this.endpointgRepository, addPoint);
     }
 
@@ -140,7 +144,6 @@ export class EnvService {
         if (!reg.test(endpoint)) {
             return endpoint
         }
-        //let result = '';
         const envData = await findEnvById(this.envRepository, envId);
         let urlList: any = endpoint.split('.');
 

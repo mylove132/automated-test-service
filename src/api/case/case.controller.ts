@@ -19,8 +19,8 @@ export class CaseController {
     @ApiOperation({title: 'create case'})
     @ApiResponse({status: 200, description: 'create case success.'})
     @Post()
-    async createCase(@Body() createCaseDto: CreateCaseDto) {
-        return this.caseService.addCase(createCaseDto);
+    async createCaseController(@Body() createCaseDto: CreateCaseDto) {
+        return this.caseService.addCaseService(createCaseDto);
     }
 
 
@@ -28,21 +28,21 @@ export class CaseController {
     @ApiOperation({title: 'search case'})
     @ApiResponse({status: 200, description: 'search case success.'})
     @Get('search')
-    async queryCase(@Query('name')name: string) {
+    async queryCaseController(@Query('name')name: string) {
         return this.caseService.searchCaseByNameService(name);
     }
 
     @ApiOperation({title: 'query case'})
     @ApiResponse({status: 200, description: 'query case success.'})
     @Get()
-    async findCaseById(@Query('catalogId') catalogId: number, @Query('envId') envId: number,
+    async findCaseByIdController(@Query('catalogId') catalogId: number, @Query('envId') envId: number,
                        @Query('caseGrade') caseGrade?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10) {
         limit = limit > 100 ? 100 : limit;
         let caseGradeList = [];
         caseGrade == null ? caseGradeList.push(0, 1, 2) : caseGrade.indexOf(',') ? caseGrade.split(',').map(grade => {
             caseGradeList.push(Number(grade))
         }) : caseGradeList.push(Number(caseGrade));
-        return this.caseService.findCase(catalogId, envId, caseGradeList, {page, limit});
+        return this.caseService.findCaseService(catalogId, envId, caseGradeList, {page, limit});
     }
 
     @OpeModule(OperateModule.CASE)
@@ -51,8 +51,8 @@ export class CaseController {
     @ApiOperation({title: 'delete case'})
     @ApiResponse({status: 200, description: 'delete case success.'})
     @Delete('')
-    async deleteCase(@Body() deleteCaseDto: DeleteCaseDto) {
-        return this.caseService.deleteById(deleteCaseDto);
+    async deleteCaseController(@Body() deleteCaseDto: DeleteCaseDto) {
+        return this.caseService.deleteByIdService(deleteCaseDto);
     }
 
 
@@ -62,22 +62,22 @@ export class CaseController {
     @ApiOperation({title: 'update case'})
     @ApiResponse({status: 200, description: 'update case success.'})
     @Put('')
-    async updateCase(@Body() updateCaseDto: UpdateCaseDto) {
-        return this.caseService.updateCase(updateCaseDto);
+    async updateCaseController(@Body() updateCaseDto: UpdateCaseDto) {
+        return this.caseService.updateCaseService(updateCaseDto);
     }
 
     @ApiOperation({title: 'batch update case'})
     @ApiResponse({status: 200, description: 'batch update case success.'})
     @Put('batchUpdate')
-    async batchUpdate(@Body() batchUpdateCatalogDto: BatchUpdateCatalogDto) {
-        return this.caseService.batchUpdateCatalog(batchUpdateCatalogDto);
+    async batchUpdateController(@Body() batchUpdateCatalogDto: BatchUpdateCatalogDto) {
+        return this.caseService.batchUpdateCatalogService(batchUpdateCatalogDto);
     }
 
     @ApiOperation({title: 'get all union endpoint case'})
     @ApiResponse({status: 200, description: 'get all union endpoint success.'})
     @Get('endpoints')
-    async unionFindEndpoint() {
-        return this.caseService.unionFindAllEndpoint();
+    async unionFindEndpointController() {
+        return this.caseService.unionFindAllEndpointService();
     }
 
 
@@ -85,14 +85,14 @@ export class CaseController {
     @ApiResponse({status: 200, description: 'get all assertType success.'})
     @Get('assert-type')
     async allAssertType() {
-        return this.caseService.getAllAssertType();
+        return this.caseService.getAllAssertTypeService();
     }
 
     @ApiOperation({title: 'get all assertType'})
     @ApiResponse({status: 200, description: 'get all assertType success.'})
     @Get('assert-judge')
     async allAssertJudge() {
-        return this.caseService.getAllAssertJudge();
+        return this.caseService.getAllAssertJudgeService();
     }
 
 

@@ -1,0 +1,1 @@
+ALTER TABLE "catalog" ADD "isRealDelete" boolean NOT NULL DEFAULT false;

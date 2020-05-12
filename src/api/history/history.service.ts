@@ -39,7 +39,7 @@ export class HistoryService {
    * @param {number, IPaginationOptions}: id, 页码信息
    * @return {Promise<Pagination<HistoryEntity>>}: 历史记录列表
    */
-  async findHistoryList(historyPath: string, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
+  async findHistoryListService(historyPath: string, options: IPaginationOptions): Promise<Pagination<HistoryEntity>> {
       const queryBuilder = await findHistoryByPath(this.historyRepository, historyPath);
         return await paginate<HistoryEntity>(queryBuilder, options);
   }

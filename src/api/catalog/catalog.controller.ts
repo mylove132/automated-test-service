@@ -24,26 +24,26 @@ export class CatalogController {
   @ApiOperation({ title: 'create catalog' })
   @ApiResponse({ status: 200, description: 'create catalog success.'})
   @Post()
-  async createCatalog(@Body() createCatalogDto: CreateCatalogDto) {
-    return await this.catalogService.addCatalog(createCatalogDto);
+  async createCatalogController(@Body() createCatalogDto: CreateCatalogDto) {
+    return await this.catalogService.addCatalogService(createCatalogDto);
   }
 
 
   @ApiOperation({ title: 'query catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Get()
-  async findCatalogByPlatformCode(@Query('platformCode') platformCode: string): Promise<CatalogEntity[]> {
+  async findCatalogByPlatformCodeController(@Query('platformCode') platformCode: string): Promise<CatalogEntity[]> {
       if (platformCode == null){
           throw new ApiException("查询目录platformCode参数不能为空", ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
       }
-    return this.catalogService.findCatalog(platformCode);
+    return this.catalogService.findCatalogService(platformCode);
   }
 
   @ApiOperation({ title: 'query platformCode list' })
   @ApiResponse({ status: 200, description: 'query platformCode list success.'})
   @Get('platformCodeList')
-  async findPlatformCode(): Promise<PlatformCodeEntity[]> {
-    return this.catalogService.findPlatformCode();
+  async findPlatformCodeController(): Promise<PlatformCodeEntity[]> {
+    return this.catalogService.findPlatformCodeService();
   }
 
   @OpeModule(OperateModule.CATALOG)
@@ -52,8 +52,8 @@ export class CatalogController {
   @ApiOperation({ title: 'delete catalog' })
   @ApiResponse({ status: 200, description: 'query catalog success.'})
   @Delete('')
-  async deleteCatalog(@Body() deleteCatalogDto: DeleteCatalogDto) {
-    return this.catalogService.deleteById(deleteCatalogDto);
+  async deleteCatalogController(@Body() deleteCatalogDto: DeleteCatalogDto) {
+    return this.catalogService.deleteByIdService(deleteCatalogDto);
   }
 
   @OpeModule(OperateModule.CATALOG)
@@ -62,8 +62,8 @@ export class CatalogController {
   @ApiOperation({ title: 'update catalog' })
   @ApiResponse({ status: 200, description: 'update catalog success.'})
   @Put('')
-  async updateCatalog(@Body() updateCatalogDto: UpdateCatalogDto) {
-    return this.catalogService.updateCatalog(updateCatalogDto);
+  async updateCatalogController(@Body() updateCatalogDto: UpdateCatalogDto) {
+    return this.catalogService.updateCatalogService(updateCatalogDto);
   }
 
 }

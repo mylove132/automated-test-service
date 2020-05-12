@@ -10,12 +10,6 @@ import {CreateJmeterDto, JmeterIdsDto, UpdateJmeterDto} from "./dto/jmeter.dto";
 export class JmeterController {
   constructor(private jmeterService: JmeterService) {}
 
-  @Get('download')
-  @SetMetadata('isOpen', true)
-  async jmeterDownload(){
-    return this.jmeterService.jmeterDownload();
-  }
-
   // @Post('upload')
   // //@UseInterceptors(FileInterceptor('file'))
   // @SetMetadata('isOpen', true)
@@ -25,52 +19,52 @@ export class JmeterController {
 
   @Post('')
   @SetMetadata('isOpen', true)
-  async jmeterCreate(@Body() createJmeterDto: CreateJmeterDto){
-    return this.jmeterService.createJmeterInfo(createJmeterDto);
+  async jmeterCreateController (@Body() createJmeterDto: CreateJmeterDto){
+    return this.jmeterService.createJmeterInfoService(createJmeterDto);
   }
 
   @Put('')
   @SetMetadata('isOpen', true)
-  async jmeterUpdate(@Body() updateJmeterDto: UpdateJmeterDto){
-    return this.jmeterService.updateJmeterInfo(updateJmeterDto);
+  async jmeterUpdateController (@Body() updateJmeterDto: UpdateJmeterDto){
+    return this.jmeterService.updateJmeterInfoService(updateJmeterDto);
   }
 
     @Delete('')
     @SetMetadata('isOpen', true)
     async jmeterDetele(@Body() jmeterIdsDto: JmeterIdsDto){
-        return this.jmeterService.deleteJmeterInfo(jmeterIdsDto);
+        return this.jmeterService.deleteJmeterInfoService(jmeterIdsDto);
     }
 
   @Get('watchResult')
   @SetMetadata('isOpen', true)
-  async watchJmeterResult(@Query('md5') md5: string){
-    return this.jmeterService.findResult(md5);
+  async watchJmeterResultController (@Query('md5') md5: string){
+    return this.jmeterService.findResultService(md5);
   }
 
   @Get('jmeterList')
   @SetMetadata('isOpen', true)
-  async queryJmeterList(@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+  async queryJmeterListController (@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
     limit = limit > 100 ? 100 : limit;
-    return await this.jmeterService.queryJmeterList(name, {page, limit});
+    return await this.jmeterService.queryJmeterListService(name, {page, limit});
   }
 
   @Get('jmeterResultList')
   @SetMetadata('isOpen', true)
-  async queryJmeterResultList(@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+  async queryJmeterResultListController (@Query('name') name?: string, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
     limit = limit > 100 ? 100 : limit;
-    return await this.jmeterService.queryJmeterResultList(name, {page, limit});
+    return await this.jmeterService.queryJmeterResultListService(name, {page, limit});
   }
 
   @Get('jmeterResultListByJmeterId')
   @SetMetadata('isOpen', true)
-  async queryJmeterResultListByJmeterId(@Query('jmeterId') jmeterId: number, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+  async queryJmeterResultListByJmeterIdController (@Query('jmeterId') jmeterId: number, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
     limit = limit > 100 ? 100 : limit;
-    return await this.jmeterService.queryJmeterResultListByJmeterId(jmeterId, {page, limit});
+    return await this.jmeterService.queryJmeterResultListByJmeterIdService(jmeterId, {page, limit});
   }
 
   @Get('watchLog')
   @SetMetadata('isOpen', true)
-  async watchLog(@Query('md5') md5: string){
-    return this.jmeterService.catLog(md5);
+  async watchLogController (@Query('md5') md5: string){
+    return this.jmeterService.catLogService(md5);
   }
 }

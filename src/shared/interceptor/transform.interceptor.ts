@@ -40,7 +40,7 @@ export class TransformInterceptor implements NestInterceptor {
         operate.requestParam = JSON.stringify(req.body);
         operate.responseParam = JSON.stringify(data);
         operate.user = req.user;
-        this.operateService.createOperate(operate).then(
+        this.operateService.createOperateService(operate).then(
         )
         return res;
       })

@@ -4,7 +4,7 @@ import { catchError, map, timeout } from 'rxjs/operators';
 import { AxiosRequestConfig } from 'axios';
 import { mergeScan, last } from 'rxjs/operators';
 import { ConfigService } from '../../config/config.service';
-
+import { Logger } from '../../utils/log4js';
 @Injectable()
 export class CurlService {
 	constructor(
@@ -18,7 +18,7 @@ export class CurlService {
 	 sendDingTalkMessage(message: string) {
 		const token = this.configService.dingtalkAccessToken;
 		const env = this.configService.env === 'production' ? '生产' : '测试';
-		console.log('钉钉消息环境：'+env)
+		Logger.info(`发送钉钉消息：${message}`);
 		const result = this.httpService.post(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
 			msgtype: 'text',
 			text: {

@@ -26,7 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     exceptionObj.uri = request.originalUrl;
     exceptionObj.requestParam = JSON.stringify(request.body);
     exceptionObj.user = request.user;
-    this.operateService.createException(exceptionObj);
+    this.operateService.createExceptionService(exceptionObj);
     response
       .status(status)
       .json({

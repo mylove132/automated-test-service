@@ -105,7 +105,7 @@ export class UpdateCaseDto {
     readonly type: RequestType;
 
     @IsOptional()
-    catalogId: string;
+    catalogId: number;
 
     @IsOptional()
     paramType: ParamType;

@@ -42,4 +42,7 @@ export class CatalogEntity {
     
     @ManyToMany(type => SchedulerEntity, scheduler => scheduler.catalogs)
     scheduler: SchedulerEntity[];
+
+    @Column({default: false})
+    isRealDelete: boolean;
 }

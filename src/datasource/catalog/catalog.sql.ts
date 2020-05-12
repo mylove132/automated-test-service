@@ -9,7 +9,7 @@ import {HttpStatus} from "@nestjs/common";
  * @param catalogEntityRepository
  * @param id
  */
-export const findCatalogById = async (catalogEntityRepository: Repository<CatalogEntity>, id) => {
+export const findCatalogById = async (catalogEntityRepository: Repository<CatalogEntity>, id: number) => {
     return await catalogEntityRepository.findOne(id).catch(
         err => {
             console.log(err);
@@ -23,9 +23,10 @@ export const findCatalogById = async (catalogEntityRepository: Repository<Catalo
  * @param catalogEntityRepository
  * @param ids
  */
-export const findCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids) => {
+export const findCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids: any) => {
     return await catalogEntityRepository.createQueryBuilder('catalog').
       where('catalog.id IN (:...ids)',{ids: ids}).
+      andWhere('catalog.isRealDelete = :isRealDelete',{isRealDelete: false}).
     getMany().catch(
         err => {
             console.log(err);
@@ -38,6 +39,7 @@ export const findCatalogOfCaseByIds = async (catalogEntityRepository: Repository
     return await catalogEntityRepository.createQueryBuilder('catalog').
         leftJoinAndSelect('catalog.cases','cases').
     where('catalog.id IN (:...ids)',{ids: ids}).
+    andWhere('catalog.isRealDelete = :isRealDelete',{isRealDelete: false}).
     getMany().catch(
         err => {
             console.log(err);
@@ -53,7 +55,7 @@ export const findCatalogOfCaseByIds = async (catalogEntityRepository: Repository
  * @param catalogEntityRepository
  * @param catalogObj
  */
-export const saveCatalog = async (catalogEntityRepository: Repository<CatalogEntity>, catalogObj) => {
+export const saveCatalog = async (catalogEntityRepository: Repository<CatalogEntity>, catalogObj: any) => {
     return await catalogEntityRepository.save(catalogObj).catch(
         err => {
             console.log(err);
@@ -68,9 +70,10 @@ export const saveCatalog = async (catalogEntityRepository: Repository<CatalogEnt
  * @param catalogEntityRepository
  * @param platformCodes
  */
-export const findCatalogByPlatformCodes = async (catalogEntityRepository: Repository<CatalogEntity>, platformCodes) => {
+export const findCatalogByPlatformCodes = async (catalogEntityRepository: Repository<CatalogEntity>, platformCodes: any) => {
     return await catalogEntityRepository.createQueryBuilder('catalog').
     where('catalog.platformCode IN (:...platforms)', {platforms: platformCodes}).
+    andWhere('catalog.isRealDelete = :isRealDelete',{isRealDelete: false}).
     leftJoinAndSelect('catalog.platformCode', 'platformCode').
     orderBy('catalog.createDate', 'DESC').
     getMany().catch(
@@ -89,7 +92,7 @@ export const findCatalogByPlatformCodes = async (catalogEntityRepository: Reposi
  * @param catalogObj
  * @param id
  */
-export const updateCatalog = async (catalogEntityRepository: Repository<CatalogEntity>, catalogObj, id) => {
+export const updateCatalog = async (catalogEntityRepository: Repository<CatalogEntity>, catalogObj: any, id: number) => {
     return await catalogEntityRepository.createQueryBuilder('catalog').
     update(CatalogEntity).set(catalogObj).
     where('catalog.id = :id',{id: id}).
@@ -108,8 +111,11 @@ export const updateCatalog = async (catalogEntityRepository: Repository<CatalogE
  * @param catalogEntityRepository
  * @param catalogIds
  */
-export const deleteCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, catalogIds) => {
-    return await catalogEntityRepository.delete(catalogIds).catch(
+export const deleteCatalogByIds = async (catalogEntityRepository: Repository<CatalogEntity>, catalogIds: any) => {
+    return await catalogEntityRepository.createQueryBuilder().update(CatalogEntity).
+    set(
+        {isRealDelete: true}
+    ).where('id IN (:...ids)',{ids: catalogIds}).execute().catch(
         err => {
             console.log(err);
             throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);

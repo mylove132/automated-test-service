@@ -11,7 +11,7 @@ class TaskIdsDto {
 }
 
 
-class SingleTaskDto {
+class AddTaskDto {
 
     @IsNumber({allowNaN: true})
     readonly envId: number;
@@ -30,11 +30,15 @@ class SingleTaskDto {
     catalogIds: number[];
 
     //任务类型
-    @Optional()
+    @IsNotEmpty()
     taskType: TaskType;
 
     @Optional()
     isSendMessage: boolean;
+
+    @IsOptional()
+    @IsArray()
+    jmeterIds: number[];
 
 }
 
@@ -62,9 +66,9 @@ class UpdateTaskDto {
     @IsOptional()
     isRestart: boolean = false;
 
-    //任务类型
-    @Optional()
-    taskType: TaskType;
+    @IsOptional()
+    @IsArray()
+    jmeterIds: number[];
 
     // @IsOptional()
     // @IsArray()
@@ -86,5 +90,5 @@ class RunCaseListDto implements IRunCaseById {
 }
 
 export {
-    RunCaseListDto, UpdateTaskDto, SingleTaskDto, TaskIdsDto
+    RunCaseListDto, UpdateTaskDto, AddTaskDto, TaskIdsDto
 }

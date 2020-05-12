@@ -20,7 +20,7 @@ import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {execSync} from 'child_process';
 import { JmeterResultEntity } from './jmeter_result.entity';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-
+import { Logger } from '../../utils/log4js';
 
 @Injectable()
 export class JmeterService {
@@ -41,16 +41,6 @@ export class JmeterService {
      */
     async paginate(options: IPaginationOptions): Promise<Pagination<JmeterResultEntity>> {
         return await paginate<JmeterResultEntity>(this.jmeterResultRepository, options);
-    }
-
-
-    /**
-     * 获取所有的历史记录列表
-     * @param {number, IPaginationOptions}: id, 页码信息
-     * @return {Promise<Pagination<HistoryEntity>>}: 历史记录列表
-     */
-    async jmeterDownload() {
-        return fs.readFileSync('/Users/liuzhanhui/lzh/workspace/node/automated-test-service/src/config/request.jmx');
     }
 
     // /**
@@ -76,8 +66,8 @@ export class JmeterService {
      * 创建压测信息
      * @param createJmeterDto
      */
-    async createJmeterInfo(createJmeterDto: CreateJmeterDto) {
-        console.log('---------------'+JSON.stringify(createJmeterDto));
+    async createJmeterInfoService(createJmeterDto: CreateJmeterDto) {
+        Logger.info(`创建jmeter脚本数据：JSON.stringify(createJmeterDto)`);
         return await createJmeter(this.jmeterRepository, createJmeterDto);
     }
 
@@ -86,7 +76,7 @@ export class JmeterService {
      * 更新jmeter信息
      * @param updateJmeterDto
      */
-    async updateJmeterInfo(updateJmeterDto: UpdateJmeterDto) {
+    async updateJmeterInfoService(updateJmeterDto: UpdateJmeterDto) {
 
         const jmeterTmpObj = await findJmeterById(this.jmeterRepository, updateJmeterDto.id);
         if (!jmeterTmpObj) throw new ApiException(`ID为:${updateJmeterDto.id}的jmeter数据不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.PARTIAL_CONTENT);
@@ -97,6 +87,8 @@ export class JmeterService {
         if (updateJmeterDto.preCountNumber != null) jmeterObj.preCountNumber = updateJmeterDto.preCountNumber;
         if (updateJmeterDto.preCountTime != null) jmeterObj.preCountTime = updateJmeterDto.preCountTime;
         if (updateJmeterDto.name != null) jmeterObj.name = updateJmeterDto.name;
+
+        Logger.info(`更新jmeter脚本数据：${JSON.stringify(jmeterObj)}`);
         return await updateJmeterById(this.jmeterRepository, jmeterObj, updateJmeterDto.id);
     }
 
@@ -104,10 +96,10 @@ export class JmeterService {
      * 删除jmeter信息
      * @param jmeterIdsDto
      */
-    async deleteJmeterInfo(jmeterIdsDto: JmeterIdsDto) {
-        const jmeterList = await findJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids); 
+    async deleteJmeterInfoService(jmeterIdsDto: JmeterIdsDto) {
+        Logger.info(`删除的脚本ID：${jmeterIdsDto.ids}`)
        return  await deleteJmeterByIds(this.jmeterRepository, jmeterIdsDto.ids);
-    };
+    }
 
     // async runJmeterFile(jmeterIdDto: JmeterIdDto){
     //     const jmeterBinPath = this.config.jmeterBinPath;
@@ -172,7 +164,7 @@ export class JmeterService {
      * 查询报告
      * @param md5 
      */
-    async findResult(md5: string){
+    async findResultService(md5: string){
         const jmeterBinPath = this.config.jmeterBinPath;
         const jmeterJtlPath = this.config.jmeterJtlPath;
         const jmeterResultUrl = this.config.jmeterResultUrl;
@@ -194,7 +186,7 @@ export class JmeterService {
      * @param name 
      * @param options 
      */
-    async queryJmeterList(name: string, options: IPaginationOptions) {
+    async queryJmeterListService(name: string, options: IPaginationOptions) {
         const queryBuilder = findJmeterList(this.jmeterRepository, name);
         return await paginate<JmeterEntity>(queryBuilder, options);
     }
@@ -204,7 +196,7 @@ export class JmeterService {
      * @param name 
      * @param options 
      */
-    async queryJmeterResultList(name: string, options: IPaginationOptions) {
+    async queryJmeterResultListService(name: string, options: IPaginationOptions) {
         const queryBuilder = findJmeterResultList(this.jmeterResultRepository, name);
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
@@ -215,7 +207,7 @@ export class JmeterService {
      * @param id 
      * @param options 
      */
-    async queryJmeterResultListByJmeterId(jmeterId: number, options: IPaginationOptions) {
+    async queryJmeterResultListByJmeterIdService(jmeterId: number, options: IPaginationOptions) {
         const queryBuilder = findJmeterResultListById(this.jmeterResultRepository, jmeterId);
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
@@ -225,7 +217,7 @@ export class JmeterService {
      * 查看jmeter执行的日志信息
      * @param md5 
      */
-    async catLog(md5: string){
+    async catLogService(md5: string){
         const jmeterLogPath = this.config.jmeterLogPath;
         if (!fs.existsSync(`${jmeterLogPath}/${md5}.log`)) {
             throw new ApiException(`查看的log日志文件:${md5}.log 不存在`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
