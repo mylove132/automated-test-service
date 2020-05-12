@@ -17,6 +17,9 @@ export class DynSqlEntity {
     @UpdateDateColumn()
     updateDate: Date;
 
+    @Column({comment: '结果属性字段'})
+    resultFields: string;
+
     @ManyToOne(type => DynDbEntity, dynDb => dynDb.dynSqls )
     dynDb: DynDbEntity;
 

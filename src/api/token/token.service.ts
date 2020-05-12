@@ -195,7 +195,7 @@ export class TokenService {
         let token: string;
         if (!result.data) throw new ApiException('获取token的用户数据有误，请检查', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         if (result.data.code === 10000) {
-            token = CommonUtil.getTokenFromResult(result.data);
+            token = CommonUtil.getFiledFromResult('token', result.data);
         } else {
             throw new ApiException(`登录失败:code：${result.data.code}`,
                 ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);

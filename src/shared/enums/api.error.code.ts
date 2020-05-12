@@ -35,4 +35,6 @@ export enum ApiErrorCode {
   SCHEDULER_CRON_INVAILD = 60004,
 
   JTL_FILE_UNEXIST = 70001,
+  //查询数据库失败
+  QUERY_MYSQL_FAIL = 90001,
 }

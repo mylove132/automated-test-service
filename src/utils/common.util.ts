@@ -121,28 +121,29 @@ export class CommonUtil {
 
 
   /**
-   * 递归查询登录返回的token值
-   * @param data 
+   * 递归查询对象中某个属性值
+   * @param data 对象值
+   * @param field 属性字段 
    */
-  static getTokenFromResult(data: any) {
-    let token: string;
+  static getFiledFromResult(field: string, data: any) {
+    let result: string;
     for (var key in data) {
-      if (token) {
+      if (result) {
         break
       }
       if (data.hasOwnProperty(key) === true) {
-        if (key === "token") {
-          token = data[key];
+        if (key === field) {
+          result = data[key];
           break
         } else {
           if (data[key] instanceof Object) {
-            token = this.getTokenFromResult(data[key]);
+            result = this.getFiledFromResult(field, data[key]);
           }
         }
       }
     }
-    if (token) {
-      return token;
+    if (result) {
+      return result;
     } else {
       return null
     }

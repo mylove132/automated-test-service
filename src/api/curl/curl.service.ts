@@ -1,10 +1,18 @@
-import { Injectable, HttpService } from '@nestjs/common';
+/* eslint-disable no-mixed-spaces-and-tabs */
+import { Injectable, HttpService, HttpStatus } from '@nestjs/common';
 import { of, Observable } from 'rxjs';
 import { catchError, map, timeout } from 'rxjs/operators';
 import { AxiosRequestConfig } from 'axios';
 import { mergeScan, last } from 'rxjs/operators';
 import { ConfigService } from '../../config/config.service';
 import { Logger } from '../../utils/log4js';
+import { DynDbEntity } from '../dyndata/dyndb.entity';
+import * as mysql from 'mysql';
+import { ApiException } from 'src/shared/exceptions/api.exception';
+import { ApiErrorCode } from 'src/shared/enums/api.error.code';
+import { DynSqlEntity } from '../dyndata/dynsql.entity';
+import { CommonUtil } from 'src/utils/common.util';
+
 @Injectable()
 export class CurlService {
 	constructor(
@@ -85,5 +93,49 @@ export class CurlService {
 				last()
 			)
 			.pipe(map(res => res.data), catchError(error => of(`失败的请求: ${error}`)))
+	}
+
+
+	/**
+	 * 连接mysql数据库
+	 * @param dynDbEbtity 
+	 */
+	private connectDb(dynDbEbtity: DynDbEntity) {
+		let connect = mysql.createConnection({
+			database: dynDbEbtity.dbName,
+			host: dynDbEbtity.dbHost,
+			port: dynDbEbtity.dbPort,
+			user: dynDbEbtity.dbUsername,
+			password: dynDbEbtity.dbPassword
+		});
+		connect.connect();
+		return connect;
+	}
+
+	/**
+	 * mysql查询
+	 * @param dynDbEbtity 
+	 * @param sql 
+	 */
+	query(dynDbEbtity: DynDbEntity, dynSqlEntity: DynSqlEntity) {
+		const connection = this.connectDb(dynDbEbtity);
+		connection.query(dynSqlEntity.sql, (error, results, fields) => {
+			if (error) {
+				throw new ApiException(`查询数据：${dynDbEbtity.dbName}, sql: ${dynSqlEntity.sql} 失败`, ApiErrorCode.QUERY_MYSQL_FAIL, HttpStatus.BAD_REQUEST);
+			}
+			Logger.info(`查询sql[${dynSqlEntity.sql}]结果：${results}`);
+			let result: any = [];
+			let fieldList: any = [];
+			if (dynSqlEntity.resultFields.indexOf(',') != -1) {
+				fieldList = dynSqlEntity.resultFields.split(',');
+			}else {
+				fieldList.push(dynSqlEntity.resultFields);
+			}
+			for (const iterator of fieldList) {
+				const fd = CommonUtil.getFiledFromResult(iterator, results);
+				result.push(iterator, fd);
+			}
+			return result;
+		});
 	}
 }
