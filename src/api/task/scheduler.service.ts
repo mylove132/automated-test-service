@@ -127,6 +127,11 @@ export class SchedulerService {
                 await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, id);
             }
         }
+        const jobs = this.schedulerRegistry.getCronJobs();
+        const keys = jobs.keys();
+        for (let iterator of keys) {
+            Logger.info(`停止后的定时任务列表：${iterator}`);
+        }
         return { success: stopSuccess, fail: stopFail };
     }
 
@@ -193,8 +198,8 @@ export class SchedulerService {
     }
 
     /**
-     * 添加单接口定时任务
-     * @param singleTaskDto
+     * 添加定时任务
+     * @param addTaskDto
      */
     async addTaskService(addTaskDto: AddTaskDto) {
         Logger.info(`添加定时任务的数据：${JSON.stringify(addTaskDto)}`);
@@ -246,7 +251,7 @@ export class SchedulerService {
         } else {
             throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
-        Logger.info(`添加的定时数据: ${JSON.stringify(scheduler)}`)
+        Logger.info(`添加的定时任务数据: ${JSON.stringify(scheduler)}`)
         const result = await saveScheduler(this.scheRepository, scheduler);
         return { id: result.id };
     }
@@ -279,7 +284,8 @@ export class SchedulerService {
         else if (schObj.taskType == TaskType.JMETER) {
             if (updateTaskDto.name != null) sObj.name = updateTaskDto.name;
             if (updateTaskDto.cron != null) sObj.cron = updateTaskDto.cron;
-            if (updateTaskDto.jmeterIds.length > 0) sObj.jmeters = await findJmeterByIds(this.jmeterRepository, updateTaskDto.jmeterIds);
+            sObj.status = RunStatus.RUNNING;
+            //if (updateTaskDto.jmeterIds.length > 0) sObj.jmeters = await findJmeterByIds(this.jmeterRepository, updateTaskDto.jmeterIds);
             Logger.info(`更新jmeter定时任务数据：${JSON.stringify(sObj)}`);
             await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
         } else {
