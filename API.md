@@ -3960,12 +3960,12 @@ data						|any		|R			|&nbsp;返回历史记录值
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
 status				    |number		|O			|定时任务的状态（默认查询所有：1：运行中，2：停止，3:已删除）
-
+taskType				    |number		|O			|定时任务类型（默认查询所有：1：接口类型，2：jmeter）
 
 请求示例
 
 ```
-/api/scheduler?status=0
+/api/scheduler?status=1&taskType=1
 ```
 
 ##### 返回结果
@@ -4224,12 +4224,15 @@ data						|any		|R			|&nbsp;返回历史记录值
   
 参数名称						|类型		|出现要求	|描述  
 :----						|:---		|:------	|:---
-caseGrade				        |number		|R			|接口等级
-envId	                    |number		|R			|环境ID
-cron	                    |string		|R			|定时任务cron表达式
-name	                |string		|O			|定时任务名称
-isSendMessage	                |bool		|O			|定时任务执行完成是否发送消息（默认不发送）
-taskType                     |number		|O			|任务类型(1:接口，2：jmeter)
+caseGrade				        |number		|O			|接口等级 (接口类型)
+envId	                    |number		|O			|环境ID (接口类型)
+cron	                    |string		|R			|定时任务cron表达式 (接口类型，jmeter类型)
+name	                |string		|R			|定时任务名称 (接口类型，jmeter类型)
+isSendMessage	                |bool		|O			|定时任务执行完成是否发送消息（默认不发送） (接口类型，jmeter类型)
+taskType                     |number		|R			|任务类型(1:接口，2：jmeter)(接口类型，jmeter类型)
+catalogIds                   |number[]		|O			|目录ID集合(接口类型)
+jmeterIds                   |number[]		|O			|jmeter脚本ID集合(jmeter类型)
+
 
 请求示例
 
