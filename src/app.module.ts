@@ -21,6 +21,7 @@ import {TransformInterceptor} from "./shared/interceptor/transform.interceptor";
 import {HttpExceptionFilter} from "./shared/filters/http-exception.filter";
 import {AllExceptionsFilter} from "./shared/filters/any-exception.filter";
 import {RequestIdGuard} from "./shared/guard/requestId.guard";
+import { DynDataModule } from './api/dyndata/dyndata.module';
 
 const Orm = (): DynamicModule => {
     console.log('连接数据库中....');
@@ -41,7 +42,8 @@ const modules = [
     JmeterModule,
     SchedulerModule,
     TokenModule,
-    OperateModule
+    OperateModule,
+    DynDataModule
 ];
 
 const provides = [
