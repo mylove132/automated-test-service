@@ -261,7 +261,8 @@ export class SchedulerService {
         // 更新接口类型定时任务数据
         if (schObj.taskType == TaskType.INTERFACE) {
             Logger.info(`更新interface定时任务数据：${JSON.stringify(updateTaskDto)}`);
-            if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
+            // 更新目录暂时未实现
+            //if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
             if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
             if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
             if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;

@@ -26,6 +26,7 @@ class AddTaskDto {
     @Optional()
     caseGrade: CaseGrade;
 
+    @IsOptional()
     @IsArray()
     catalogIds: number[];
 

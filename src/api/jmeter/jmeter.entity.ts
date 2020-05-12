@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Binary, ManyToOne} from 'typeorm';
+import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Binary, ManyToOne, ManyToMany} from 'typeorm';
 import {JmeterResultEntity} from "./jmeter_result.entity";
 import { SchedulerEntity } from '../task/scheduler.entity';
 import { type } from 'os';
@@ -44,7 +44,7 @@ export class JmeterEntity {
     @Column({default: false})
     isRealDelete: boolean;
 
-    @ManyToOne(type => SchedulerEntity, scheduler => scheduler.jmeters)
+    @ManyToMany(type => SchedulerEntity, scheduler => scheduler.jmeters)
     schedulers: SchedulerEntity[];
 }
 
