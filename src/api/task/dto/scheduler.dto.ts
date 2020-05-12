@@ -13,7 +13,8 @@ class TaskIdsDto {
 
 class AddTaskDto {
 
-    @IsNumber({allowNaN: true})
+    @IsOptional()
+    @IsNumber()
     readonly envId: number;
 
     @IsNotEmpty()

@@ -3,7 +3,7 @@ import { SchedulerEntity } from "src/api/task/scheduler.entity";
 import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
-import { RunStatus } from "../../config/base.enum";
+import { RunStatus, TaskType } from "../../config/base.enum";
 import { TaskResultEntity } from "../../api/task/task_result.entity";
 
 /**
@@ -51,15 +51,23 @@ export const findSchedulerOfCaseAndEnvByIds = async (schedulerRepository: Reposi
  * @param schedulerRepository
  * @param runStatus
  */
-export const findScheduleByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
-    return schedulerRepository.createQueryBuilder("sch").
+export const findScheduleByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus, taskType: TaskType) => {
+  return schedulerRepository.createQueryBuilder('sch').
     leftJoinAndSelect('sch.env','env').
     leftJoinAndSelect('sch.catalogs','catalogs').
+    leftJoinAndSelect('sch.jmeters','jmeters').
     where(qb => {
         if (runStatus != null) {
-            qb.where("sch.status = :status", {status: runStatus});
+            qb.where('sch.status = :status', {status: runStatus});
+            if (taskType != null) {
+              qb.andWhere('sch.taskType = :taskType', {taskType: taskType});
+            }
+        }else {
+          if (taskType != null) {
+            qb.where('sch.taskType = :taskType', {taskType: taskType});
+          }
         }
-    }).orderBy("sch.updateDate", "DESC").getMany().catch(
+    }).orderBy('sch.updateDate', 'DESC').getMany().catch(
       err => {
         console.log(err);
         throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
@@ -67,13 +75,17 @@ export const findScheduleByStatus = async (schedulerRepository: Repository<Sched
     )
 };
 
-
+/**
+ * 通过定时任务状态查找定时任务
+ * @param schedulerRepository 
+ * @param runStatus 
+ */
 export const findScheduleListByStatus = async (schedulerRepository: Repository<SchedulerEntity>, runStatus: RunStatus) => {
   return schedulerRepository.createQueryBuilder("sch").
   leftJoinAndSelect('sch.env','env').
   where(qb => {
     if (runStatus != null) {
-      qb.where("sch.status = :status", {status: runStatus});
+      qb.where('sch.status = :status', {status: runStatus});
     }
   }).getMany().catch(
     err => {

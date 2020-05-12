@@ -78,8 +78,8 @@ export class SchedulerService {
     /**
      * 根据状态获取所有的定时任务
      */
-    async getAllJobsService(runStatus: RunStatus, options: IPaginationOptions) {
-        let queryBuilder = await findScheduleByStatus(this.scheRepository, runStatus);
+    async getAllJobsService(runStatus: RunStatus, taskType: TaskType, options: IPaginationOptions) {
+        let queryBuilder = await findScheduleByStatus(this.scheRepository, runStatus, taskType);
         //return await paginate<SchedulerEntity>(queryBuilder, options);
         return queryBuilder;
     }
@@ -228,7 +228,7 @@ export class SchedulerService {
             await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
         } else if (addTaskDto.taskType == TaskType.JMETER) {
             scheduler.name = addTaskDto.name;
-            let jmeterList: JmeterEntity[];
+            let jmeterList: JmeterEntity[] = [];
             for (const iterator of addTaskDto.jmeterIds) {
                 jmeterList.push(await findJmeterById(this.jmeterRepository, iterator));
             }
@@ -240,6 +240,8 @@ export class SchedulerService {
                 throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
             }
             scheduler.md5 = md5;
+            scheduler.cron = addTaskDto.cron;
+            scheduler.status = RunStatus.RUNNING;
             await this.runJmeterTask(addTaskDto.jmeterIds, scheduler.cron, md5);
         } else {
             throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -390,6 +392,7 @@ export class SchedulerService {
      * @param md5
      */
     private async runJmeterTask(jmeterIds: number[], cron: string, md5: string) {
+        console.info(`ids: ${jmeterIds}, cron: ${cron}, md5: ${md5}`)
         const job = new CronJob(cron, async () => {
             for (const iterator of jmeterIds) {
                 const jmeterBinPath = this.config.jmeterBinPath;

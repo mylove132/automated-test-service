@@ -3,7 +3,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query, SetMetadata} fro
 import { TaskIdsDto, UpdateTaskDto, AddTaskDto } from "./dto/scheduler.dto";
 import { SchedulerService } from "./scheduler.service";
 import { OpeModule, OperateDesc, OpeType } from "../../utils/common.decorators";
-import {OperateModule, OperateType} from "../../config/base.enum";
+import {OperateModule, OperateType, RunStatus, TaskType} from "../../config/base.enum";
 
 ApiBearerAuth();
 
@@ -31,9 +31,9 @@ export class SchedulerController {
   }
 
   @Get("")
-  async getAllJobs(@Query("status")status?: number, @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
-    //limit = limit > 100 ? 100 : limit;
-    return this.schedulerService.getAllJobsService(status, { page, limit });
+  async getAllJobs(@Query("status")status?: RunStatus, @Query("taskType")taskType?: TaskType, @Query("page") page: number = 0, @Query("limit") limit: number = 10) {
+    limit = limit > 100 ? 100 : limit;
+    return this.schedulerService.getAllJobsService(status, taskType, { page, limit });
   }
 
   @OpeModule(OperateModule.TASK)
