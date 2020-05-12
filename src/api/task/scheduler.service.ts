@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, HttpService } from "@nestjs/common";
 import * as crypto from "crypto";
 import { SchedulerEntity } from "./scheduler.entity";
 import { EnvEntity } from "../env/env.entity";
@@ -35,13 +35,14 @@ import { TaskResultEntity } from "./task_result.entity";
 import { ConfigService } from "../../config/config.service";
 import { findCatalogByIds } from "../../datasource/catalog/catalog.sql";
 import { CatalogEntity } from "../catalog/catalog.entity";
-import { findJmeterById, saveJmeterResult } from "../../datasource/jmeter/jmeter.sql";
+import { findJmeterById, saveJmeterResult, findJmeterByIds } from "../../datasource/jmeter/jmeter.sql";
 import { JmeterEntity } from "../jmeter/jmeter.entity";
 import { JmeterResultEntity } from "../jmeter/jmeter_result.entity";
 import { exec } from "child_process";
 import { CurlService } from "../curl/curl.service";
 import { CronJob } from 'cron';
 import * as cronParser from 'cron-parser';
+import * as fs from 'fs';
 
 export class SchedulerService {
 
@@ -60,8 +61,8 @@ export class SchedulerService {
         private readonly jmeterRepository: Repository<JmeterEntity>,
         @InjectRepository(JmeterResultEntity)
         private readonly jmeterResultRepository: Repository<JmeterResultEntity>,
-        //@InjectQueue("dingdingProcessor") private readonly sendMessageQueue: Queue,
         private readonly curlService: CurlService,
+        private httpService: HttpService,
         private readonly runService: RunService) {
     }
 
@@ -168,17 +169,18 @@ export class SchedulerService {
                 if (!this.isExistTask(schedulerEntity.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                 await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, schedulerEntity.id);
             } else {
-                const caseList = await findCaseByCaseGradeAndCatalogs(this.caseRepository, schedulerEntity.caseGrade,
-                    schedulerEntity.catalogs.map(catalog => {
-                        return catalog.id
-                    }));
-                let caseIds = caseList.map(cas => {
-                    return cas.id;
-                });
                 if (schedulerEntity.taskType == TaskType.INTERFACE) {
+                    const caseList = await findCaseByCaseGradeAndCatalogs(this.caseRepository, schedulerEntity.caseGrade,
+                        schedulerEntity.catalogs.map(catalog => {
+                            return catalog.id
+                        }));
+                    let caseIds = caseList.map(cas => {
+                        return cas.id;
+                    });
                     await this.runSingleTask(caseIds, schedulerEntity.env.id, schedulerEntity.cron, schedulerEntity.md5);
                 } else if (schedulerEntity.taskType == TaskType.JMETER) {
-                    await this.runJmeterTask(caseIds, schedulerEntity.cron);
+                    const jmeterIds = schedulerEntity.jmeters.map(jmeter => { return jmeter.id });
+                    await this.runJmeterTask(jmeterIds, schedulerEntity.cron, schedulerEntity.md5);
                 }
                 if (!this.isExistTask(schedulerEntity.md5)) {
                     throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
@@ -197,6 +199,7 @@ export class SchedulerService {
     async addTaskService(addTaskDto: AddTaskDto) {
         Logger.info(`添加定时任务的数据：${JSON.stringify(addTaskDto)}`);
         const scheduler = new SchedulerEntity();
+        scheduler.taskType = addTaskDto.taskType;
         if (addTaskDto.taskType == TaskType.INTERFACE) {
             const caseGrade = addTaskDto.caseGrade == null ? CaseGrade.LOW : addTaskDto.caseGrade;
             const envId = addTaskDto.envId == null ? 5 : addTaskDto.envId;
@@ -214,7 +217,6 @@ export class SchedulerService {
                 throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
             }
             if (addTaskDto.isSendMessage != null) scheduler.isSendMessage = addTaskDto.isSendMessage;
-            scheduler.taskType = addTaskDto.taskType;
             scheduler.catalogs = await findCatalogByIds(this.catalogRepository, addTaskDto.catalogIds);
             scheduler.caseGrade = caseGrade;
             scheduler.name = addTaskDto.name;
@@ -225,7 +227,20 @@ export class SchedulerService {
             scheduler.status = RunStatus.RUNNING;
             await this.runSingleTask(caseIds, scheduler.env.id, scheduler.cron, scheduler.md5);
         } else if (addTaskDto.taskType == TaskType.JMETER) {
-            await this.runJmeterTask(addTaskDto.jmeterIds, scheduler.cron);
+            scheduler.name = addTaskDto.name;
+            let jmeterList: JmeterEntity[];
+            for (const iterator of addTaskDto.jmeterIds) {
+                jmeterList.push(await findJmeterById(this.jmeterRepository, iterator));
+            }
+            scheduler.jmeters = jmeterList;
+            const createDate = new Date();
+            const md5 = crypto.createHmac("sha256", createDate + CommonUtil.randomChar(10)).digest("hex");
+            const scheObj = await findScheduleByMd5(this.scheRepository, md5);
+            if (scheObj) {
+                throw new ApiException(`定时任务md5:${md5}已存在,不能重复`, ApiErrorCode.SCHEDULER_MD5_REPEAT, HttpStatus.BAD_REQUEST);
+            }
+            scheduler.md5 = md5;
+            await this.runJmeterTask(addTaskDto.jmeterIds, scheduler.cron, md5);
         } else {
             throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
         }
@@ -243,9 +258,10 @@ export class SchedulerService {
         const schObj = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
         if (!schObj) throw new ApiException(`定时任务id ${updateTaskDto.id}找不到`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.OK);
         const sObj = new SchedulerEntity();
-        if (schObj.taskType == TaskType.JMETER) {
+        // 更新接口类型定时任务数据
+        if (schObj.taskType == TaskType.INTERFACE) {
             Logger.info(`更新interface定时任务数据：${JSON.stringify(updateTaskDto)}`);
-            //if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
+            if (updateTaskDto.catalogIds != null) sObj.catalogs = await findCatalogByIds(this.catalogRepository, updateTaskDto.catalogIds);
             if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
             if (updateTaskDto.caseGrade != null) sObj.caseGrade = updateTaskDto.caseGrade;
             if (updateTaskDto.isSendMessage != null) sObj.isSendMessage = updateTaskDto.isSendMessage;
@@ -254,17 +270,37 @@ export class SchedulerService {
             sObj.env = updateTaskDto.envId != null ? await findEnvById(this.envRepository, updateTaskDto.envId) : schObj.env;
             sObj.status = RunStatus.RUNNING;
             Logger.info(`更新定时任务数据：${JSON.stringify(sObj)}`)
-            const result = await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
-            if (updateTaskDto.isRestart) {
-                const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
-                try {
+            await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
+        }
+        // 更新jmeter类型定时任务数据
+        else if (schObj.taskType == TaskType.JMETER) {
+            if (updateTaskDto.name != null) sObj.name = updateTaskDto.name;
+            if (updateTaskDto.cron != null) sObj.cron = updateTaskDto.cron;
+            if (updateTaskDto.jmeterIds.length > 0) sObj.jmeters = await findJmeterByIds(this.jmeterRepository, updateTaskDto.jmeterIds);
+            Logger.info(`更新jmeter定时任务数据：${JSON.stringify(sObj)}`);
+            await updateScheduler(this.scheRepository, sObj, updateTaskDto.id);
+        } else {
+            throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+        }
+        if (updateTaskDto.isRestart) {
+            const newSecheduler = await findSchedulerOfCaseAndEnvById(this.scheRepository, updateTaskDto.id);
+            try {
+                // 检测旧的定时任务是否存在，存在删除
+                if (this.isExistTask(newSecheduler.md5)) {
+                    Logger.info(`存在旧的md5: ${newSecheduler.md5}`)
+                    this.schedulerRegistry.deleteCronJob(newSecheduler.md5);
                     if (this.isExistTask(newSecheduler.md5)) {
-                        Logger.info(`存在旧的md5: ${newSecheduler.md5}`)
-                        this.schedulerRegistry.deleteCronJob(newSecheduler.md5);
-                        if (this.isExistTask(newSecheduler.md5)) {
-                            throw new ApiException('定时任务失败', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
-                        }
+                        throw new ApiException('定时任务失败', ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                     }
+                }
+            } catch (e) {
+                Logger.error(`更新定时任务失败：${e.stack}`)
+                await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, updateTaskDto.id);
+                throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+            // 重启接口类型定时任务
+            if (schObj.taskType == TaskType.INTERFACE) {
+                try {
                     const catalogIds = newSecheduler.catalogs.map(catalog => {
                         return catalog.id;
                     });
@@ -276,17 +312,28 @@ export class SchedulerService {
                     if (!this.isExistTask(newSecheduler.md5)) throw new ApiException(`重启定时任务失败`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                     await updateSchedulerRunStatus(this.scheRepository, RunStatus.RUNNING, updateTaskDto.id);
                 } catch (e) {
-                    Logger.error(`更新定时任务失败：${e.stack}`)
+                    Logger.error(`更新接口定时任务失败：${e.stack}`)
                     await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, updateTaskDto.id);
                     throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
                 }
             }
+            // 重启jmeter类型定时任务 
+            else if (schObj.taskType == TaskType.JMETER) {
+                try {
+                    const jmeterIds = newSecheduler.jmeters.map(jmeter => { return jmeter.id });
+                    await this.runJmeterTask(jmeterIds, updateTaskDto.cron, newSecheduler.md5);
+                } catch (e) {
+                    Logger.error(`更新jmeter定时任务失败：${e.stack}`)
+                    await updateSchedulerRunStatus(this.scheRepository, RunStatus.STOP, updateTaskDto.id);
+                    throw new ApiException(e, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+                }
+
+            } else {
+                throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+            }
+
             return { status: true };
-        }else if (schObj.taskType == TaskType.INTERFACE) {
-            Logger.info(`更新jmeter定时任务数据：${JSON.stringify(updateTaskDto)}`);
-            await this.runJmeterTask(updateTaskDto.jmeterIds, updateTaskDto.cron);
-        } else {
-            throw new ApiException(`暂时不支持别的定时任务类型`, ApiErrorCode.PARAM_VALID_FAIL, HttpStatus.BAD_REQUEST);
+
         }
     }
 
@@ -306,38 +353,6 @@ export class SchedulerService {
             return { result: false };
         }
     }
-
-    // /**
-    //  * 排查定时任务库，确认定时任务是否存活
-    //  *
-    //  */
-    // //@Cron("* */10 * * * *", { name: "checkStatus" })
-    // async checkJobRunStatus() {
-    //     //console.log('------------------------排查定时任务--------------------')
-    //     const runningSchObj: SchedulerEntity[] = await findScheduleListByStatus(this.scheRepository, RunStatus.RUNNING);
-    //     let md5List = [];
-    //     const jobs = this.schedulerRegistry.getCronJobs();
-    //     jobs.forEach((value, key, map) => {
-    //         let next;
-    //         try {
-    //             next = value.nextDates().toDate();
-    //         } catch (e) {
-    //             next = "error: next fire date is in the past!";
-    //         }
-    //         md5List.push(key);
-    //     });
-    //     console.log("定时任务中的md5列表" + JSON.stringify(runningSchObj));
-    //     for (let runningSch of runningSchObj) {
-    //         if (md5List.indexOf(runningSch.md5) == -1) {
-    //             await this.scheRepository.createQueryBuilder().update(SchedulerEntity).set({ status: RunStatus.STOP }).where("id = :id", { id: runningSch.id }).execute().catch(
-    //                 err => {
-    //                     throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
-    //                 }
-    //             );
-    //         }
-    //     }
-    // }
-
 
     /**
      * 运行单接口任务
@@ -373,45 +388,77 @@ export class SchedulerService {
      * @param cron
      * @param md5
      */
-    private async runJmeterTask(jmeterId: number[], cron: string) {
-        const jmeterBinPath = this.config.jmeterBinPath;
-        const jmeterJtlPath = this.config.jmeterJtlPath;
-        const jmeterLogPath = this.config.jmeterLogPath;
+    private async runJmeterTask(jmeterIds: number[], cron: string, md5: string) {
+        const job = new CronJob(cron, async () => {
+            for (const iterator of jmeterIds) {
+                const jmeterBinPath = this.config.jmeterBinPath;
+                const jmeterJtlPath = this.config.jmeterJtlPath;
+                const jmeterLogPath = this.config.jmeterLogPath;
 
-        const jmeter = await findJmeterById(this.jmeterRepository, jmeterId);
-        const jmeterCountNum = jmeter.preCountNumber;
-        const preCountTime = jmeter.preCountTime;
-        const loopNum = jmeter.loopNum;
-        const remote_address = jmeter.remote_address == null ? '' : '-R ' + jmeter.remote_address;
+                const jmeter = await findJmeterById(this.jmeterRepository, iterator);
+                const jmeterCountNum = jmeter.preCountNumber;
+                const preCountTime = jmeter.preCountTime;
+                const loopNum = jmeter.loopNum;
+                const remote_address = jmeter.remote_address == null || jmeter.remote_address == '' ? '' : '-R ' + jmeter.remote_address;
 
 
-        //更新md5值
-        const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
-        const cmd = `${jmeterBinPath} -n -t ${jmeter}.jmx -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${jmeterLogPath}/${md5}.log -l ${jmeterJtlPath}/${md5}.jtl ${remote_address}`;
-        console.log(cmd)
-        let flag = true;
-        const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {
-            if (error) {
-                flag = false;
-                const jmeterResult = new JmeterResultEntity();
-                jmeterResult.jmeter = jmeter;
-                jmeterResult.md5 = md5;
-                jmeterResult.jmeterRunStatus = JmeterRunStatus.FAIL;
-                await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
-                child.kill("SIGINT");
+                //创建临时文件
+                const md5 = crypto.createHmac("sha256", new Date() + CommonUtil.randomChar(10)).digest("hex");
+                const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
+                const tmpJtlFilePath = jmeterJtlPath + '/' + md5 + '.jtl';
+                const tmpLogFilePath = jmeterLogPath + '/' + md5 + '.log';
+                //下载文件
+                const ds = await this.httpService.get(jmeter.url).toPromise();
+                fs.writeFileSync(tmpJmxtFilePath, ds.data);
+
+                //构建命令行
+                const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address}`;
+                Logger.info(`压测脚本命令行：${cmd}`)
+                //执行命令行
+                const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {
+                    if (error) {
+                        Logger.error(error.stack);
+                    }
+                });
+                //监听返回记录
+                child.stdout.on("data", (data) => {
+                    Logger.info(data);
+                });
+                //监听结束
+                child.stdout.on("close", async () => {
+                    if (!fs.existsSync(jmeterJtlPath + `/${md5}.jtl`)) {
+                        const jmeterResult = new JmeterResultEntity();
+                        jmeterResult.jmeter = jmeter;
+                        jmeterResult.md5 = md5;
+                        jmeterResult.jmeterRunStatus = JmeterRunStatus.FAIL;
+                        await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+                    }
+                    else {
+                        const jmeterResult = new JmeterResultEntity();
+                        jmeterResult.jmeter = jmeter;
+                        jmeterResult.md5 = md5;
+                        jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
+                        await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
+                        //copy运行结果到远程服务器
+                        //const copyJtl = `scp -r ${tmpJtlFilePath}  ${jmeterJtlPath}`;
+                        //execSync(copyJtl);
+                        //删除本地的数据
+                        //fs.unlinkSync(tmpJtlFilePath);
+                    }
+                    //copy压测信息到远程服务器
+                    //const copyLog = `scp -r ${tmpLogFilePath}  ${jmeterLogPath}`;
+                    //execSync(copyLog);
+                    //删除临时生成的压测文件
+                    fs.unlinkSync(tmpJmxtFilePath);
+                    //fs.unlinkSync(tmpLogFilePath);
+                    Logger.info(`jmeter脚本：${jmeter.name} -- 执行完毕`);
+                });
+
             }
-        });
-
-        child.stdout.on("close", async () => {
-            if (flag) {
-                const jmeterResult = new JmeterResultEntity();
-                jmeterResult.jmeter = jmeter;
-                jmeterResult.md5 = md5;
-                jmeterResult.jmeterRunStatus = JmeterRunStatus.FINISH;
-                await saveJmeterResult(this.jmeterResultRepository, jmeterResult);
-            }
-        });
-
+        }
+        );
+        this.schedulerRegistry.addCronJob(md5, job);
+        job.start();
     }
 
 

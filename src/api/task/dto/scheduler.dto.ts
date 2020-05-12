@@ -68,6 +68,10 @@ class UpdateTaskDto {
 
     @IsOptional()
     @IsArray()
+    catalogIds: number[];
+
+    @IsOptional()
+    @IsArray()
     jmeterIds: number[];
 
     // @IsOptional()

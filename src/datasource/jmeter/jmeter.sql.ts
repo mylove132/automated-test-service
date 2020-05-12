@@ -24,7 +24,7 @@ export const createJmeter = async (jmeterEntityRepository: Repository<JmeterEnti
  * @param jmeterEntityRepository
  * @param id
  */
-export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEntity>, id) => {
+export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEntity>, id: number) => {
     return await jmeterEntityRepository.findOne(id).catch(
         err => {
             console.log(err);
@@ -38,7 +38,7 @@ export const findJmeterById = async (jmeterEntityRepository: Repository<JmeterEn
  * @param jmeterEntityRepository
  * @param ids
  */
-export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids) => {
+export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterEntity>, ids: any) => {
     return await jmeterEntityRepository.createQueryBuilder('jmeter').
     where('jmeter.id IN (:...ids)',{ids: ids}).
     andWhere('jmeter.isRealDelete = :isRealDelete', {isRealDelete: false}).
@@ -58,7 +58,7 @@ export const findJmeterByIds = async (jmeterEntityRepository: Repository<JmeterE
  * @param jmeterObj
  * @param id
  */
-export const updateJmeterById = async (jmeterEntityRepository: Repository<JmeterEntity>, jmeterObj, id) => {
+export const updateJmeterById = async (jmeterEntityRepository: Repository<JmeterEntity>, jmeterObj, id: number) => {
     return await jmeterEntityRepository.update(id, jmeterObj).catch(
         err => {
             console.log(err);
@@ -90,7 +90,7 @@ export const deleteJmeterByIds = async (jmeterEntityRepository: Repository<Jmete
  * @param jmeterResultEntityRepository 
  * @param jmeterResultObj 
  */
-export const saveJmeterResult = async (jmeterResultEntityRepository: Repository<JmeterResultEntity>, jmeterResultObj) => {
+export const saveJmeterResult = async (jmeterResultEntityRepository: Repository<JmeterResultEntity>, jmeterResultObj: any) => {
     return await jmeterResultEntityRepository.save(jmeterResultObj).catch(
         err => {
             console.log(err);

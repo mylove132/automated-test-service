@@ -9,7 +9,7 @@ import {HistoryEntity} from "../../api/history/history.entity";
  * @param historyRepository
  * @param historyObj
  */
-export const saveHistory = async (historyRepository: Repository<HistoryEntity>, historyObj) => {
+export const saveHistory = async (historyRepository: Repository<HistoryEntity>, historyObj: any) => {
     return await historyRepository.save(historyObj)
         .catch(
             err => {

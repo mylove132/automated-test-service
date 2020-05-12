@@ -12,6 +12,7 @@ import {EnvEntity} from '../env/env.entity';
 import {CaseGrade, RunStatus, TaskType} from "../../config/base.enum";
 import { TaskResultEntity } from "./task_result.entity";
 import {CatalogEntity} from "../catalog/catalog.entity";
+import { JmeterEntity } from "../jmeter/jmeter.entity";
 
 @Unique(['md5','name'])
 @Entity('secheduler')
@@ -59,4 +60,7 @@ export class SchedulerEntity {
    @JoinTable()
    catalogs: CatalogEntity[];
 
+   @ManyToMany(type => JmeterEntity, jmeters => jmeters.schedulers, {cascade: true, onDelete: 'SET NULL', onUpdate: 'CASCADE'})
+   @JoinTable()
+   jmeters: JmeterEntity[];
 }

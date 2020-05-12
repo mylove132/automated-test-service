@@ -10,7 +10,7 @@ import {EnvEntity} from "../../api/env/env.entity";
  * @param endpointEntityRepository
  * @param id
  */
-export const findEndpointById = async (endpointEntityRepository: Repository<EndpointEntity>, id) => {
+export const findEndpointById = async (endpointEntityRepository: Repository<EndpointEntity>, id: number) => {
     return await endpointEntityRepository.findOne(id).catch(
         err => {
             console.log(err);
@@ -24,7 +24,7 @@ export const findEndpointById = async (endpointEntityRepository: Repository<Endp
  * @param entityRepository
  * @param id
  */
-export const findEnvById = async (entityRepository: Repository<EnvEntity>, id) => {
+export const findEnvById = async (entityRepository: Repository<EnvEntity>, id: number) => {
     return await entityRepository.findOne(id).catch(
         err => {
             console.log(err);
@@ -37,7 +37,7 @@ export const findEnvById = async (entityRepository: Repository<EnvEntity>, id) =
  * @param entityRepository
  * @param ids
  */
-export const findEnvByIds= async (entityRepository: Repository<EnvEntity>, ids) => {
+export const findEnvByIds= async (entityRepository: Repository<EnvEntity>, ids: any) => {
     return await entityRepository.createQueryBuilder('env').
     select(['name']).where("id IN (:...ids)",{ids:ids}).
     getMany().
@@ -70,7 +70,7 @@ export const findAllEnv = async (entityRepository: Repository<EnvEntity>) => {
  * @param endpointEntity
  * @param endpoint
  */
-export const findEndpointInstanceByEndpoint = async (endpointEntity: Repository<EndpointEntity>, endpoint) => {
+export const findEndpointInstanceByEndpoint = async (endpointEntity: Repository<EndpointEntity>, endpoint: string) => {
     return await endpointEntity.createQueryBuilder('endpoint').
     where('endpoint.endpoint = :enp', {enp: endpoint}).
     getOne().catch(
@@ -139,7 +139,7 @@ export const findEndpoints = async (envRepositoryEntity: Repository<EnvEntity>) 
  * @param envObj
  * @param envId
  */
-export const updateEnv = async (entityRepository: Repository<EnvEntity>, envObj, envId) => {
+export const updateEnv = async (entityRepository: Repository<EnvEntity>, envObj: any, envId: number) => {
     return await entityRepository.createQueryBuilder().
     update(EnvEntity).
     set(envObj).
@@ -176,7 +176,7 @@ export const updateEndPoint = async (endpointEntity: Repository<EndpointEntity>,
  * @param entityRepository
  * @param envObj
  */
-export const addEnv = async (entityRepository: Repository<EnvEntity>, envObj) => {
+export const addEnv = async (entityRepository: Repository<EnvEntity>, envObj: any) => {
     return await entityRepository.createQueryBuilder().
     insert().
     into(EnvEntity).
@@ -196,7 +196,7 @@ export const addEnv = async (entityRepository: Repository<EnvEntity>, envObj) =>
  * @param entityRepository
  * @param envObj
  */
-export const deleteEnvByIds = async (entityRepository: Repository<EnvEntity>, envIds) => {
+export const deleteEnvByIds = async (entityRepository: Repository<EnvEntity>, envIds: any) => {
     return await entityRepository.delete(envIds).
     catch(
         err => {
@@ -213,7 +213,7 @@ export const deleteEnvByIds = async (entityRepository: Repository<EnvEntity>, en
  * @param endpointRepository
  * @param endpointIds
  */
-export const deleteEndpointByIds = async (endpointRepository: Repository<EndpointEntity>, endpointIds) => {
+export const deleteEndpointByIds = async (endpointRepository: Repository<EndpointEntity>, endpointIds: any) => {
     return await endpointRepository.delete(endpointIds).
     catch(
         err => {

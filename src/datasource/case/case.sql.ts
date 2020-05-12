@@ -245,7 +245,7 @@ export const deleteCase = async (caseEntityRepository: Repository<CaseEntity>, c
  * @param caseObj
  * @param caseId
  */
-export const updateCase = async (caseEntityRepository: Repository<CaseEntity>, caseObj, caseId) => {
+export const updateCase = async (caseEntityRepository: Repository<CaseEntity>, caseObj: any, caseId: number) => {
   return await caseEntityRepository.update(caseId, caseObj).catch(
     err => {
       console.log(err);

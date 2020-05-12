@@ -35,7 +35,7 @@ export const findCatalogByIds = async (catalogEntityRepository: Repository<Catal
     )
 };
 
-export const findCatalogOfCaseByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids) => {
+export const findCatalogOfCaseByIds = async (catalogEntityRepository: Repository<CatalogEntity>, ids: any) => {
     return await catalogEntityRepository.createQueryBuilder('catalog').
         leftJoinAndSelect('catalog.cases','cases').
     where('catalog.id IN (:...ids)',{ids: ids}).
