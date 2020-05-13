@@ -5417,7 +5417,159 @@ jmeterId						|number		|R			|上传的脚本ID
 ```
 
 
+### 13.0 查询所有的数据库配置
+- **接口说明：** 查询所有的数据库配置
+- **请求方式：** GET
+- **接口地址：** /api/db
+#### 13.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
 
+
+请求示例：
+
+```
+/api/db
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 4,
+                "dbName": "crm_test_db",
+                "dbHost": "172.17.71.60",
+                "dbPort": 22809,
+                "dbUsername": "crm_test_user",
+                "dbPassword": "910e51eb560a28cd4fc071d0a856d1eb7e274efe5a8560508c86ca344d1670c8",
+                "createDate": "2020-05-13T06:18:55.479Z",
+                "updateDate": "2020-05-13T06:18:55.479Z",
+                "isRealDelete": false
+            },
+            {
+                "id": 2,
+                "dbName": "crm_test_db",
+                "dbHost": "172.17.71.60",
+                "dbPort": 22809,
+                "dbUsername": "crm_test_user",
+                "dbPassword": "910e51eb560a28cd4fc071d0a856d1eb7e274efe5a8560508c86ca344d1670c8",
+                "createDate": "2020-05-13T06:14:07.924Z",
+                "updateDate": "2020-05-13T06:14:07.924Z",
+                "isRealDelete": false
+            },
+            {
+                "id": 1,
+                "dbName": "crm_test_db",
+                "dbHost": "172.17.71.60",
+                "dbPort": 22809,
+                "dbUsername": "crm_test_user",
+                "dbPassword": "EyH5O!8Wq!uJKAs3lP",
+                "createDate": "2020-05-12T10:57:05.000Z",
+                "updateDate": "2020-05-12T10:57:08.000Z",
+                "isRealDelete": false
+            }
+        ],
+        "itemCount": 3,
+        "totalItems": 3,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
+### 13.1 查询所有的sql语句
+- **接口说明：** 查询所有的sql
+- **请求方式：** GET
+- **接口地址：** /api/db/sql
+#### 13.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+
+
+请求示例：
+
+```
+/api/db/sql
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 6,
+                "sql": "SELECT app_ver FROM app_version WHERE id=1;",
+                "name": "查询app_ver",
+                "createDate": "2020-05-13T06:34:33.370Z",
+                "updateDate": "2020-05-13T06:34:33.616Z",
+                "resultFields": null,
+                "sqlAlias": "sqlAlias6",
+                "isRealDelete": false
+            }
+        ],
+        "itemCount": 1,
+        "totalItems": 1,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
+### 13.2 添加数据库配置
+- **接口说明：** 添加数据库配置
+- **请求方式：** POST
+- **接口地址：** /api/db
+#### 13.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+dbName						|string		|R			|数据库名称
+dbName						|string		|R			|数据库名称
+
+
+请求示例：
+
+```
+/api/db/sql
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 6,
+                "sql": "SELECT app_ver FROM app_version WHERE id=1;",
+                "name": "查询app_ver",
+                "createDate": "2020-05-13T06:34:33.370Z",
+                "updateDate": "2020-05-13T06:34:33.616Z",
+                "resultFields": null,
+                "sqlAlias": "sqlAlias6",
+                "isRealDelete": false
+            }
+        ],
+        "itemCount": 1,
+        "totalItems": 1,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
 
 响应码	|说明  
 :----	|:---

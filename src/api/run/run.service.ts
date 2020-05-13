@@ -292,7 +292,7 @@ export class RunService {
         else if (regData.startsWith("sqlAlias") != -1) {
           const sqlObj = await querySqlByAlias(this.dynSqlEntityRepository, regData.split('.')[0]);
           const execSqlResult = await this.curlService.query(sqlObj);
-          const field = CommonUtil.getFiledFromResult(regData.split('.')[1], execSqlResult);
+          const field = execSqlResult[regData.split('.')[1]];
           param[paramsKey] = field;
         }
       }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpStatus, Post, Put, Query, SetMetadata } from "@nestjs/common";
 import { CatalogService } from "./catalog.service";
 
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
@@ -65,5 +65,14 @@ export class CatalogController {
   async updateCatalogController(@Body() updateCatalogDto: UpdateCatalogDto) {
     return this.catalogService.updateCatalogService(updateCatalogDto);
   }
+
+  @OperateDesc('')
+    @ApiOperation({title: 'query platform interface number case'})
+    @ApiResponse({status: 200, description: 'query platform interface number success.'})
+    @Get('interface/count')
+    @SetMetadata('isOpen', true)
+    async queryplatformCodeInterfaceCountController() {
+        return await this.catalogService.getplatformCodeInterfaceCountService();
+    }
 
 }

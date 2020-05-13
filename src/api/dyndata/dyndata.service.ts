@@ -8,6 +8,8 @@ import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { CurlService } from '../curl/curl.service';
 import { CommonUtil } from 'src/utils/common.util';
 import { CreateSqlDto, UpdateSqlDto, DbIdsDto, SqlIdsDto } from './dto/dyndata.dto';
+import { AxiosRequestConfig } from 'axios';
+import * as FormData from "form-data";
 
 export class DynDataService {
 
@@ -16,7 +18,7 @@ export class DynDataService {
         private readonly dynSqlRepository: Repository<DynSqlEntity>,
         @InjectRepository(DynDbEntity)
         private readonly dynDbRepository: Repository<DynDbEntity>,
-        private curlService: CurlService,
+        private curlService: CurlService
     ){}
 
 
@@ -119,5 +121,20 @@ export class DynDataService {
     async runSqlService(dbId: number, sql: string) {
         const dynDbEntity = await queryDbById(this.dynDbRepository, dbId);
         return await this.curlService.runSql(dynDbEntity, sql);
+    }
+
+    /**
+     * 检查mysql语法
+     * @param sql 
+     */
+    async grammarCheckService(sql: string){
+        const requestData: AxiosRequestConfig = {};
+        requestData.url = 'http://cn.piliapp.com/mysql-syntax-check/checking/';
+        requestData.method = 'POST';
+        const form = new FormData();
+        form.append('sql',sql);
+        requestData.headers = form.getHeaders();
+        requestData.data = form;
+        return await this.curlService.makeRequest(requestData).toPromise();
     }
 }

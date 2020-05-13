@@ -168,8 +168,8 @@ export const findCaseOfAssertTypeAndAssertJudgeById = async (caseEntityRepositor
  */
 export const findCaseByCaseGradeAndCatalogs = async (caseEntityRepository: Repository<CaseEntity>, caseGrade: CaseGrade, catalogIds: any) => {
   return await caseEntityRepository
-    .createQueryBuilder("cas").where
-    ("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
+    .createQueryBuilder("cas").
+    where("cas.caseGrade = :caseGrade", { caseGrade: caseGrade }).
     andWhere('cas.catalog IN (:...catalogs)', { catalogs: catalogIds }).
     andWhere('cas.isRealDelete = :isRealDelete', {isRealDelete: false}).
     getMany().
@@ -284,7 +284,7 @@ export const findAllAssertJudge = async (assertJudgeEntityRepository: Repository
  * @param caseRepository
  * @param name
  */
-export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, name) => {
+export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, name: string) => {
   return caseRepository.createQueryBuilder('cas').where(
     qb => {
       if (name) {
@@ -295,6 +295,17 @@ export const searchCaseByName = async (caseRepository: Repository<CaseEntity>, n
       }
     }
   ).orderBy('cas.createDate', 'DESC').getMany();
+};
+
+
+/**
+ * 获取case条数
+ * @param caseRepository 
+ */
+export const findAllCaseCount = async (caseRepository: Repository<CaseEntity>) => {
+  return caseRepository.createQueryBuilder('cas').where(
+    'cas.isRealDelete = false'
+  ).getCount();
 };
 
 

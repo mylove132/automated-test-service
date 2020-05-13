@@ -81,5 +81,12 @@ export class DynDataController {
     async runSqlController(@Query('dbId') dbId: number, @Query('sql') sql: string){
         return await this.dynDataService.runSqlService(dbId, sql)
     }
+
+    @ApiOperation({ title: 'del sql' })
+    @ApiResponse({ status: 200, description: 'del sql success.'})
+    @Get('sql/grammarCheck')
+    async grammarCheckController(@Query('sql') sql: string){
+        return await this.dynDataService.grammarCheckService(sql);
+    }
   
 }

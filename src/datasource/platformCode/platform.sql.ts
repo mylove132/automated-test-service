@@ -52,6 +52,25 @@ export const findPlatformCodeByCodeList = async (PlatformCodeEntity: Repository<
     )
 };
 
+/**
+ * 查询平台接口数
+ * @param platformCodeEntityRepository 
+ */
+export const platformInterfaceCount = async (platformCodeEntityRepository: Repository<PlatformCodeEntity>) => {
+    return await platformCodeEntityRepository.
+    createQueryBuilder('pc').
+    leftJoinAndSelect('pc.catalog','catalog').
+    where('catalog.isRealDelete = false').
+    leftJoinAndSelect('catalog.cases','cases').
+    where('cases.isRealDelete = false').
+    getMany().
+    catch(
+        err => {
+            console.log(err);
+            throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+        }
+    );
+}
 
 /**
  * 通过code集合查询platform实体

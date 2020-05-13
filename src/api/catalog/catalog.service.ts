@@ -10,13 +10,14 @@ import {PlatformCodeEntity} from "./platformCode.entity";
 import {
     deleteCatalogByIds,
     findCatalogById,
-    findCatalogByPlatformCodes, findCatalogOfCaseByIds,
+    findCatalogByPlatformCodes,
     saveCatalog, updateCatalog
 } from '../../datasource/catalog/catalog.sql';
 import {
     findAllPlatformCode,
     findPlatformCodeByCode,
-    findPlatformCodeByCodeList
+    findPlatformCodeByCodeList,
+    platformInterfaceCount
 } from "../../datasource/platformCode/platform.sql";
 import {Logger} from "../../utils/log4js";
 
@@ -64,8 +65,6 @@ export class CatalogService {
         return await findAllPlatformCode(this.platformRepository);
     }
 
-
-
     /**
      * 删除目录
      * @param deleteCatalogDto
@@ -90,5 +89,25 @@ export class CatalogService {
         Logger.info(`更新目录的数据：${catalogObj}`);
         return await updateCatalog(this.catalogRepository, catalogObj, id);
 
+    }
+
+    /**
+     * 查询平台接口数
+     */
+    async getplatformCodeInterfaceCountService(){
+        const platofomQueryResult: PlatformCodeEntity[] =  await platformInterfaceCount(this.platformRepository);
+        let resultList = [];
+        for (const iterator of platofomQueryResult) {
+            let result: any = {};
+            result['platformName'] = iterator.name;
+            result['catalogCount'] = iterator.catalog.length;
+            let caseCount: number = 0;
+            for (const it of iterator.catalog) {
+                caseCount += it.cases.length;
+            }
+            result['interfaceCount'] = caseCount;
+            resultList.push(result);
+        }
+        return resultList;
     }
 }

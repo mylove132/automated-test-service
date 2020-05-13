@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post, Put, Query, SetMetadata} from "@nestjs/common";
 import {ApiBearerAuth, ApiOperation, ApiResponse} from "@nestjs/swagger";
 import {CaseService} from "./case.service";
 import {BatchUpdateCatalogDto, CreateCaseDto, DeleteCaseDto, UpdateCaseDto} from "./dto/case.dto";
@@ -31,6 +31,16 @@ export class CaseController {
     async queryCaseController(@Query('name')name: string) {
         return this.caseService.searchCaseByNameService(name);
     }
+
+    @OperateDesc('')
+    @ApiOperation({title: 'query count number case'})
+    @ApiResponse({status: 200, description: 'query count number success.'})
+    @Get('count')
+    @SetMetadata('isOpen', true)
+    async queryCaseCountNumberController() {
+        return this.caseService.getAllCaseCountService();
+    }
+
 
     @ApiOperation({title: 'query case'})
     @ApiResponse({status: 200, description: 'query case success.'})

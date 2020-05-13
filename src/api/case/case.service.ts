@@ -27,7 +27,7 @@ import {
     updateCase,
     findCaseUnionEndpoint,
     searchCaseByName,
-    batchUpdateCaseOfCatalogId, finCaseNamesByIds
+    batchUpdateCaseOfCatalogId, finCaseNamesByIds, findAllCaseCount
 } from "../../datasource/case/case.sql";
 import {findTokenById} from "../../datasource/token/token.sql";
 import {TokenEntity} from "../token/token.entity";
@@ -178,10 +178,25 @@ export class CaseService {
         return await updateCase(this.caseRepository, caseObj, updateCaseDto.id);
     }
 
+    /**
+     * 通过名称搜索用例
+     * @param name 
+     */
     async searchCaseByNameService(name: string) {
         return await searchCaseByName(this.caseRepository, name);
     }
 
+
+    /**
+     * 获取用例总条数
+     */
+    async getAllCaseCountService() {
+        return await findAllCaseCount(this.caseRepository);
+    }
+
+    /**
+     * 联合查询用例和endpoint
+     */
     async unionFindAllEndpointService() {
         return await findCaseUnionEndpoint(this.caseRepository);
     }
