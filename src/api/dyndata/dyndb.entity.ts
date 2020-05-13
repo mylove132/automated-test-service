@@ -1,6 +1,5 @@
 import {Column, Entity, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { DynSqlEntity } from './dynsql.entity';
-import { type } from 'os';
 
 @Entity('dyn_db')
 export class DynDbEntity {

@@ -1,7 +1,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { Injectable, HttpService, HttpStatus } from '@nestjs/common';
 import { of, Observable } from 'rxjs';
-import { catchError, map, timeout } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { AxiosRequestConfig } from 'axios';
 import { mergeScan, last } from 'rxjs/operators';
 import { ConfigService } from '../../config/config.service';

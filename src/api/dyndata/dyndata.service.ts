@@ -7,7 +7,7 @@ import { findAllDynDb, findAllSqlByDbId, queryDbById, querySqlById, saveDb, save
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { CurlService } from '../curl/curl.service';
 import { CommonUtil } from 'src/utils/common.util';
-import { CreateSqlDto, UpdateSqlDto } from './dto/dyndata.dto';
+import { CreateSqlDto, UpdateSqlDto, DbIdsDto, SqlIdsDto } from './dto/dyndata.dto';
 
 export class DynDataService {
 
@@ -26,7 +26,8 @@ export class DynDataService {
      */
     async addDbService(dynDbEntity: DynDbEntity){
         dynDbEntity.dbPassword = CommonUtil.Encrypt(dynDbEntity.dbPassword, dynDbEntity.dbUsername);
-        await saveDb(this.dynDbRepository, dynDbEntity);
+        const result =  await saveDb(this.dynDbRepository, dynDbEntity);
+        return {id: result.id};
     }
 
     /**
@@ -39,8 +40,9 @@ export class DynDataService {
         sqlObj.sql = createSqlDto.sql;
         sqlObj.dynDb = await queryDbById(this.dynDbRepository, createSqlDto.dbId);
         const result = await saveSql(this.dynSqlRepository, sqlObj);
-        result.sqlAlias = `sqlAlias${result.id}`;
-        await updateSql(this.dynSqlRepository, result, result.id);
+        const sObj = new DynSqlEntity();
+        sObj.sqlAlias = `sqlAlias${result.id}`;
+        await updateSql(this.dynSqlRepository, sObj, result.id);
         return {id: result.id};
     }
 
@@ -57,16 +59,16 @@ export class DynDataService {
      * 删除数据库配置项
      * @param ids 
      */
-    async delDbService(ids: any){
-        return await deleteDb(this.dynDbRepository, ids);
+    async delDbService(dbIdsDto: DbIdsDto){
+        return await deleteDb(this.dynDbRepository, dbIdsDto.ids);
     }
 
      /**
      * 删除数据库配置项
      * @param ids 
      */
-    async delSqlService(ids: any){
-        return await deleteSql(this.dynSqlRepository, ids);
+    async delSqlService(sqlIdsDto: SqlIdsDto){
+        return await deleteSql(this.dynSqlRepository, sqlIdsDto.ids);
     }
     
 

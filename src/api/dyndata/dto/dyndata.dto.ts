@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty, IsOptional, IsArray } from "class-validator";
 import { Optional } from "@nestjs/common";
 
 /**
@@ -56,4 +56,16 @@ export class UpdateSqlDto {
     @Optional()
     readonly name: string;
 
+}
+
+export class DbIdsDto{
+
+    @IsArray()
+    ids: number[];
+}
+
+export class SqlIdsDto{
+
+    @IsArray()
+    ids: number[];
 }

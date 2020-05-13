@@ -113,9 +113,9 @@ export const updateSql = async (dynSqlEntityRepository: Repository<DynSqlEntity>
  * @param id
  */
 export const findAllDynDb = async (dynDbEntityRepository: Repository<DynDbEntity>) => {
-    return dynDbEntityRepository.createQueryBuilder().where(
-        'isRealDelete = :isRealDelete', {isRealDelete: false}
-    ).orderBy('updateData', 'DESC');
+    return dynDbEntityRepository.createQueryBuilder('db').where(
+        'db.isRealDelete = :isRealDelete', {isRealDelete: false}
+    ).orderBy('db.updateDate', 'DESC');
 };
 
 /**
@@ -132,7 +132,7 @@ export const findAllSqlByDbId = async (dynSqlEntityRepository: Repository<DynSql
             }
             qb.where('dynSql.isRealDelete = :isRealDelete', {isRealDelete: false});
         }
-    ).orderBy('dynSql.updateData', 'DESC');
+    ).orderBy('dynSql.updateDate', 'DESC');
 };
 
 /**
@@ -159,6 +159,24 @@ export const querySqlById = async (dynSqlEntityRepository: Repository<DynSqlEnti
     return await dynSqlEntityRepository.createQueryBuilder('sqlEntity').
     leftJoinAndSelect('sqlEntity.dynDb', 'dynDb').
     where('sqlEntity.id = :id', { id: sqlId }).
+    getOne().
+        catch(
+            err => {
+                console.log(err);
+                throw new ApiException(err, ApiErrorCode.RUN_SQL_EXCEPTION, HttpStatus.OK);
+            }
+        )
+}
+
+/**
+ * 通过别名查找sql
+ * @param dynSqlEntityRepository 
+ * @param alias 
+ */
+export const querySqlByAlias = async (dynSqlEntityRepository: Repository<DynSqlEntity>, alias: string) => {
+    return await dynSqlEntityRepository.createQueryBuilder('sqlEntity').
+    leftJoinAndSelect('sqlEntity.dynDb', 'dynDb').
+    where('sqlEntity.sqlAlias = :sqlAlias', { sqlAlias: alias }).
     getOne().
         catch(
             err => {

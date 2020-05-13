@@ -17,3 +17,4 @@ ALTER TABLE "dyn_sql" ADD CONSTRAINT "UQ_2f17cefbea486efe5b3482334bd" UNIQUE ("s
 ALTER TABLE "dyn_sql" ADD "name" character varying NOT NULL;
 ALTER TABLE "dyn_sql" ADD "isRealDelete" boolean NOT NULL DEFAULT false;
 ALTER TABLE "dyn_db" ADD "isRealDelete" boolean NOT NULL DEFAULT false;
+ALTER TABLE "dyn_sql" ALTER COLUMN "resultFields" DROP NOT NULL;

@@ -24,6 +24,8 @@ import {
 import { ParamType } from "../../config/base.enum";
 import { CommonUtil } from "../../utils/common.util";
 import { Logger } from "../../utils/log4js";
+import { DynSqlEntity } from "../dyndata/dynsql.entity";
+import { querySqlByAlias } from "src/datasource/dyndata/dyndata.sql";
 
 
 @Injectable()
@@ -33,6 +35,8 @@ export class RunService {
     private readonly caseRepository: Repository<CaseEntity>,
     @InjectRepository(TokenEntity)
     private readonly tokenRepository: Repository<TokenEntity>,
+    @InjectRepository(DynSqlEntity)
+    private readonly dynSqlEntityRepository: Repository<DynSqlEntity>,
     private readonly curlService: CurlService,
     private readonly historyService: HistoryService,
     private readonly envService: EnvService,
@@ -232,7 +236,7 @@ export class RunService {
    * @param param
    * @param endpoint
    */
-  private async analysisParam(param, endpoint) {
+  private async analysisParam(param, endpoint: string) {
     const paramReg = /\{\{(.+?)\}\}/g;
     var regex2 = /\[(.+?)\]/g;
     for (let paramsKey in param) {
@@ -264,7 +268,6 @@ export class RunService {
             param[paramsKey] = CommonUtil.randomChar(6);
           }
         }
-
         //匹配参数中的级联调用
         else if (regData.startsWith("alias") != -1) {
           const regData = value.toString().replace(paramReg, "$1");
@@ -284,6 +287,13 @@ export class RunService {
           const paramValue = getAssertObjectValue(this.tmpResult[alias], newVal);
           Logger.info(`执行中保存的别名：${alias}, 执行脚本返回的数据：${paramValue})`);
           param[paramsKey] = paramValue;
+        }
+        // 匹配参数中的数据库语句
+        else if (regData.startsWith("sqlAlias") != -1) {
+          const sqlObj = await querySqlByAlias(this.dynSqlEntityRepository, regData.split('.')[0]);
+          const execSqlResult = await this.curlService.query(sqlObj);
+          const field = CommonUtil.getFiledFromResult(regData.split('.')[1], execSqlResult);
+          param[paramsKey] = field;
         }
       }
     }

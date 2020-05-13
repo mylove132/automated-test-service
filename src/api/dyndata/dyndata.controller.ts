@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common"
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
 import { DynDataService } from "./dyndata.service";
 import { DynDbEntity } from "./dyndb.entity";
-import { CreateSqlDto, UpdateSqlDto } from "./dto/dyndata.dto";
+import { CreateSqlDto, UpdateSqlDto, DbIdsDto, SqlIdsDto } from "./dto/dyndata.dto";
 
 
 @ApiBearerAuth()
@@ -64,22 +64,22 @@ export class DynDataController {
     @ApiOperation({ title: 'del db' })
     @ApiResponse({ status: 200, description: 'del db success.'})
     @Delete('')
-    async delDbController(@Body() ids: any){
-        return await this.dynDataService.delDbService(ids);
+    async delDbController(@Body() dbIdsDto: DbIdsDto){
+        return await this.dynDataService.delDbService(dbIdsDto);
     }
 
     @ApiOperation({ title: 'del sql' })
     @ApiResponse({ status: 200, description: 'del sql success.'})
     @Delete('sql')
-    async delSqlController(@Body() ids: any){
-        return await this.dynDataService.delSqlService(ids);
+    async delSqlController(@Body() SqlIdsDto: SqlIdsDto){
+        return await this.dynDataService.delSqlService(SqlIdsDto);
     }
 
     @ApiOperation({ title: 'del sql' })
     @ApiResponse({ status: 200, description: 'del sql success.'})
-    @Get('sql/runSql')
+    @Get('sql/exec')
     async runSqlController(@Query('dbId') dbId: number, @Query('sql') sql: string){
-        return await this.dynDataService.runSqlService(dbId, sql);
+        return await this.dynDataService.runSqlService(dbId, sql)
     }
   
 }
