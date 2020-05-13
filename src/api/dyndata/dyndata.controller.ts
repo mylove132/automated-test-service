@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Post, Put, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiUseTags } from "@nestjs/swagger";
 import { DynDataService } from "./dyndata.service";
+import { DynDbEntity } from "./dyndb.entity";
+import { CreateSqlDto, UpdateSqlDto } from "./dto/dyndata.dto";
 
 
 @ApiBearerAuth()
@@ -22,6 +24,62 @@ export class DynDataController {
     @Get('sql')
     async queryAllSqlController(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('dbId') dbId?: number) {
         return this.dynDataService.getAllSqlByDbIdService(dbId, {page, limit});
+    }
+
+    @ApiOperation({ title: 'run sql by sqlId' })
+    @ApiResponse({ status: 200, description: 'run sql by sqlId success.'})
+    @Get('query')
+    async querySqlController(@Query('sqlId') sqlId: number){
+        return await this.dynDataService.queryDataByDbIdAndSqlIdService(sqlId);
+    }
+
+    @ApiOperation({ title: 'add db' })
+    @ApiResponse({ status: 200, description: 'add db success.'})
+    @Post('')
+    async addDbController(@Body() dbEntity: DynDbEntity){
+        return await this.dynDataService.addDbService(dbEntity);
+    }
+
+    @ApiOperation({ title: 'update db' })
+    @ApiResponse({ status: 200, description: 'update db success.'})
+    @Put('')
+    async updateDbController(@Body() dbEntity: DynDbEntity){
+        return await this.dynDataService.updateDbService(dbEntity);
+    }
+
+    @ApiOperation({ title: 'add db' })
+    @ApiResponse({ status: 200, description: 'add db success.'})
+    @Post('sql')
+    async addSqlController(@Body() createSqlDto: CreateSqlDto){
+        return await this.dynDataService.addSqlService(createSqlDto);
+    }
+
+    @ApiOperation({ title: 'update sql' })
+    @ApiResponse({ status: 200, description: 'update sql success.'})
+    @Put('sql')
+    async updateSqlController(@Body() updateSqlDto: UpdateSqlDto){
+        return await this.dynDataService.updateSqlService(updateSqlDto);
+    }
+
+    @ApiOperation({ title: 'del db' })
+    @ApiResponse({ status: 200, description: 'del db success.'})
+    @Delete('')
+    async delDbController(@Body() ids: any){
+        return await this.dynDataService.delDbService(ids);
+    }
+
+    @ApiOperation({ title: 'del sql' })
+    @ApiResponse({ status: 200, description: 'del sql success.'})
+    @Delete('sql')
+    async delSqlController(@Body() ids: any){
+        return await this.dynDataService.delSqlService(ids);
+    }
+
+    @ApiOperation({ title: 'del sql' })
+    @ApiResponse({ status: 200, description: 'del sql success.'})
+    @Get('sql/runSql')
+    async runSqlController(@Query('dbId') dbId: number, @Query('sql') sql: string){
+        return await this.dynDataService.runSqlService(dbId, sql);
     }
   
 }

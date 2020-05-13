@@ -13,7 +13,6 @@ import {HistoryEntity} from '../history/history.entity';
 import {EndpointEntity} from '../env/endpoint.entity';
 import {AssertJudgeEntity, AssertTypeEntity} from "./assert.entity";
 import {TokenEntity} from "../token/token.entity";
-import {JmeterEntity} from "../jmeter/jmeter.entity";
 
 @Unique(['alias'])
 @Entity('case')

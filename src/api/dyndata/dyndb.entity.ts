@@ -32,5 +32,6 @@ export class DynDbEntity {
     @OneToMany(type => DynSqlEntity, dynSqls => dynSqls.dynDb)
     dynSqls: DynSqlEntity[];
 
-    
+    @Column({default: false})
+    isRealDelete: boolean;
 }

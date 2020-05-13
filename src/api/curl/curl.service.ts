@@ -8,8 +8,6 @@ import { ConfigService } from '../../config/config.service';
 import { Logger } from '../../utils/log4js';
 import { DynDbEntity } from '../dyndata/dyndb.entity';
 import * as mysql from 'mysql';
-import { ApiException } from 'src/shared/exceptions/api.exception';
-import { ApiErrorCode } from 'src/shared/enums/api.error.code';
 import { DynSqlEntity } from '../dyndata/dynsql.entity';
 import { CommonUtil } from 'src/utils/common.util';
 
@@ -18,12 +16,12 @@ export class CurlService {
 	constructor(
 		private httpService: HttpService,
 		private configService: ConfigService
-		) { }
+	) { }
 	/**
 	 * 向钉钉群发送消息
 	 *@param {message} : text钉钉消息
 	 */
-	 sendDingTalkMessage(message: string) {
+	sendDingTalkMessage(message: string) {
 		const token = this.configService.dingtalkAccessToken;
 		const env = this.configService.env === 'production' ? '生产' : '测试';
 		Logger.info(`发送钉钉消息环境：${env}, 发送钉钉消息：${message}`);
@@ -97,19 +95,18 @@ export class CurlService {
 
 
 	/**
-	 * 连接mysql数据库
+	 * mysql连接池配置
 	 * @param dynDbEbtity 
 	 */
-	private connectDb(dynDbEbtity: DynDbEntity) {
-		let connect = mysql.createConnection({
+	private createDbPool(dynDbEbtity: DynDbEntity) {
+		let pool = mysql.createPool({
 			database: dynDbEbtity.dbName,
 			host: dynDbEbtity.dbHost,
 			port: dynDbEbtity.dbPort,
 			user: dynDbEbtity.dbUsername,
-			password: dynDbEbtity.dbPassword
+			password: CommonUtil.Decrypt(dynDbEbtity.dbPassword, dynDbEbtity.dbUsername)
 		});
-		connect.connect();
-		return connect;
+		return pool;
 	}
 
 	/**
@@ -117,25 +114,68 @@ export class CurlService {
 	 * @param dynDbEbtity 
 	 * @param sql 
 	 */
-	query(dynDbEbtity: DynDbEntity, dynSqlEntity: DynSqlEntity) {
-		const connection = this.connectDb(dynDbEbtity);
-		connection.query(dynSqlEntity.sql, (error, results, fields) => {
-			if (error) {
-				throw new ApiException(`查询数据：${dynDbEbtity.dbName}, sql: ${dynSqlEntity.sql} 失败`, ApiErrorCode.QUERY_MYSQL_FAIL, HttpStatus.BAD_REQUEST);
-			}
-			Logger.info(`查询sql[${dynSqlEntity.sql}]结果：${results}`);
-			let result: any = [];
-			let fieldList: any = [];
-			if (dynSqlEntity.resultFields.indexOf(',') != -1) {
-				fieldList = dynSqlEntity.resultFields.split(',');
-			}else {
-				fieldList.push(dynSqlEntity.resultFields);
-			}
-			for (const iterator of fieldList) {
-				const fd = CommonUtil.getFiledFromResult(iterator, results);
-				result.push(iterator, fd);
-			}
-			return result;
+	query(dynSqlEntity: DynSqlEntity) {
+		// const connection = this.connectDb(dynDbEbtity);
+		// let result: any = {};
+		//  connection.query(dynSqlEntity.sql, (error, results, fields) => {
+		// 	if (error) {
+		// 		throw new ApiException(`查询数据：${dynDbEbtity.dbName}, sql: ${dynSqlEntity.sql} 失败`, ApiErrorCode.QUERY_MYSQL_FAIL, HttpStatus.BAD_REQUEST);
+		// 	}
+		// 	Logger.info(`查询sql[${dynSqlEntity.sql}]结果：${JSON.stringify(results)}`);
+
+		// 	let fieldList: any = [];
+		// 	if (dynSqlEntity.resultFields.indexOf(',') != -1) {
+		// 		fieldList = dynSqlEntity.resultFields.split(',');
+		// 	}else {
+		// 		fieldList.push(dynSqlEntity.resultFields);
+		// 	}
+		// 	for (const iterator of fieldList) {
+		// 		const fd = CommonUtil.getFiledFromResult(iterator, results);
+		// 		result[iterator] = fd;
+		// 	}
+		// });
+		// console.log(`----------${JSON.stringify(result)}`)
+		// return result;
+		return new Promise((resolve, reject) => {
+			this.createDbPool(dynSqlEntity.dynDb).getConnection((error, connection) => {
+				if (error) {
+					reject(error);
+				} else {
+					connection.query(dynSqlEntity.sql, (err, row) => {
+						if (err) {
+							reject(err)
+						} else {
+							resolve(row);
+						}
+						connection.release();
+					});
+				}
+			});
+		});
+
+	}
+
+	/**
+	 * 执行sql语句
+	 * @param dynDbENtity 
+	 * @param sql 
+	 */
+	runSql(dynDbENtity: DynDbEntity, sql: string) {
+		return new Promise((resolve, reject) => {
+			this.createDbPool(dynDbENtity).getConnection((error, connection) => {
+				if (error) {
+					reject(error);
+				} else {
+					connection.query(sql, (err, row) => {
+						if (err) {
+							reject(err)
+						} else {
+							resolve(row);
+						}
+						connection.release();
+					});
+				}
+			});
 		});
 	}
 }

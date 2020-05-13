@@ -1,15 +1,19 @@
-import {Column, Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
+import {Column, Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, Unique} from 'typeorm';
 import { type } from 'os';
 import { DynDbEntity } from './dyndb.entity';
 
+@Unique(['sqlAlias'])
 @Entity('dyn_sql')
 export class DynSqlEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({comment: 'sql语句'})
+    @Column('text', {comment: 'sql语句', nullable: true})
     sql: string;
+
+    @Column()
+    name: string;
 
     @CreateDateColumn()
     createDate: Date;
@@ -23,4 +27,9 @@ export class DynSqlEntity {
     @ManyToOne(type => DynDbEntity, dynDb => dynDb.dynSqls )
     dynDb: DynDbEntity;
 
+    @Column({nullable: true, comment:'sql别名'})
+    sqlAlias: string;
+
+    @Column({default: false})
+    isRealDelete: boolean;
 }
