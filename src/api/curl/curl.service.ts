@@ -9,7 +9,7 @@ import { Logger } from '../../utils/log4js';
 import { DynDbEntity } from '../dyndata/dyndb.entity';
 import * as mysql from 'mysql';
 import { DynSqlEntity } from '../dyndata/dynsql.entity';
-import { CommonUtil } from 'src/utils/common.util';
+import { CommonUtil } from '../../utils/common.util';
 
 @Injectable()
 export class CurlService {

@@ -18,3 +18,5 @@ ALTER TABLE "dyn_sql" ADD "name" character varying NOT NULL;
 ALTER TABLE "dyn_sql" ADD "isRealDelete" boolean NOT NULL DEFAULT false;
 ALTER TABLE "dyn_db" ADD "isRealDelete" boolean NOT NULL DEFAULT false;
 ALTER TABLE "dyn_sql" ALTER COLUMN "resultFields" DROP NOT NULL;
+
+ALTER TABLE "jmeter" ADD "name" character varying;

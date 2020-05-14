@@ -11,3 +11,4 @@ ALTER TABLE "secheduler_catalogs_catalog" ADD CONSTRAINT "FK_c8170a590fb4460220c
 ALTER TABLE "secheduler_catalogs_catalog" ADD CONSTRAINT "FK_0b156f1316d0acaaf7310fc61b1" FOREIGN KEY ("catalogId") REFERENCES "catalog"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "jmeter_result" ADD "md5" character varying NOT NULL;
 ALTER TABLE "jmeter_result" ADD CONSTRAINT "UQ_6251fb638bf86ca80458c302844" UNIQUE ("md5");
+
