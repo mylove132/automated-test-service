@@ -1,7 +1,6 @@
 import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Binary, ManyToOne, ManyToMany} from 'typeorm';
 import {JmeterResultEntity} from "./jmeter_result.entity";
 import { SchedulerEntity } from '../task/scheduler.entity';
-import { type } from 'os';
 
 @Entity('jmeter')
 export class JmeterEntity {
