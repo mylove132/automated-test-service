@@ -5571,6 +5571,115 @@ dbName						|string		|R			|数据库名称
 }
 ```
 
+
+### 13.1 查询所有的sql语句
+- **接口说明：** 查询所有的sql
+- **请求方式：** GET
+- **接口地址：** /api/db/sql
+#### 13.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+
+
+请求示例：
+
+```
+/api/db/sql
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "items": [
+            {
+                "id": 6,
+                "sql": "SELECT app_ver FROM app_version WHERE id=1;",
+                "name": "查询app_ver",
+                "createDate": "2020-05-13T06:34:33.370Z",
+                "updateDate": "2020-05-13T06:34:33.616Z",
+                "resultFields": null,
+                "sqlAlias": "sqlAlias6",
+                "isRealDelete": false
+            }
+        ],
+        "itemCount": 1,
+        "totalItems": 1,
+        "pageCount": 1,
+        "next": "",
+        "previous": ""
+    }
+}
+```
+
+### 14.1 查询项目所有平台接口数据
+- **接口说明：** 查询项目所有接口数
+- **请求方式：** GET
+- **接口地址：** /api/catalog/interface/count
+#### 14.1.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+
+
+请求示例：
+
+```
+/api/catalog/interface/count
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": [
+        {
+            "platformName": "自动化测试平台",
+            "catalogCount": 75,
+            "interfaceCount": 282
+        },
+        {
+            "platformName": "CRM平台",
+            "catalogCount": 1,
+            "interfaceCount": 1
+        }
+    ]
+}
+```
+
+
+### 14.0 查询项目所有接口数
+- **接口说明：** 查询项目所有接口数
+- **请求方式：** GET
+- **接口地址：** /api/case/count
+#### 14.0.1 请求参数
+  
+参数名称						|类型		|出现要求	|描述  
+:----						|:---		|:------	|:---	
+
+
+请求示例：
+
+```
+/api/case/count
+```
+返回结果
+
+```
+{
+    "code": 0,
+    "msg": "success",
+    "data": 284
+}
+```
+
+
+
+
 响应码	|说明  
 :----	|:---
 0		|处理成功

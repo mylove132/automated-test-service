@@ -216,4 +216,11 @@ export class ConfigService {
       }
     }
   }
+
+  getRedisConfig() {
+    return {
+      redis_host: this.redisHost,
+      redis_port: this.redisPort
+    }
+  }
 }

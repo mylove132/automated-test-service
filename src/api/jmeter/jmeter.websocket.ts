@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { ConfigService } from "../../config/config.service";
-import { exec, execSync } from 'child_process';
+import { exec } from 'child_process';
 import { Server } from 'socket.io';
 import { findJmeterById, saveJmeterResult } from '../../datasource/jmeter/jmeter.sql';
 import { InjectRepository } from '@nestjs/typeorm';

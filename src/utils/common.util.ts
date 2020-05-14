@@ -3,6 +3,9 @@ import { Md5 } from "ts-md5";
 import { ConfigService } from "../config/config.service";
 import * as os from 'os';
 import * as crypto from 'crypto';
+import * as redis from 'redis';
+import { HttpException, HttpStatus } from "@nestjs/common";
+
 export class CommonUtil {
 
   private static iv = '1012132405963708';
@@ -180,4 +183,50 @@ export class CommonUtil {
     return dec;
   }
 
+  private static connectionRedis(){
+    const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
+    const redisConfig = config.getRedisConfig();
+    const client = redis.createClient(Number(redisConfig.redis_port), redisConfig.redis_host);
+    client.on("error",  (err) => {
+      throw new HttpException(`连接redis配置异常：${JSON.stringify(redisConfig)}`,HttpStatus.BAD_REQUEST);
+  });
+  return client;
+  }
+
+
+  /**
+   * 设置redis值
+   * @param key 
+   * @param value 
+   * @param expires（seconds） 
+   */
+  static setRedisItem(key: string, value: any, expires?: number) {
+    const client = this.connectionRedis();
+    client.set(key, value);
+    if (expires) {
+      client.expire(key, expires);
+    }
+  }
+
+  /**
+   * 获取redis某个值
+   * @param key 
+   */
+  static async getRedisItem(key: string) {
+    const client = this.connectionRedis();
+    return new Promise((resolve, reject) => {
+      client.get(key, (err, val) => {
+          if(err) {
+              reject(err)
+          }
+          resolve(val);
+      })
+  });
+  }
+
+  static async rmRedisItem(key: string) {
+    const client = this.connectionRedis();
+    client.move(key, 0);
+  }
 }
+
