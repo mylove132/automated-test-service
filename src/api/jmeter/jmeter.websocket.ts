@@ -31,6 +31,7 @@ export class JmeterGateway {
         const jmeterBinPath = this.config.jmeterBinPath;
         const jmeterJtlPath = this.config.jmeterJtlPath;
         const jmeterLogPath = this.config.jmeterLogPath;
+        const jmeterHtmlPath = this.config.jmeterHtmlPath;
 
         const jmeter = await findJmeterById(this.jmeterRepository, data.id);
         const jmeterCountNum = jmeter.preCountNumber;
@@ -44,12 +45,13 @@ export class JmeterGateway {
         const tmpJmxtFilePath = '/tmp/' + md5 + '.jmx';
         const tmpJtlFilePath = jmeterJtlPath + '/' + md5 + '.jtl';
         const tmpLogFilePath = jmeterLogPath + '/' + md5 + '.log';
+        const tmpHtmlPath = jmeterHtmlPath + '/' + md5;
         //下载文件
         const ds = await this.httpService.get(jmeter.url).toPromise();
         fs.writeFileSync(tmpJmxtFilePath, ds.data);
 
         //构建命令行
-        const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address}`;
+        const cmd = `${jmeterBinPath} -n -t ${tmpJmxtFilePath} -Jconcurrent_number=${jmeterCountNum} -Jduration=${preCountTime} -Jcycles=${loopNum} -j ${tmpLogFilePath} -l ${tmpJtlFilePath} ${remote_address} -e -o ${tmpHtmlPath}`;
         Logger.info(`压测脚本命令行：${cmd}`)
         //执行命令行
         const child = exec(cmd, { killSignal: "SIGINT" }, async (error, stdout, stderr) => {
