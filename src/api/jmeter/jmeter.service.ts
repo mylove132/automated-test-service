@@ -123,7 +123,7 @@ export class JmeterService {
             const cmd = `${jmeterBinPath} -g ${jmeterJtlPath}/${md5}.jtl -o ${jmeterHtmlPath}/${md5}`;
             execSync(cmd);
         }
-        return {url: `${jmeterResultUrl}/html/${md5}/index.html`};
+        return {url: `${jmeterResultUrl}/${md5}/index.html`};
     }
 
 
