@@ -220,7 +220,8 @@ export class ConfigService {
   getRedisConfig() {
     return {
       redis_host: this.redisHost,
-      redis_port: this.redisPort
+      redis_port: this.redisPort,
+      redis_password: this.redisPassword
     }
   }
 }

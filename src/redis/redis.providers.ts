@@ -7,13 +7,13 @@ const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
 export const redisProviders: Provider[] = [
   {
     useFactory: (): Redis => {
-      return new IORedis({host: config.getRedisConfig().redis_host, port: Number(config.getRedisConfig().redis_port)});
+      return new IORedis({host: config.getRedisConfig().redis_host, port: Number(config.getRedisConfig().redis_port), password: config.getRedisConfig().redis_password});
     },
     provide: REDIS_SUBSCRIBER_CLIENT,
   },
   {
     useFactory: (): Redis => {
-      return new IORedis({host: config.getRedisConfig().redis_host, port: Number(config.getRedisConfig().redis_port)});
+      return new IORedis({host: config.getRedisConfig().redis_host, port: Number(config.getRedisConfig().redis_port), password: config.getRedisConfig().redis_password});
     },
     provide: REDIS_PUBLISHER_CLIENT,
   },
