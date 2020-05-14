@@ -3,7 +3,7 @@ import { ConfigService } from '../config/config.service';
 const redis = require('socket.io-redis');
 
 const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
-const redisAdapter = redis({ host: config.getRedisConfig().redis_host, port: config.getRedisConfig().redis_host });
+const redisAdapter = redis({ host: config.getRedisConfig().redis_host, port: config.getRedisConfig().redis_host, password: config.getRedisConfig().redis_password});
 
 export class RedisIoAdapter extends IoAdapter {
   createIOServer(port: number, options?: any): any {
