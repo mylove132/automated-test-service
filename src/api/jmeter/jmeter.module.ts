@@ -3,13 +3,13 @@ import {JmeterController} from './jmeter.controller';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {JmeterService} from "./jmeter.service";
 import {JmeterEntity} from "./jmeter.entity";
-import { JmeterGateway } from './jmeter.websocket';
 import { JmeterResultEntity } from './jmeter_result.entity';
+import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([JmeterEntity, JmeterResultEntity])],
     controllers: [JmeterController],
-    providers: [JmeterService, JmeterGateway],
+    providers: [JmeterService],
 })
 export class JmeterModule {
 }

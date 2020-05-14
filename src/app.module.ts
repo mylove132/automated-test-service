@@ -22,6 +22,7 @@ import {HttpExceptionFilter} from "./shared/filters/http-exception.filter";
 import {AllExceptionsFilter} from "./shared/filters/any-exception.filter";
 import {RequestIdGuard} from "./shared/guard/requestId.guard";
 import { DynDataModule } from './api/dyndata/dyndata.module';
+import { SocketModule } from './socket/socket.module';
 
 const Orm = (): DynamicModule => {
     console.log('连接数据库中....');
@@ -43,7 +44,8 @@ const modules = [
     SchedulerModule,
     TokenModule,
     OperateModule,
-    DynDataModule
+    DynDataModule,
+    SocketModule
 ];
 
 const provides = [

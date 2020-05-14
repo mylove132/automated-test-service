@@ -5,6 +5,7 @@ import {ConfigService} from "./config/config.service";
 import * as express from 'express';
 import {ValidationPipe} from './shared/pipes/validation.pipe';
 import {Logger} from "./utils/log4js";
+import { RedisIoAdapter } from './socket/socket.adapter';
 
 
 async function bootstrap() {
@@ -12,6 +13,8 @@ async function bootstrap() {
   const app = await NestFactory.create(ApplicationModule, {cors: true});
   app.use(express.json()); // For parsing application/json
   app.useGlobalPipes(new ValidationPipe());
+
+  app.useWebSocketAdapter(new RedisIoAdapter(app));
   // 使用拦截器打印出参
   // app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');
