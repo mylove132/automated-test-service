@@ -111,17 +111,11 @@ export class JmeterService {
      * @param md5 
      */
     async findResultService(md5: string){
-        const jmeterBinPath = this.config.jmeterBinPath;
-        const jmeterJtlPath = this.config.jmeterJtlPath;
         const jmeterResultUrl = this.config.jmeterResultUrl;
         const jmeterHtmlPath = this.config.jmeterHtmlPath;
 
-        if (!fs.existsSync(jmeterJtlPath+`/${md5}.jtl`)){
-            throw new ApiException(`${md5}.jtl文件不存在,请确认脚本是否执行完毕。`,ApiErrorCode.JTL_FILE_UNEXIST, HttpStatus.BAD_REQUEST);
-        }
         if (!fs.existsSync(jmeterHtmlPath+`/${md5}`)){
-            const cmd = `${jmeterBinPath} -g ${jmeterJtlPath}/${md5}.jtl -o ${jmeterHtmlPath}/${md5}`;
-            execSync(cmd);
+            throw new ApiException(`${md5}文件夹不存在,请确认脚本是否执行成功。`,ApiErrorCode.JTL_FILE_UNEXIST, HttpStatus.BAD_REQUEST);
         }
         return {url: `${jmeterResultUrl}/${md5}/index.html`};
     }
