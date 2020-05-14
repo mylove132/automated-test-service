@@ -1,4 +1,4 @@
-import { PlatformCodeEntity } from "src/api/catalog/platformCode.entity";
+import { PlatformCodeEntity } from "../../api/catalog/platformCode.entity";
 import { Repository } from "typeorm";
 import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";

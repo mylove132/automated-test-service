@@ -25,7 +25,7 @@ import { ParamType } from "../../config/base.enum";
 import { CommonUtil } from "../../utils/common.util";
 import { Logger } from "../../utils/log4js";
 import { DynSqlEntity } from "../dyndata/dynsql.entity";
-import { querySqlByAlias } from "src/datasource/dyndata/dyndata.sql";
+import { querySqlByAlias } from "../../datasource/dyndata/dyndata.sql";
 
 
 @Injectable()

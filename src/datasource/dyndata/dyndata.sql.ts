@@ -1,8 +1,8 @@
 import { Repository } from "typeorm";
-import { DynDbEntity } from "src/api/dyndata/dyndb.entity";
-import { DynSqlEntity } from "src/api/dyndata/dynsql.entity";
-import { ApiException } from "src/shared/exceptions/api.exception";
-import { ApiErrorCode } from "src/shared/enums/api.error.code";
+import { DynDbEntity } from "../../api/dyndata/dyndb.entity";
+import { DynSqlEntity } from "../../api/dyndata/dynsql.entity";
+import { ApiException } from "../../shared/exceptions/api.exception";
+import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
 
 /**

@@ -3,7 +3,7 @@ import {ApiException} from "../../shared/exceptions/api.exception";
 import {ApiErrorCode} from "../../shared/enums/api.error.code";
 import {HttpStatus} from "@nestjs/common";
 import {JmeterEntity} from "../../api/jmeter/jmeter.entity";
-import { JmeterResultEntity } from "src/api/jmeter/jmeter_result.entity";
+import { JmeterResultEntity } from "../../api/jmeter/jmeter_result.entity";
 
 /**
  * 创建jmeter

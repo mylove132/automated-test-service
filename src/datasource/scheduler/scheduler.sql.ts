@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { SchedulerEntity } from "src/api/task/scheduler.entity";
+import { SchedulerEntity } from "../../api/task/scheduler.entity";
 import { ApiException } from "../../shared/exceptions/api.exception";
 import { ApiErrorCode } from "../../shared/enums/api.error.code";
 import { HttpStatus } from "@nestjs/common";
