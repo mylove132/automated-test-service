@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { KeyType, Redis } from 'ioredis';
+import { KeyType, Redis, ValueType } from 'ioredis';
 import { Observable, Observer } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
@@ -18,6 +18,7 @@ export interface IRedisSubscribeMessage {
 
 @Injectable()
 export class RedisService {
+  
   public constructor(
     @Inject(REDIS_SUBSCRIBER_CLIENT) private readonly subClient: Redis,
     @Inject(REDIS_PUBLISHER_CLIENT) private readonly pubClient: Redis
@@ -52,11 +53,15 @@ export class RedisService {
 
   public async get(key: KeyType) {
     const res = await this.pubClient.get(key);
-
     return await JSON.parse(res);
   }
 
   public async del(key: KeyType) {
     return await this.pubClient.del(key);
+  }
+
+  public async getAndSet(key: KeyType, value: ValueType){
+    const result = await this.pubClient.getset(key, value);
+    return result;
   }
 }

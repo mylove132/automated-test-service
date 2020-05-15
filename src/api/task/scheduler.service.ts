@@ -43,6 +43,7 @@ import { CurlService } from "../curl/curl.service";
 import { CronJob } from 'cron';
 import * as cronParser from 'cron-parser';
 import * as fs from 'fs';
+import { RedisService } from "../../redis/redis.service";
 
 export class SchedulerService {
 
@@ -63,6 +64,7 @@ export class SchedulerService {
         private readonly jmeterResultRepository: Repository<JmeterResultEntity>,
         private readonly curlService: CurlService,
         private httpService: HttpService,
+        private redisService: RedisService,
         private readonly runService: RunService) {
     }
 
@@ -374,6 +376,9 @@ export class SchedulerService {
 
         const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
         const job = new CronJob(cron, async () => {
+            if (await this.redisService.getAndSet(md5, '1') != null) {
+                return;
+            }
             let result = await this.runService.runCaseById(caseListDto);
             const taskResult = new TaskResultEntity();
             taskResult.result = JSON.stringify(result);
@@ -385,6 +390,7 @@ export class SchedulerService {
                 const config = new ConfigService(`env/${process.env.NODE_ENV}.env`);
                 this.curlService.sendDingTalkMessage(`${taskResult.scheduler.name}：` + config.taskResultUrl + saveResult.id);
             }
+            await this.redisService.del(md5);
         });
         this.schedulerRegistry.addCronJob(md5, job);
         job.start();
