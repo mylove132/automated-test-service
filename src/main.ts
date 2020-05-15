@@ -6,6 +6,8 @@ import * as express from 'express';
 import {ValidationPipe} from './shared/pipes/validation.pipe';
 import {Logger} from "./utils/log4js";
 import { RedisIoAdapter } from './socket/socket.adapter';
+import { Redis } from 'ioredis';
+import { REDIS_PUBLISHER_CLIENT, REDIS_SUBSCRIBER_CLIENT } from './redis/redis.constants';
 
 
 async function bootstrap() {
@@ -14,7 +16,10 @@ async function bootstrap() {
   app.use(express.json()); // For parsing application/json
   app.useGlobalPipes(new ValidationPipe());
 
-  app.useWebSocketAdapter(new RedisIoAdapter(app));
+  const pubClient: Redis = app.get(REDIS_PUBLISHER_CLIENT);
+  const subClient: Redis = app.get(REDIS_SUBSCRIBER_CLIENT);
+
+  app.useWebSocketAdapter(new RedisIoAdapter(app, subClient, pubClient));
   // 使用拦截器打印出参
   // app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');
