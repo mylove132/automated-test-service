@@ -12,7 +12,7 @@ import { TaskResultEntity } from "./task_result.entity";
 import {CatalogEntity} from "../catalog/catalog.entity";
 import { JmeterEntity } from '../jmeter/jmeter.entity';
 import { JmeterResultEntity } from '../jmeter/jmeter_result.entity';
-import { RedisModule } from 'src/redis/redis.module';
+import { RedisModule } from '../../redis/redis.module';
 
 
 @Module({
