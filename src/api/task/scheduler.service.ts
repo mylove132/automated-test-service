@@ -377,6 +377,7 @@ export class SchedulerService {
         const caseListDto = new RunCaseListDto(caseIds, envId, Executor.SCHEDULER);
         const job = new CronJob(cron, async () => {
             if (await this.redisService.getAndSet(md5, '1') != null) {
+                console.log(`定时任务已开始执行，当前机器不执行`)
                 return;
             }
             let result = await this.runService.runCaseById(caseListDto);
