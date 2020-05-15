@@ -12,10 +12,11 @@ import { TaskResultEntity } from "./task_result.entity";
 import {CatalogEntity} from "../catalog/catalog.entity";
 import { JmeterEntity } from '../jmeter/jmeter.entity';
 import { JmeterResultEntity } from '../jmeter/jmeter_result.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 
 @Module({
-    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity, CatalogEntity, JmeterEntity, JmeterResultEntity]),QueueModule, RunModule],
+    imports: [ TypeOrmModule.forFeature([SchedulerEntity,EnvEntity, CaseEntity, TaskResultEntity, CatalogEntity, JmeterEntity, JmeterResultEntity]),QueueModule, RunModule, RedisModule],
     providers: [SchedulerService],
     controllers: [
         SchedulerController
