@@ -407,6 +407,10 @@ export class SchedulerService {
     private async runJmeterTask(jmeterIds: number[], cron: string, md5: string) {
         console.info(`ids: ${jmeterIds}, cron: ${cron}, md5: ${md5}`)
         const job = new CronJob(cron, async () => {
+            if (await this.redisService.getAndSet(md5, '1') != null) {
+                console.log(`jmeter定时任务已开始执行，当前机器不执行`)
+                return;
+            }
             for (const iterator of jmeterIds) {
                 const jmeterBinPath = this.config.jmeterBinPath;
                 const jmeterJtlPath = this.config.jmeterJtlPath;
@@ -472,6 +476,7 @@ export class SchedulerService {
                 });
 
             }
+            await this.redisService.del(md5);
         }
         );
         this.schedulerRegistry.addCronJob(md5, job);
