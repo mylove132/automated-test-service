@@ -143,7 +143,7 @@ export const findJmeterResultList = (jmeterResultEntityRepository: Repository<Jm
  * @param jmeterResultEntityRepository 
  * @param jmeterId 
  */
-export const findJmeterResultListById = (jmeterResultEntityRepository: Repository<JmeterResultEntity>, jmeterId) => {
-    return jmeterResultEntityRepository.createQueryBuilder('jmeterResult').where('jmeterResult.jmeter = :jmeter',{jmeter: jmeterId})
+export const findJmeterResultListById = (jmeterResultEntityRepository: Repository<JmeterResultEntity>, jmeterIds: any) => {
+    return jmeterResultEntityRepository.createQueryBuilder('jmeterResult').where('jmeterResult.jmeter IN (:...jmeterId)',{jmeterId: jmeterIds})
     .orderBy('jmeterResult.createDate','DESC');
 };

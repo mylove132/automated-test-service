@@ -16,15 +16,13 @@ const redis = redisIoAdapter({
   subClient: this.subClient,
 })
 export class RedisIoAdapter extends IoAdapter {
-  
+
   constructor(app: INestApplication, private readonly subClient: Redis, private readonly pubClient: Redis) {
     super(app);
   }
   public createIOServer(port: number, options?: ServerOptions): Server {
     const server = super.createIOServer(port, options);
-    server.adapter(
-      redis
-    );
+    server.adapter(redis);
     return server;
   }
 }

@@ -1,7 +1,5 @@
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Logger } from '../utils/log4js';
-
-import { IClientQuery } from './socket.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JmeterEntity } from '../api/jmeter/jmeter.entity';
 import { Repository } from 'typeorm';
@@ -28,14 +26,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly jmeterResultRepository: Repository<JmeterResultEntity>,
         private httpService: HttpService, ) { }
 
-  private getClientQuery(client: io.Socket): IClientQuery {
-    return client.handshake.query as IClientQuery;
+  private getClientQuery(client: io.Socket) {
+    return client.handshake.query;
   }
 
   public async handleConnection(client: io.Socket) {
-    const { user_id } = this.getClientQuery(client);
-    Logger.info(`${user_id} - handleConnection`);
-    return this.server.emit('event', { connected: user_id });
+    const clinetInfo = this.getClientQuery(client);
+    Logger.info(`${JSON.stringify(clinetInfo)} - handleConnection`);
+    return this.server.emit('message', { connected: JSON.stringify(clinetInfo) });
   }
 
   @SubscribeMessage('jmeter')

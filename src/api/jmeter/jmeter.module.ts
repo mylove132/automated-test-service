@@ -4,7 +4,6 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {JmeterService} from "./jmeter.service";
 import {JmeterEntity} from "./jmeter.entity";
 import { JmeterResultEntity } from './jmeter_result.entity';
-import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([JmeterEntity, JmeterResultEntity])],

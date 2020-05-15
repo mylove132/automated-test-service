@@ -147,8 +147,8 @@ export class JmeterService {
      * @param id 
      * @param options 
      */
-    async queryJmeterResultListByJmeterIdService(jmeterId: number, options: IPaginationOptions) {
-        const queryBuilder = findJmeterResultListById(this.jmeterResultRepository, jmeterId);
+    async queryJmeterResultListByJmeterIdService(jmeterIdsDto: JmeterIdsDto, options: IPaginationOptions) {
+        const queryBuilder = findJmeterResultListById(this.jmeterResultRepository, jmeterIdsDto.ids);
         return await paginate<JmeterResultEntity>(queryBuilder, options);
     }
 

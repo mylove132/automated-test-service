@@ -55,11 +55,11 @@ export class JmeterController {
     return await this.jmeterService.queryJmeterResultListService(name, {page, limit});
   }
 
-  @Get('jmeterResultListByJmeterId')
+  @Post('jmeterResultListByJmeterIds')
   @SetMetadata('isOpen', true)
-  async queryJmeterResultListByJmeterIdController (@Query('jmeterId') jmeterId: number, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
+  async queryJmeterResultListByJmeterIdController (@Body() jmeterIdsDto: JmeterIdsDto, @Query('page') page: number = 0, @Query('limit') limit: number = 10){
     limit = limit > 100 ? 100 : limit;
-    return await this.jmeterService.queryJmeterResultListByJmeterIdService(jmeterId, {page, limit});
+    return await this.jmeterService.queryJmeterResultListByJmeterIdService(jmeterIdsDto, {page, limit});
   }
 
   @Get('watchLog')
